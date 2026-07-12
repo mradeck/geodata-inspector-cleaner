@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Lokale Inspektion und Bereinigung räumlicher Ausreißer in DXF- und GeoJSON-Dateien." />
+    <title>Geodata Inspector & Cleaner</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Geodata Inspector & Cleaner Startseite">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <span>
+            <strong>Geodata Inspector</strong>
+            <small>& Cleaner</small>
+          </span>
+        </a>
+        <div class="privacy-chip"><span></span> Lokal verarbeitet · kein Upload</div>
+        <nav class="top-actions" aria-label="Projektaktionen">
+          <button id="download-report" class="button button-quiet" disabled>Prüfbericht</button>
+          <a class="button button-quiet" href="./docs/PRODUCT-DESIGN.md" target="_blank">Konzept</a>
+        </nav>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar sidebar-left">
+          <section>
+            <p class="eyebrow">01 · Eingabe</p>
+            <h1>Geodaten prüfen, bevor sie den Workflow sprengen.</h1>
+            <p class="intro">Finde Planköpfe, Schnitte und Koordinaten-Ausreißer, die „Zoom all“ und räumliche Folgeprozesse unbrauchbar machen.</p>
+
+            <label id="drop-zone" class="drop-zone" for="file-input">
+              <input id="file-input" type="file" accept=".dxf,.geojson,.json,.dwg" hidden />
+              <span class="drop-icon" aria-hidden="true">↥</span>
+              <strong>DXF oder GeoJSON ablegen</strong>
+              <span>Datei auswählen · lokal analysiert</span>
+              <small>DWG: Roadmap / Vorabkonvertierung</small>
+            </label>
+            <button id="load-demo" class="button button-demo">Beispiel mit entferntem Plankopf öffnen</button>
+          </section>
+
+          <section class="settings-section">
+            <p class="eyebrow">02 · Analyse</p>
+            <label class="field-label" for="cluster-distance">
+              Cluster-Abstand
+              <span id="cluster-distance-value">1.000 m</span>
+            </label>
+            <input id="cluster-distance" type="range" min="50" max="5000" step="50" value="1000" />
+            <p class="field-help">Features innerhalb dieser Distanz werden transitiv zu räumlichen Gruppen verbunden. Der Wert entfernt nichts automatisch.</p>
+          </section>
+
+          <section id="file-facts" class="file-facts empty">
+            <p class="eyebrow">Datei-Inventar</p>
+            <p>Noch keine Datei geladen.</p>
+          </section>
+        </aside>
+
+        <section class="stage" aria-live="polite">
+          <div class="stage-heading">
+            <div>
+              <p class="eyebrow">Räumliche Diagnose</p>
+              <h2 id="stage-title">Bereit für die erste Datei</h2>
+            </div>
+            <div class="legend" aria-label="Legende">
+              <span><i class="legend-main"></i> Hauptbereich</span>
+              <span><i class="legend-remote"></i> entfernt / prüfen</span>
+              <span><i class="legend-selected"></i> ausgewählt</span>
+            </div>
+          </div>
+
+          <div id="empty-state" class="empty-stage">
+            <div class="coordinate-art" aria-hidden="true">
+              <span class="axis axis-x"></span>
+              <span class="axis axis-y"></span>
+              <span class="cluster-dot d1"></span>
+              <span class="cluster-dot d2"></span>
+              <span class="cluster-dot d3"></span>
+              <span class="outlier-dot"></span>
+            </div>
+            <h3>Die entscheidende Distanz sichtbar machen</h3>
+            <p>Gesamtausdehnung und wahrscheinlicher Projektbereich werden nebeneinander gerendert – damit entfernte Inhalte nicht einfach im Maßstab verschwinden.</p>
+          </div>
+
+          <div id="results" class="results" hidden>
+            <div class="metric-row">
+              <article class="metric-card"><span>Features</span><strong id="metric-features">–</strong><small id="metric-layers">–</small></article>
+              <article class="metric-card"><span>Cluster</span><strong id="metric-clusters">–</strong><small id="metric-dominance">–</small></article>
+              <article class="metric-card accent"><span>Extent-Faktor</span><strong id="metric-inflation">–</strong><small>Gesamt ÷ Fokus</small></article>
+              <article class="metric-card"><span>CRS</span><strong id="metric-crs">–</strong><small id="metric-crs-status">–</small></article>
+            </div>
+
+            <div class="preview-grid">
+              <article class="preview-card">
+                <header><div><span>Gesamtausdehnung</span><small id="overview-extent">–</small></div><b>ALL</b></header>
+                <canvas id="overview-canvas" aria-label="Vorschau der vollständigen Ausdehnung"></canvas>
+              </article>
+              <article class="preview-card">
+                <header><div><span>Empfohlener Fokus</span><small id="focus-extent">–</small></div><b>FOCUS</b></header>
+                <canvas id="focus-canvas" aria-label="Vorschau des Hauptbereichs"></canvas>
+              </article>
+            </div>
+
+            <div class="crs-strip">
+              <span class="crs-icon" aria-hidden="true">◎</span>
+              <div><strong id="crs-title">Koordinatensystem</strong><p id="crs-detail">–</p></div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="sidebar sidebar-right">
+          <section class="findings-heading">
+            <p class="eyebrow">03 · Befunde</p>
+            <h2>Was braucht Aufmerksamkeit?</h2>
+            <p>Empfehlungen sind markiert, Änderungen werden aber erst in einem späteren Cleaning-Schritt angewendet.</p>
+          </section>
+          <div id="findings" class="findings-list">
+            <div class="finding-placeholder">
+              <span>✓</span>
+              <p>Nach dem Import erscheinen hier räumliche Cluster, CRS-Hinweise und Importverluste.</p>
+            </div>
+          </div>
+          <div class="roadmap-card">
+            <span class="roadmap-label">Roadmap</span>
+            <strong>DWG ist kein einfacher zweiter Parser.</strong>
+            <p>Geplant ist zunächst lokale DWG→DXF-Konvertierung. LibreDWG, ODA und RealDWG werden getrennt nach Lizenz, Genauigkeit und Deployment bewertet.</p>
+            <a href="./docs/ADR-001-DWG-STRATEGY.md" target="_blank">Entscheidungsdokument öffnen →</a>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="statusbar">
+        <span id="status"><i></i> Bereit · Daten bleiben auf diesem Gerät</span>
+        <span>Designprototyp v0.1.0</span>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
