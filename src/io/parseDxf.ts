@@ -1,4 +1,4 @@
-import type { GeoDataset, GeoFeature, GeometryKind, ImportWarning, Position3 } from "../model";
+import type { GeoDataset, GeoFeature, GeoLayerMetadata, GeometryKind, ImportWarning, Position3 } from "../model";
 
 interface DxfGroup {
   code: number;
@@ -59,7 +59,73 @@ export function parseDxf(text: string, fileName: string): GeoDataset {
     features: state.features,
     declaredCrs: findDeclaredCrs(groups),
     warnings,
+    layerMetadata: parseLayerMetadata(groups, state.features),
   };
+}
+
+function parseLayerMetadata(groups: DxfGroup[], features: GeoFeature[]): GeoLayerMetadata[] {
+  const layers = new Map<string, GeoLayerMetadata>();
+  for (let index = 0; index < groups.length; index++) {
+    const marker = groups[index];
+    if (marker?.code !== 0 || marker.value.toUpperCase() !== "LAYER") continue;
+    const next = findNextMarker(groups, index + 1, groups.length);
+    const entries = groups.slice(index + 1, next);
+    const name = valueForCode(entries, 2)?.trim() || "0";
+    const rawAci = integerForCode(entries, 62) ?? 7;
+    const aciColor = Math.abs(rawAci);
+    const trueColor = integerForCode(entries, 420);
+    const flags = integerForCode(entries, 70) ?? 0;
+    layers.set(name, {
+      name,
+      color: trueColor === null ? aciToHex(aciColor) : trueColorToHex(trueColor),
+      aciColor,
+      trueColor,
+      lineType: valueForCode(entries, 6)?.trim() || "CONTINUOUS",
+      lineWeight: integerForCode(entries, 370),
+      flags,
+      isOff: rawAci < 0,
+      isFrozen: (flags & 1) === 1,
+      isLocked: (flags & 4) === 4,
+      isPlottable: (integerForCode(entries, 290) ?? 1) !== 0,
+    });
+    index = next - 1;
+  }
+
+  for (const name of new Set(features.map((feature) => feature.layer))) {
+    if (layers.has(name)) continue;
+    layers.set(name, defaultLayerMetadata(name));
+  }
+  return [...layers.values()]
+    .filter((layer) => features.some((feature) => feature.layer === layer.name))
+    .sort((left, right) => left.name.localeCompare(right.name, undefined, { numeric: true, sensitivity: "base" }));
+}
+
+function defaultLayerMetadata(name: string): GeoLayerMetadata {
+  return {
+    name,
+    color: "#ffffff",
+    aciColor: 7,
+    trueColor: null,
+    lineType: "CONTINUOUS",
+    lineWeight: null,
+    flags: 0,
+    isOff: false,
+    isFrozen: false,
+    isLocked: false,
+    isPlottable: true,
+  };
+}
+
+function trueColorToHex(value: number): string {
+  return `#${(value & 0xffffff).toString(16).padStart(6, "0")}`;
+}
+
+function aciToHex(aci: number): string {
+  const palette: Record<number, string> = {
+    1: "#ff0000", 2: "#ffff00", 3: "#00ff00", 4: "#00ffff",
+    5: "#0000ff", 6: "#ff00ff", 7: "#ffffff", 8: "#808080", 9: "#c0c0c0",
+  };
+  return palette[aci] ?? "#ffffff";
 }
 
 function parseGroups(text: string): DxfGroup[] {

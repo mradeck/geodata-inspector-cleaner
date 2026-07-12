@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2607.01.0`
-- **npm-kompatible Version:** `2607.1.0`
+- **Aktuelle Release-Version:** `2607.01.1`
+- **npm-kompatible Version:** `2607.1.1`
 - **Repository:** privates GitHub-Repository `mradeck/geodata-inspector-cleaner`
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md`
@@ -33,57 +33,65 @@ Beispiele:
 - `2607.02.0`: nächster Funktionsrelease im selben Monat.
 - `2608.01.0`: erster Funktionsrelease im Folgemonat.
 
-Ein Funktionsrelease erhöht `RR` und setzt `P` auf `0`. Ein enger Bugfix,
-Dokumentations- oder Packaging-Nachtrag ohne neue Hauptfunktion erhöht nur `P`.
-Beim Monatswechsel beginnt `RR` wieder mit `01`. Versionssprünge erfolgen nie
-automatisch, sondern nur auf ausdrücklichen Nutzerauftrag.
+`RR` bezeichnet eine bewusst eröffnete größere Release-Linie innerhalb des
+Monats und setzt `P` auf `0`. Innerhalb dieser Linie wird `P` nach jeder
+abgeschlossenen lokalen Feature-Runde und nach jedem abgeschlossenen Bugfix um
+eins erhöht. Mehrere zusammengehörige Änderungen in einem Nutzerauftrag zählen
+als eine Runde. Reine Analyse ohne Dateiänderung und noch nicht abgeschlossene
+Arbeit lösen keinen Versionssprung aus. Beim Monatswechsel beginnt `RR` wieder
+mit `01`.
 
 SemVer verbietet führende Nullen in numerischen Segmenten. Deshalb verwenden
-`package.json` und `package-lock.json` für `2607.01.0` die npm-kompatible Form
-`2607.1.0`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
-Berichte und Dokumentation verwenden die kanonische Form `2607.01.0`.
+`package.json` und `package-lock.json` für `2607.01.1` die npm-kompatible Form
+`2607.1.1`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
+Berichte und Dokumentation verwenden die kanonische Form `2607.01.1`.
 
 ## Versionierungs-, Dokumentations- und Push-Regel
 
-Versionssprünge, README-/Lernlog-/Dokumentationsupdates und Git-Pushes erfolgen
-**nur auf ausdrückliche Ansage des Nutzers**. Normale Implementierungs-,
-Recherche- oder Fehlerbehebungsaufgaben erhöhen die Version nicht automatisch.
+Jede vollständig umgesetzte und verifizierte Feature-Runde beziehungsweise jeder
+Bugfix erhöht die lokale Subversion `P` vor der Übergabe automatisch. Dabei
+werden `package.json`, `package-lock.json`, `displayVersion`, sichtbare
+Dev-Server-Version, Berichtsversion, README, Lernlog und Versionshistorie
+konsistent nachgezogen. So ist am lokalen Dev-Server unmittelbar erkennbar,
+welcher Arbeitsstand aktiv ist.
+
+Git-Commits, GitHub-Pushes und das Eröffnen einer neuen Release-Linie `RR`
+erfolgen weiterhin **nur auf ausdrückliche Ansage des Nutzers**.
 
 Wenn ein GitHub-Push, Release-Stand oder explizites Dokumentationsupdate
 beauftragt ist, sind Release-Stand und Dokumentation konsistent nachzuziehen.
 
-Pflichtschritte vor jedem Push:
+Pflichtschritte zum Abschluss jeder Feature-/Bugfix-Runde:
 
-1. **Versionsnummer erhöhen**
+1. **Subversion erhöhen**
    - kanonische Release-Version bestimmen,
    - `package.json` und `package-lock.json` npm-kompatibel aktualisieren,
    - `displayVersion`, sichtbare App-Version und Berichtsversion aktualisieren,
    - README, AGENTS und Versionshistorie konsistent halten.
-2. **README aktualisieren**
+2. **README und Lernlog aktualisieren**
    - neue/geänderte Funktionen,
    - relevante Bedienänderungen,
    - Datenschutz-, Daten- und Nutzerhinweise.
-3. **Lernlog aktualisieren**
-   - technische Erkenntnisse,
-   - Fehlerbilder und Ursachen,
-   - stabile Lösungen und bewusste Grenzen.
-4. **Projektkontext prüfen**
+3. **Projektkontext prüfen**
    - Version, Release-Stand, Arbeitsregeln und projektspezifische Fallstricke in
      `AGENTS.md` abgleichen.
-5. **Copyright-/Lizenzübersicht prüfen**
+4. **Copyright-/Lizenzübersicht prüfen**
    - `docs/COPYRIGHT-LICENSES.md` gegen `package.json`, `package-lock.json` und
      externe Dienste wie OpenStreetMap prüfen,
    - neue/entfernte Bibliotheken, Versionen, Lizenzen, Notices und
      Attributionspflichten aktualisieren,
    - Abhängigkeiten mit GPL, AGPL, Non-Commercial- oder unklaren Bedingungen
      ausdrücklich kennzeichnen und vor einer Veröffentlichung klären.
-6. **Verifizieren**
+5. **Verifizieren**
    - `npm run test`,
    - `npm run build`,
    - `npm audit`,
    - `git diff --check`,
    - Versionskonsistenz und Repository-Sichtbarkeit prüfen.
-7. **Bewusst committen und pushen**
+
+Zusätzliche Pflichtschritte nur bei ausdrücklich beauftragtem Push:
+
+6. **Bewusst committen und pushen**
    - nur den bestätigten Arbeitsumfang stagen,
    - aussagekräftigen Release-Commit erstellen,
    - den beauftragten Branch pushen,
@@ -91,7 +99,8 @@ Pflichtschritte vor jedem Push:
 
 Merksätze:
 
-- **Kein Versionssprung, Doku-Nachzug oder Git-Push ohne ausdrückliche Ansage.**
+- **Jede abgeschlossene Feature-/Bugfix-Runde endet mit einer lokal sichtbaren Patchversion.**
+- **Keine neue `RR`-Release-Linie und kein Git-Push ohne ausdrückliche Ansage.**
 - **Kein Push ohne Versionssprung und aktualisierte Kerndokumentation.**
 - **`push git` beziehungsweise `git push` meint den vollständigen
   Release-Ablauf einschließlich Lizenzcheck, Verifikation, Commit und Push.**
@@ -131,6 +140,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2607.01.1` | 2026-07-12 | CRS-gestützte Hauptbereichswahl, Karten für Haupt-/Störbereich, normalisierter Cleaner-Export auf Basis des Pointcloud-Manager-Exporters, Layer-/Objekttypfilter mit DXF-Metadaten, GeoJSON→DXF-Konvertierung, Inter-Typografie und lokal sichtbares Patch-Versioning. |
 | `2607.01.0` | 2026-07-12 | Erster main-Release mit lokalem DXF-/GeoJSON-Import, Cluster-/CRS-/Z-Analyse, drei Diagnosevorschauen, OSM-Geometrieüberlagerung, manueller Hauptbereichswahl, DE/EN-Umschaltung, lokalisierten Konzeptseiten und realen privaten Regressionsfixtures. |
 
 ## Entscheidungsdokumente

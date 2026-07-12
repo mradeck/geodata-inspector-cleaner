@@ -16,6 +16,11 @@ type DrawableCluster = MapClusterAssessment & {
   bounds: NonNullable<MapClusterAssessment["bounds"]>;
 };
 
+export interface OsmClusterRenderOptions {
+  visibleClusterIds?: ReadonlySet<string>;
+  initialClusterId?: string | null;
+}
+
 export class OsmClusterMap {
   private readonly map: L.Map;
   private readonly geometryLayers = L.layerGroup();
@@ -39,19 +44,21 @@ export class OsmClusterMap {
     this.markerLayers.addTo(this.map);
   }
 
-  render(report: ClusterMapReport, dataset: GeoDataset): void {
+  render(report: ClusterMapReport, dataset: GeoDataset, options: OsmClusterRenderOptions = {}): boolean {
     this.geometryLayers.clearLayers();
     this.boundaryLayers.clearLayers();
     this.markerLayers.clearLayers();
     this.clusterBounds.clear();
 
-    const drawable = report.clusters.filter(isDrawableCluster);
+    const drawable = report.clusters.filter((cluster): cluster is DrawableCluster =>
+      isDrawableCluster(cluster) && (!options.visibleClusterIds || options.visibleClusterIds.has(cluster.clusterId)),
+    );
     if (drawable.length === 0 || !report.sourceCrs) {
       this.removeTiles();
       this.map.setView([51, 10], 5, { animate: false });
       window.setTimeout(() => this.map.invalidateSize(), 0);
       this.localizeControls();
-      return;
+      return false;
     }
 
     this.ensureTiles();
@@ -86,13 +93,15 @@ export class OsmClusterMap {
       marker.bindTooltip(createTooltip(cluster), { direction: "top", offset: [0, -8] });
     }
 
-    const initial = drawable.find((cluster) => cluster.isPrimary && cluster.status === "mappable")
+    const initial = drawable.find((cluster) => cluster.clusterId === options.initialClusterId)
+      ?? drawable.find((cluster) => cluster.isPrimary && cluster.status === "mappable")
       ?? drawable.find((cluster) => cluster.status === "mappable")
       ?? drawable.find((cluster) => cluster.isPrimary)
       ?? drawable[0];
     if (initial) this.focusCluster(initial.clusterId);
     window.setTimeout(() => this.map.invalidateSize(), 0);
     this.localizeControls();
+    return true;
   }
 
   focusCluster(clusterId: string): boolean {

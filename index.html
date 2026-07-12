@@ -99,17 +99,25 @@
             <div class="preview-grid">
               <article class="preview-card">
                 <header><div><span data-i18n="preview.all">Gesamtausdehnung</span><small id="overview-extent">–</small></div><b>ALL</b></header>
-                <canvas id="overview-canvas" aria-label="Vorschau der vollständigen Ausdehnung" data-i18n-aria-label="preview.allAria"></canvas>
+                <div class="preview-visual">
+                  <canvas id="overview-canvas" aria-label="Vorschau der vollständigen Ausdehnung" data-i18n-aria-label="preview.allAria"></canvas>
+                </div>
                 <div id="overview-coordinate-range" class="preview-coordinate-range">XY-Koordinatenbereich: –</div>
               </article>
               <article class="preview-card">
                 <header><div><span id="focus-title" data-i18n="preview.focus">Empfohlener Fokus</span><small id="focus-extent">–</small></div><b>FOCUS</b></header>
-                <canvas id="focus-canvas" aria-label="Vorschau des Hauptbereichs" data-i18n-aria-label="preview.focusAria"></canvas>
+                <div id="focus-preview-visual" class="preview-visual map-backed-preview">
+                  <canvas id="focus-canvas" aria-label="Vorschau des Hauptbereichs" data-i18n-aria-label="preview.focusAria"></canvas>
+                  <div id="focus-osm-map" class="mini-osm-map" aria-label="OSM-Unterlage des Hauptbereichs" data-i18n-aria-label="preview.focusMapAria" aria-hidden="true" inert></div>
+                </div>
                 <div id="focus-coordinate-range" class="preview-coordinate-range">XY-Koordinatenbereich: –</div>
               </article>
               <article class="preview-card disturbance-preview-card">
                 <header><div><span data-i18n="preview.disturbance">Vermuteter Störbereich</span><small id="disturbance-extent">–</small></div><b id="disturbance-badge" data-i18n="preview.disturbanceReview">PRÜFEN</b></header>
-                <canvas id="disturbance-canvas" aria-label="Vorschau des vermuteten Störbereichs" data-i18n-aria-label="preview.disturbanceAria"></canvas>
+                <div id="disturbance-preview-visual" class="preview-visual map-backed-preview">
+                  <canvas id="disturbance-canvas" aria-label="Vorschau des vermuteten Störbereichs" data-i18n-aria-label="preview.disturbanceAria"></canvas>
+                  <div id="disturbance-osm-map" class="mini-osm-map" aria-label="OSM-Unterlage des vermuteten Störbereichs" data-i18n-aria-label="preview.disturbanceMapAria" aria-hidden="true" inert></div>
+                </div>
                 <div id="disturbance-coordinate-range" class="preview-coordinate-range">XY-Koordinatenbereich: –</div>
               </article>
             </div>
@@ -146,6 +154,31 @@
               </footer>
             </article>
 
+            <article class="object-filter-card" aria-labelledby="object-filter-title">
+              <header class="object-filter-header">
+                <div>
+                  <span id="object-filter-title" data-i18n="filter.title">Objekt- und Layerübersicht</span>
+                  <small data-i18n="filter.detail">Checkbox aktiv = im bereinigten Export behalten</small>
+                </div>
+                <b id="object-filter-summary">–</b>
+              </header>
+              <div class="object-filter-actions" aria-label="Filter-Sammelaktionen" data-i18n-aria-label="filter.actionsAria">
+                <button id="filter-points-off" class="button" type="button" data-i18n="filter.pointsOff">Alle Punkte cleanen</button>
+                <button id="filter-points-on" class="button" type="button" data-i18n="filter.pointsOn">Alle Punkte behalten</button>
+                <button id="filter-all-on" class="button" type="button" data-i18n="filter.allOn">Alles behalten</button>
+                <button id="filter-all-off" class="button" type="button" data-i18n="filter.allOff">Alles cleanen</button>
+              </div>
+              <div id="object-filter-confirmation" class="object-filter-confirmation">
+                <span id="object-filter-confirmation-text" data-i18n="filter.confirmHint">Vor dem Export muss der aktuelle Hauptbereich ausdrücklich bestätigt werden.</span>
+                <button id="filter-confirm-primary" class="button" type="button" data-i18n="filter.confirmPrimary">Aktuellen Hauptbereich bestätigen</button>
+              </div>
+              <div id="object-filter-table" class="object-filter-table"></div>
+              <footer class="object-filter-note">
+                <span>ⓘ</span>
+                <p data-i18n="filter.note">Die Auswahl verändert nicht die Quelldatei. Sie wird zusätzlich zur räumlichen Hauptbereichswahl auf die neue cleaned-Datei angewendet.</p>
+              </footer>
+            </article>
+
             <div class="crs-strip">
               <span class="crs-icon" aria-hidden="true">◎</span>
               <div><strong id="crs-title" data-i18n="crs.strip">Koordinatensystem</strong><p id="crs-detail">–</p></div>
@@ -157,7 +190,7 @@
           <section class="findings-heading">
             <p class="eyebrow" data-i18n="findings.eyebrow">03 · Befunde</p>
             <h2 data-i18n="findings.title">Was braucht Aufmerksamkeit?</h2>
-            <p data-i18n="findings.intro">Empfehlungen sind markiert, Änderungen werden aber erst in einem späteren Cleaning-Schritt angewendet.</p>
+            <p data-i18n="findings.intro">Empfehlungen sind markiert; entfernt wird erst nach manueller Bestätigung im Cleaner.</p>
           </section>
           <div id="findings" class="findings-list">
             <div class="finding-placeholder">
@@ -165,6 +198,17 @@
               <p data-i18n="findings.placeholder">Nach dem Import erscheinen hier räumliche Cluster, CRS-Hinweise und Importverluste.</p>
             </div>
           </div>
+          <section class="cleaner-card" aria-labelledby="cleaner-title">
+            <span class="cleaner-label" data-i18n="cleaner.label">04 · Cleaner</span>
+            <strong id="cleaner-title" data-i18n="cleaner.title">Bereinigte Datei speichern</strong>
+            <p id="cleaner-summary" data-i18n="cleaner.empty">Datei laden und den korrekten Hauptbereich auf der Karte bestätigen.</p>
+            <div class="cleaner-actions">
+              <button id="download-cleaned" class="button cleaner-button" type="button" disabled data-i18n="cleaner.download">Bereinigte Datei speichern</button>
+              <button id="download-geojson-as-dxf" class="button cleaner-button cleaner-convert-button" type="button" disabled hidden data-i18n="cleaner.convertDxf">Als DXF exportieren</button>
+            </div>
+            <small id="cleaner-conversion-note" hidden data-i18n="cleaner.conversionNote">Koordinaten bleiben unverändert; es erfolgt keine automatische Reprojektion.</small>
+            <small data-i18n="cleaner.normalized">Erzeugt eine neue normalisierte Datei; die Quelldatei bleibt unverändert.</small>
+          </section>
           <div class="roadmap-card">
             <span class="roadmap-label" data-i18n="roadmap.label">Roadmap</span>
             <strong data-i18n="roadmap.title">DWG ist kein einfacher zweiter Parser.</strong>
@@ -176,7 +220,7 @@
 
       <footer class="statusbar">
         <span id="status"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></span>
-        <span data-i18n="version.label">Version 2607.01.0</span>
+        <span data-i18n="version.label">Version 2607.01.1</span>
       </footer>
     </div>
     <script type="module" src="/src/main.ts"></script>

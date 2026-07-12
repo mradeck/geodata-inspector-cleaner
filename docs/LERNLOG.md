@@ -1,7 +1,62 @@
 # Lernlog
 
 Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
-Das Lernlog wird vor jedem beauftragten Git-Push aktualisiert.
+Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
+jedem beauftragten Git-Push aktualisiert.
+
+## 12. Juli 2026 – Subversion 2607.01.1
+
+### Lokale Versionen müssen den tatsächlich laufenden Stand kennzeichnen
+
+**Problem:** Mehrere abgeschlossene Feature-Runden liefen weiter unter
+`2607.01.0`. Auf dem lokalen Dev-Server war dadurch nicht erkennbar, ob bereits
+der neue Cleaner oder noch ein älterer Build aktiv war.
+
+**Stabile Regel:** Jede abgeschlossene und verifizierte Feature-Runde sowie jeder
+Bugfix erhöht `P` in `JJMM.RR.P`. Eine zusammengehörige Nutzeranforderung zählt
+als eine Runde; reine Analyse und unfertige Arbeit nicht. Commit, Push und das
+Eröffnen einer neuen `RR`-Linie bleiben davon getrennt und benötigen weiterhin
+einen ausdrücklichen Auftrag.
+
+**Technische Absicherung:** UI und Prüfbericht lesen `displayVersion` zentral aus
+`package.json`. Dadurch können sichtbare App-Version und Berichtsversion nicht
+mehr unabhängig von der Paketversion vergessen werden.
+
+### Bereinigte DXF besser neu erzeugen als strukturell zerschneiden
+
+**Erkenntnis:** Ein Herausschneiden einzelner Entity-Textbereiche kann veraltete
+Header-Extents, Layerverweise oder abhängige DXF-Strukturen zurücklassen.
+
+**Stabile Lösung:** Der Cleaner adaptiert den DXF-Exporter des
+Pointcloud-Managers und erzeugt eine normalisierte Datei mit neuen Extents,
+Einheiten, Layern, Farben und Cleaning-Protokoll. Ein Kontrollimport verifiziert
+Featurezahl, Einzelcluster und Ergebnis-Bounds vor dem Download. Das reale
+200-Feature-Referenz-DXF wird reproduzierbar auf den korrekten 99-Feature-Bereich
+reduziert.
+
+### Räumliches Cleaning und Objektfilter sind getrennte Entscheidungen
+
+**Erkenntnis:** Ein korrekt gewählter Projektbereich kann weiterhin redundante
+`POINT`-Objekte oder unerwünschte Layer enthalten.
+
+**Stabile Lösung:** Eine Matrix aus Layer und Geometrietyp übernimmt das Muster
+des Pointcloud-Managers. Einzelpunkte sind zunächst abgewählt; jede Kombination
+kann separat oder über Sammelaktionen geschaltet werden. Export und Protokoll
+unterscheiden räumlich entfernte Features von zusätzlich objektgefilterten
+Features. DXF-Farbe, ACI, Linientyp, Linienstärke und Statusflags werden für die
+Inspektion aus der Layer-Tabelle gelesen.
+
+### GeoJSON-zu-DXF darf keine Reprojektion vortäuschen
+
+**Problem:** GeoJSON kann sowohl projizierte Meterkoordinaten als auch
+geografische Gradwerte enthalten. Ein pauschales `$INSUNITS = 6` würde Gradwerte
+fälschlich als Meter deklarieren.
+
+**Stabile Lösung:** GeoJSON kann nach derselben Hauptbereichs- und Filterprüfung
+als DXF exportiert werden. Koordinaten bleiben unverändert. Deklarierte
+projizierte CRS werden metrisch ausgegeben; EPSG:4326, CRS84 und nicht deklarierte
+CRS werden als einheitenlos markiert und erhalten einen ausdrücklichen
+Keine-Reprojektion-Kommentar.
 
 ## 12. Juli 2026 – Release 2607.01.0
 

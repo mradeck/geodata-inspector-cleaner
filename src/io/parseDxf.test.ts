@@ -29,4 +29,27 @@ describe("parseDxf", () => {
 
     expect(parseDxf(dxf, "plan.dxf").declaredCrs).toBe("EPSG:25832");
   });
+
+  it("liest Farbe, Linientyp, Linienstärke und Statusflags der verwendeten Layer", () => {
+    const dxf = [
+      "0", "SECTION", "2", "TABLES", "0", "TABLE", "2", "LAYER",
+      "0", "LAYER", "2", "Vermessung", "70", "5", "62", "-3", "420", "3368601", "6", "DASHED", "370", "25", "290", "0",
+      "0", "ENDTAB", "0", "ENDSEC",
+      "0", "SECTION", "2", "ENTITIES", "0", "POINT", "8", "Vermessung", "10", "1", "20", "2", "0", "ENDSEC", "0", "EOF",
+    ].join("\n");
+
+    expect(parseDxf(dxf, "metadata.dxf").layerMetadata).toEqual([{
+      name: "Vermessung",
+      color: "#336699",
+      aciColor: 3,
+      trueColor: 3_368_601,
+      lineType: "DASHED",
+      lineWeight: 25,
+      flags: 5,
+      isOff: true,
+      isFrozen: true,
+      isLocked: true,
+      isPlottable: false,
+    }]);
+  });
 });

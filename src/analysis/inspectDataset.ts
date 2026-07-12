@@ -60,11 +60,13 @@ export function inspectDataset(
   const config: InspectionConfig = { ...DEFAULT_INSPECTION_CONFIG, ...overrides };
   const featureStatistics = collectFeatureStatistics(dataset, config);
   const clusters = buildClusters(featureStatistics, config.clusterDistanceMeters);
-  const manuallySelectedPrimary = options.preferredPrimaryFeatureId
+  const preferredPrimary = options.preferredPrimaryFeatureId
     ? clusters.find((cluster) => cluster.featureIds.includes(options.preferredPrimaryFeatureId!)) ?? null
     : null;
-  const primary = manuallySelectedPrimary ?? choosePrimaryCluster(clusters);
-  const primarySelection: "automatic" | "manual" = manuallySelectedPrimary ? "manual" : "automatic";
+  const primary = preferredPrimary ?? choosePrimaryCluster(clusters);
+  const primarySelection: "automatic" | "crs" | "manual" = preferredPrimary
+    ? options.preferredPrimarySource ?? "manual"
+    : "automatic";
 
   if (primary) {
     for (const cluster of clusters) {

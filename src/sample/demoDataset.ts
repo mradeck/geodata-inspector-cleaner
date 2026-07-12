@@ -53,6 +53,11 @@ export const demoDataset: GeoDataset = {
   format: "dxf",
   declaredCrs: "EPSG:25832",
   features,
+  layerMetadata: [
+    { name: "2D-Ergänzung", color: "#4da3ff", aciColor: 5, trueColor: 5_088_255, lineType: "DASHED", lineWeight: 18, flags: 0, isOff: false, isFrozen: false, isLocked: false, isPlottable: true },
+    { name: "Bestand", color: "#4de2b1", aciColor: 3, trueColor: 5_104_305, lineType: "CONTINUOUS", lineWeight: 25, flags: 0, isOff: false, isFrozen: false, isLocked: false, isPlottable: true },
+    { name: "Plankopf", color: "#ff647c", aciColor: 1, trueColor: 16_737_404, lineType: "CONTINUOUS", lineWeight: 35, flags: 4, isOff: false, isFrozen: false, isLocked: true, isPlottable: true },
+  ],
   warnings: [
     {
       code: "demo.approximation",

@@ -1,6 +1,6 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2607.01.0
+**Release:** 2607.01.1
 
 **Prüfstand:** 12. Juli 2026
 
@@ -85,7 +85,7 @@ DXF-, GeoJSON- oder andere Benutzerinhalte werden nicht als Markdown/HTML an
 `marked` übergeben. Sollte später fremdes Markdown unterstützt werden, ist vor
 der Aktivierung eine Sanitizing-Schicht verpflichtend.
 
-## Release-Prüfung 2607.01.0
+## Release-Prüfung 2607.01.1
 
 - direkte Abhängigkeiten gegen `package.json` und Lockfile abgeglichen,
 - vollständigen npm-Lizenzscan geprüft,

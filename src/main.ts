@@ -1,5 +1,16 @@
 import "./styles.css";
-import { inspectDataset } from "./analysis/inspectDataset";
+import { analyzeDataset } from "./analysis/analyzeDataset";
+import {
+  buildDefaultSelection,
+  countSelected,
+  FILTER_SHAPE_TYPES,
+  filterFeatures,
+  selectionKey,
+  summarizeLayers,
+  type FeatureFilterSelection,
+  type FilterShapeType,
+  type LayerObjectSummary,
+} from "./analysis/layerFilter";
 import { selectDisturbanceArea } from "./analysis/selectDisturbanceArea";
 import { median } from "./analysis/statistics";
 import { assessClustersForMap, type ClusterMapReport, type MapClusterAssessment } from "./geo/mapProjection";
@@ -14,10 +25,12 @@ import {
   t,
 } from "./i18n";
 import { readDataset } from "./io/readDataset";
+import { CleanerError, createCleanedExport } from "./io/exportCleaned";
 import type { Bounds2D, GeoDataset, InspectionFinding, InspectionReport } from "./model";
 import { renderPreview } from "./render/renderPreview";
 import { demoDataset } from "./sample/demoDataset";
 import { OsmClusterMap } from "./map/osmClusterMap";
+import { APP_VERSION } from "./version";
 
 const elements = {
   fileInput: byId<HTMLInputElement>("file-input"),
@@ -32,10 +45,27 @@ const elements = {
   findings: byId<HTMLElement>("findings"),
   status: byId<HTMLElement>("status"),
   downloadReport: byId<HTMLButtonElement>("download-report"),
+  downloadCleaned: byId<HTMLButtonElement>("download-cleaned"),
+  downloadGeoJsonAsDxf: byId<HTMLButtonElement>("download-geojson-as-dxf"),
+  cleanerConversionNote: byId<HTMLElement>("cleaner-conversion-note"),
+  cleanerSummary: byId<HTMLElement>("cleaner-summary"),
+  objectFilterTable: byId<HTMLElement>("object-filter-table"),
+  objectFilterSummary: byId<HTMLElement>("object-filter-summary"),
+  filterPointsOff: byId<HTMLButtonElement>("filter-points-off"),
+  filterPointsOn: byId<HTMLButtonElement>("filter-points-on"),
+  filterAllOn: byId<HTMLButtonElement>("filter-all-on"),
+  filterAllOff: byId<HTMLButtonElement>("filter-all-off"),
+  objectFilterConfirmation: byId<HTMLElement>("object-filter-confirmation"),
+  objectFilterConfirmationText: byId<HTMLElement>("object-filter-confirmation-text"),
+  filterConfirmPrimary: byId<HTMLButtonElement>("filter-confirm-primary"),
   conceptLink: byId<HTMLAnchorElement>("concept-link"),
   overviewCanvas: byId<HTMLCanvasElement>("overview-canvas"),
   focusCanvas: byId<HTMLCanvasElement>("focus-canvas"),
+  focusOsmMap: byId<HTMLElement>("focus-osm-map"),
+  focusPreviewVisual: byId<HTMLElement>("focus-preview-visual"),
   disturbanceCanvas: byId<HTMLCanvasElement>("disturbance-canvas"),
+  disturbanceOsmMap: byId<HTMLElement>("disturbance-osm-map"),
+  disturbancePreviewVisual: byId<HTMLElement>("disturbance-preview-visual"),
   disturbanceBadge: byId<HTMLElement>("disturbance-badge"),
   osmMap: byId<HTMLElement>("osm-map"),
   mapEmpty: byId<HTMLElement>("map-empty"),
@@ -50,6 +80,10 @@ let currentReport: InspectionReport | null = null;
 let highlightedIds = new Set<string>();
 let preferredPrimaryFeatureId: string | null = null;
 let osmClusterMap: OsmClusterMap | null = null;
+let focusOsmMap: OsmClusterMap | null = null;
+let disturbanceOsmMap: OsmClusterMap | null = null;
+let layerSummaries: LayerObjectSummary[] = [];
+let featureFilterSelection: FeatureFilterSelection = new Set();
 
 initI18n();
 syncLanguageControl();
@@ -90,9 +124,23 @@ elements.dropZone.addEventListener("drop", (event) => {
 
 elements.loadDemo.addEventListener("click", () => {
   currentDataset = demoDataset;
+  resetObjectFilter();
   highlightedIds.clear();
   preferredPrimaryFeatureId = null;
   analyzeAndRender(t("status.demoLoaded"));
+});
+
+elements.filterPointsOff.addEventListener("click", () => setObjectFilter("point", false));
+elements.filterPointsOn.addEventListener("click", () => setObjectFilter("point", true));
+elements.filterAllOn.addEventListener("click", () => setObjectFilter(null, true));
+elements.filterAllOff.addEventListener("click", () => setObjectFilter(null, false));
+elements.filterConfirmPrimary.addEventListener("click", () => {
+  const primary = currentReport?.clusters.find((cluster) => cluster.isPrimary);
+  preferredPrimaryFeatureId = primary?.featureIds[0] ?? null;
+  if (preferredPrimaryFeatureId) {
+    highlightedIds = new Set(primary?.featureIds ?? []);
+    analyzeAndRender(t("status.primarySelected"));
+  }
 });
 
 elements.clusterDistance.addEventListener("input", () => {
@@ -105,7 +153,7 @@ elements.downloadReport.addEventListener("click", () => {
   const serializable = {
     generatedAt: new Date().toISOString(),
     application: "geodata-inspector-cleaner",
-    version: "2607.01.0",
+    version: APP_VERSION,
     file: currentReport.dataset.fileName,
     format: currentReport.dataset.format,
     config: currentReport.config,
@@ -115,18 +163,55 @@ elements.downloadReport.addEventListener("click", () => {
     focusBounds: currentReport.focusBounds,
     extentInflationFactor: currentReport.extentInflationFactor,
     clusters: currentReport.clusters,
+    primaryClusterId: currentReport.primaryClusterId,
+    primarySelection: currentReport.primarySelection,
     findings: currentReport.findings.map((finding) => ({
       ...finding,
       ...localizeFinding(finding, currentReport!),
     })),
     recommendedRemovalIds: [...currentReport.recommendedRemovalIds],
+    objectFilter: {
+      selectedFeatureCount: countSelected(currentReport.dataset.features, featureFilterSelection),
+      totalFeatureCount: currentReport.dataset.features.length,
+      layers: layerSummaries.map((summary) => ({
+        layerName: summary.layerName,
+        metadata: summary.metadata,
+        counts: summary.counts,
+        selectedTypes: FILTER_SHAPE_TYPES.filter((type) =>
+          featureFilterSelection.has(selectionKey(summary.layerName, type)),
+        ),
+      })),
+    },
     warnings: currentReport.dataset.warnings.map((warning) => ({
       ...warning,
       message: localizeWarning(warning.code, warning.message),
     })),
   };
-  downloadText(`${baseName(currentReport.dataset.fileName)}-inspection-report.json`, JSON.stringify(serializable, null, 2));
+  downloadText(`${baseName(currentReport.dataset.fileName)}-inspection-report.json`, JSON.stringify(serializable, null, 2), "application/json;charset=utf-8");
 });
+
+elements.downloadCleaned.addEventListener("click", () => exportCurrentSelection());
+elements.downloadGeoJsonAsDxf.addEventListener("click", () => exportCurrentSelection("dxf", true));
+
+function exportCurrentSelection(outputFormat?: "dxf" | "geojson", allowUnchangedOutput = false): void {
+  if (!currentDataset || !currentReport) return;
+  try {
+    const cleaned = createCleanedExport(currentDataset, currentReport, {
+      featureFilterSelection,
+      outputFormat,
+      allowUnchangedOutput,
+    });
+    downloadText(cleaned.fileName, cleaned.content, cleaned.mimeType);
+    elements.cleanerSummary.textContent = t("cleaner.validated", {
+      kept: formatNumber(cleaned.keptFeatureCount),
+      removed: formatNumber(cleaned.removedFeatureCount),
+    });
+    setStatus(t("status.cleanedSaved", { file: cleaned.fileName }), "ok");
+  } catch (error) {
+    const message = error instanceof CleanerError ? t(`cleaner.error.${error.code}`) : t("cleaner.error.unknown");
+    setStatus(message, "error");
+  }
+}
 
 new ResizeObserver(() => renderCanvases()).observe(document.querySelector(".preview-grid") ?? document.body);
 
@@ -134,6 +219,7 @@ async function loadFile(file: File): Promise<void> {
   setStatus(t("status.reading", { file: file.name }), "working");
   try {
     currentDataset = await readDataset(file);
+    resetObjectFilter();
     highlightedIds.clear();
     preferredPrimaryFeatureId = null;
     analyzeAndRender(t("status.analyzed", { file: file.name }));
@@ -146,7 +232,7 @@ async function loadFile(file: File): Promise<void> {
 
 function analyzeAndRender(status: string): void {
   if (!currentDataset) return;
-  currentReport = inspectDataset(currentDataset, {
+  currentReport = analyzeDataset(currentDataset, {
     clusterDistanceMeters: Number(elements.clusterDistance.value),
   }, { preferredPrimaryFeatureId });
   renderDashboard(currentReport);
@@ -167,7 +253,9 @@ function renderDashboard(report: InspectionReport): void {
   setText("metric-dominance", primary
     ? report.primarySelection === "manual"
       ? t("metric.primaryManual", { count: formatNumber(primary.featureCount) })
-      : t("metric.primaryShare", { share: formatPercent(primary.featureCount / report.dataset.features.length) })
+      : report.primarySelection === "crs"
+        ? t("metric.primaryCrs", { count: formatNumber(primary.featureCount) })
+        : t("metric.primaryShare", { share: formatPercent(primary.featureCount / report.dataset.features.length) })
     : t("metric.noGeometry"));
   setText("metric-inflation", report.extentInflationFactor === null ? "–" : `${formatNumber(report.extentInflationFactor)}×`);
   setText("metric-crs", report.dataset.declaredCrs ?? (report.crs.status === "plausible" ? t("metric.candidate") : t("metric.unknown")));
@@ -176,9 +264,11 @@ function renderDashboard(report: InspectionReport): void {
   setText("overview-coordinate-range", formatCoordinateRange(report.fullBounds));
   setText("focus-title", report.primarySelection === "manual"
     ? t("preview.focusManual")
-    : report.primaryIsDominant
-      ? t("preview.focus")
-      : t("preview.focusAmbiguous"));
+    : report.primarySelection === "crs"
+      ? t("preview.focusCrs")
+      : report.primaryIsDominant
+        ? t("preview.focus")
+        : t("preview.focusAmbiguous"));
   setText("focus-extent", formatBoundsSize(report.focusBounds));
   setText("focus-coordinate-range", formatCoordinateRange(report.focusBounds));
   const disturbance = selectDisturbanceArea(report);
@@ -208,8 +298,192 @@ function renderDashboard(report: InspectionReport): void {
     </dl>`;
 
   renderFindings(report);
+  renderObjectFilter(report.dataset);
+  renderCleaner(report);
   renderMapSection(report);
   renderCanvases();
+}
+
+function resetObjectFilter(): void {
+  if (!currentDataset) {
+    layerSummaries = [];
+    featureFilterSelection = new Set();
+    return;
+  }
+  layerSummaries = summarizeLayers(currentDataset);
+  featureFilterSelection = buildDefaultSelection(layerSummaries);
+}
+
+function setObjectFilter(type: FilterShapeType | null, selected: boolean): void {
+  if (!currentDataset) return;
+  for (const summary of layerSummaries) {
+    for (const candidateType of FILTER_SHAPE_TYPES) {
+      if (type !== null && candidateType !== type) continue;
+      if (summary.counts[candidateType] === 0) continue;
+      const key = selectionKey(summary.layerName, candidateType);
+      if (selected) featureFilterSelection.add(key);
+      else featureFilterSelection.delete(key);
+    }
+  }
+  renderObjectFilter(currentDataset);
+  if (currentReport) renderCleaner(currentReport);
+  renderCanvases();
+  setStatus(t("status.objectFilterUpdated"), "ok");
+}
+
+function renderObjectFilter(dataset: GeoDataset): void {
+  const total = dataset.features.length;
+  const kept = countSelected(dataset.features, featureFilterSelection);
+  elements.objectFilterSummary.textContent = t("filter.summary", {
+    kept: formatNumber(kept),
+    total: formatNumber(total),
+  });
+  const primary = currentReport?.clusters.find((cluster) => cluster.isPrimary);
+  const confirmed = currentReport?.primarySelection === "manual";
+  elements.objectFilterConfirmation.classList.toggle("confirmed", confirmed);
+  elements.objectFilterConfirmationText.textContent = t(confirmed ? "filter.confirmed" : "filter.confirmHint");
+  elements.filterConfirmPrimary.hidden = confirmed;
+  elements.filterConfirmPrimary.disabled = !primary;
+  elements.objectFilterTable.replaceChildren();
+
+  const header = document.createElement("div");
+  header.className = "object-filter-row object-filter-row-head";
+  header.append(createFilterCell(t("filter.column.layer"), "object-filter-cell"));
+  for (const type of FILTER_SHAPE_TYPES) {
+    header.append(createFilterCell(filterTypeLabel(type), "object-filter-cell object-filter-cell-type"));
+  }
+  elements.objectFilterTable.append(header);
+
+  for (const summary of layerSummaries) {
+    const row = document.createElement("div");
+    row.className = "object-filter-row";
+    const layerCell = document.createElement("div");
+    layerCell.className = "object-filter-cell object-filter-layer";
+    const swatch = document.createElement("span");
+    swatch.className = "object-filter-swatch";
+    swatch.style.background = summary.metadata.color;
+    const name = document.createElement("span");
+    name.className = "object-filter-layer-name";
+    name.textContent = `${summary.layerName} · ${formatNumber(summary.total)}`;
+    name.title = summary.layerName;
+    const metadata = document.createElement("span");
+    metadata.className = "object-filter-metadata";
+    metadata.textContent = formatLayerMetadata(summary);
+    metadata.title = metadata.textContent;
+    layerCell.append(swatch, name, metadata);
+    row.append(layerCell);
+
+    for (const type of FILTER_SHAPE_TYPES) {
+      const cell = document.createElement("div");
+      cell.className = "object-filter-cell object-filter-cell-type";
+      const count = summary.counts[type];
+      if (count === 0) {
+        cell.classList.add("object-filter-empty");
+        cell.textContent = "–";
+      } else {
+        const key = selectionKey(summary.layerName, type);
+        const label = document.createElement("label");
+        label.className = "object-filter-check";
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.checked = featureFilterSelection.has(key);
+        input.setAttribute("aria-label", t("filter.keepAria", {
+          count: formatNumber(count),
+          type: filterTypeLabel(type),
+          layer: summary.layerName,
+        }));
+        input.addEventListener("change", () => {
+          if (input.checked) featureFilterSelection.add(key);
+          else featureFilterSelection.delete(key);
+          renderObjectFilter(dataset);
+          if (currentReport) renderCleaner(currentReport);
+          renderCanvases();
+          setStatus(t("status.objectFilterUpdated"), "ok");
+        });
+        const countLabel = document.createElement("span");
+        countLabel.textContent = formatNumber(count);
+        label.append(input, countLabel);
+        cell.append(label);
+      }
+      row.append(cell);
+    }
+    elements.objectFilterTable.append(row);
+  }
+}
+
+function createFilterCell(text: string, className: string): HTMLElement {
+  const cell = document.createElement("div");
+  cell.className = className;
+  cell.textContent = text;
+  return cell;
+}
+
+function filterTypeLabel(type: FilterShapeType): string {
+  return t(({
+    point: "filter.type.point",
+    line: "filter.type.line",
+    polyline: "filter.type.polyline",
+    area: "filter.type.area",
+  } as const)[type]);
+}
+
+function formatLayerMetadata(summary: LayerObjectSummary): string {
+  const metadata = summary.metadata;
+  const states = [
+    metadata.isOff ? t("filter.state.off") : null,
+    metadata.isFrozen ? t("filter.state.frozen") : null,
+    metadata.isLocked ? t("filter.state.locked") : null,
+    !metadata.isPlottable ? t("filter.state.noPlot") : null,
+  ].filter((state): state is string => state !== null);
+  const lineWeight = metadata.lineWeight !== null && metadata.lineWeight >= 0
+    ? t("filter.lineWeight.value", { value: formatNumber(metadata.lineWeight / 100, 2) })
+    : t("filter.lineWeight.default");
+  return t("filter.metadata", {
+    color: metadata.color.toUpperCase(),
+    aci: metadata.aciColor,
+    lineType: metadata.lineType,
+    lineWeight,
+    states: states.join(", ") || t("filter.state.normal"),
+  });
+}
+
+function renderCleaner(report: InspectionReport): void {
+  const primary = report.clusters.find((cluster) => cluster.isPrimary);
+  const primaryIds = new Set(primary?.featureIds ?? []);
+  const kept = filterFeatures(report.dataset.features, featureFilterSelection)
+    .filter((feature) => primaryIds.has(feature.id)).length;
+  const spatialRemoved = report.dataset.features.length - (primary?.featureCount ?? 0);
+  const objectFiltered = Math.max(0, (primary?.featureCount ?? 0) - kept);
+  const removed = Math.max(0, report.dataset.features.length - kept);
+  const canExport = report.primarySelection === "manual" && Boolean(primary) && kept > 0;
+  const isGeoJson = report.dataset.format === "geojson";
+  elements.downloadCleaned.textContent = t(report.dataset.format === "dxf" ? "cleaner.downloadDxf" : "cleaner.downloadGeoJson");
+  elements.downloadCleaned.disabled = !canExport || removed === 0;
+  elements.downloadGeoJsonAsDxf.hidden = !isGeoJson;
+  elements.downloadGeoJsonAsDxf.disabled = !canExport;
+  elements.cleanerConversionNote.hidden = !isGeoJson;
+
+  if (!primary) {
+    elements.cleanerSummary.textContent = t("cleaner.noPrimary");
+  } else if (kept === 0) {
+    elements.cleanerSummary.textContent = t("cleaner.nothingSelected");
+  } else if (report.primarySelection !== "manual") {
+    elements.cleanerSummary.textContent = t("cleaner.confirm", {
+      kept: formatNumber(kept),
+      removed: formatNumber(removed),
+    });
+  } else if (removed === 0) {
+    elements.cleanerSummary.textContent = t(isGeoJson ? "cleaner.conversionOnly" : "cleaner.nothingToRemove", {
+      kept: formatNumber(kept),
+    });
+  } else {
+    elements.cleanerSummary.textContent = t("cleaner.ready", {
+      kept: formatNumber(kept),
+      removed: formatNumber(removed),
+      spatial: formatNumber(spatialRemoved),
+      filtered: formatNumber(objectFiltered),
+    });
+  }
 }
 
 function renderMapSection(report: InspectionReport): void {
@@ -221,7 +495,38 @@ function renderMapSection(report: InspectionReport): void {
   elements.mapEmpty.hidden = drawable.length > 0;
   if (!osmClusterMap) osmClusterMap = new OsmClusterMap(elements.osmMap);
   osmClusterMap.render(mapReport, report.dataset);
+  renderDetailMaps(report, mapReport);
   renderMapCandidates(mapReport, report);
+}
+
+function renderDetailMaps(report: InspectionReport, mapReport: ClusterMapReport): void {
+  const primary = report.clusters.find((cluster) => cluster.isPrimary);
+  if (!focusOsmMap) focusOsmMap = new OsmClusterMap(elements.focusOsmMap);
+  const focusHasMap = primary
+    ? focusOsmMap.render(mapReport, report.dataset, {
+        visibleClusterIds: new Set([primary.id]),
+        initialClusterId: primary.id,
+      })
+    : false;
+  setDetailMapAvailability(elements.focusPreviewVisual, elements.focusOsmMap, focusHasMap);
+
+  const disturbance = selectDisturbanceArea(report);
+  const disturbanceClusterIds = new Set(report.clusters
+    .filter((cluster) => !cluster.isPrimary && cluster.featureIds.some((id) => disturbance?.featureIds.has(id)))
+    .map((cluster) => cluster.id));
+  if (!disturbanceOsmMap) disturbanceOsmMap = new OsmClusterMap(elements.disturbanceOsmMap);
+  const disturbanceHasMap = disturbanceClusterIds.size > 0 && disturbanceOsmMap.render(mapReport, report.dataset, {
+    visibleClusterIds: disturbanceClusterIds,
+    initialClusterId: disturbanceClusterIds.values().next().value ?? null,
+  });
+  setDetailMapAvailability(elements.disturbancePreviewVisual, elements.disturbanceOsmMap, disturbanceHasMap);
+}
+
+function setDetailMapAvailability(visual: HTMLElement, mapElement: HTMLElement, available: boolean): void {
+  visual.classList.toggle("has-osm", available);
+  mapElement.inert = !available;
+  if (available) mapElement.removeAttribute("aria-hidden");
+  else mapElement.setAttribute("aria-hidden", "true");
 }
 
 function renderMapCandidates(mapReport: ClusterMapReport, report: InspectionReport): void {
@@ -236,9 +541,11 @@ function renderMapCandidates(mapReport: ClusterMapReport, report: InspectionRepo
     heading.className = "map-candidate-title";
     const title = document.createElement("strong");
     const titleKey = cluster.isPrimary
-      ? report.primarySelection === "automatic" && !report.primaryIsDominant
-        ? "map.automaticCandidate"
-        : "map.currentPrimary"
+      ? report.primarySelection === "crs"
+        ? "map.crsCandidate"
+        : report.primarySelection === "automatic" && !report.primaryIsDominant
+          ? "map.automaticCandidate"
+          : "map.currentPrimary"
       : "map.cluster";
     title.textContent = t(titleKey, {
       count: formatNumber(cluster.featureCount),
@@ -262,11 +569,11 @@ function renderMapCandidates(mapReport: ClusterMapReport, report: InspectionRepo
       actions.append(show);
     }
 
-    if (candidate.status === "mappable" && !cluster.isPrimary) {
+    if (candidate.status === "mappable" && (!cluster.isPrimary || report.primarySelection !== "manual")) {
       const choose = document.createElement("button");
       choose.type = "button";
       choose.className = "button choose-primary";
-      choose.textContent = t("map.choosePrimary");
+      choose.textContent = t(cluster.isPrimary ? "map.confirmPrimary" : "map.choosePrimary");
       choose.addEventListener("click", () => {
         preferredPrimaryFeatureId = cluster.featureIds[0] ?? null;
         highlightedIds = new Set(cluster.featureIds);
@@ -326,6 +633,8 @@ function renderFindings(report: InspectionReport): void {
 function renderCanvases(): void {
   if (!currentDataset || !currentReport || elements.results.hidden) return;
   const primaryIds = new Set(currentReport.clusters.find((cluster) => cluster.isPrimary)?.featureIds ?? []);
+  const selectedIds = new Set(filterFeatures(currentDataset.features, featureFilterSelection).map((feature) => feature.id));
+  const filteredPrimaryIds = new Set([...primaryIds].filter((id) => selectedIds.has(id)));
   renderPreview(elements.overviewCanvas, currentDataset, currentReport, {
     bounds: currentReport.fullBounds,
     highlightedFeatureIds: highlightedIds,
@@ -333,7 +642,7 @@ function renderCanvases(): void {
   });
   renderPreview(elements.focusCanvas, currentDataset, currentReport, {
     bounds: currentReport.focusBounds,
-    visibleFeatureIds: primaryIds,
+    visibleFeatureIds: filteredPrimaryIds,
     highlightedFeatureIds: highlightedIds,
   });
   const disturbance = selectDisturbanceArea(currentReport);
@@ -562,8 +871,8 @@ function baseName(fileName: string): string {
   return fileName.replace(/^.*[\\/]/, "").replace(/\.[^.]+$/, "");
 }
 
-function downloadText(fileName: string, content: string): void {
-  const url = URL.createObjectURL(new Blob([content], { type: "application/json" }));
+function downloadText(fileName: string, content: string, mimeType: string): void {
+  const url = URL.createObjectURL(new Blob([content], { type: mimeType }));
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = fileName;
