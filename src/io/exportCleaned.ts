@@ -1,6 +1,7 @@
 import { inspectDataset } from "../analysis/inspectDataset";
 import { classifyFeature, filterFeatures, type FeatureFilterSelection } from "../analysis/layerFilter";
 import type { Bounds2D, GeoDataset, GeoFeature, GeoLayerMetadata, InspectionReport, Position3, SourceFormat } from "../model";
+import { exportNormalizedDxf, type DxfAcadVersion } from "./dxfNormalizedExporter";
 import { parseDxf } from "./parseDxf";
 import { parseGeoJson } from "./parseGeoJson";
 
@@ -49,6 +50,8 @@ export interface CleanedExportOptions {
   outputFormat?: SourceFormat;
   /** Erlaubt eine reine Formatkonvertierung, auch wenn kein Feature entfernt wird. */
   allowUnchangedOutput?: boolean;
+  /** DXF-Zielformat; AC1015 bleibt der OEM-kompatible Default. */
+  acadVersion?: DxfAcadVersion;
 }
 
 /**
@@ -100,6 +103,7 @@ export function createCleanedExport(
         audit,
         dataset.layerMetadata,
         dataset.format === "geojson" ? inferGeoJsonDxfUnits(dataset.declaredCrs) : 6,
+        options.acadVersion,
       )
     : exportFeaturesAsGeoJson(keptFeatures, dataset.declaredCrs, audit);
   const reparsed = outputFormat === "dxf"
@@ -126,111 +130,33 @@ export function exportFeaturesAsDxf(
   audit?: CleaningAudit,
   layerMetadata?: GeoLayerMetadata[],
   insUnits = 6,
+  acadVersion: DxfAcadVersion = "AC1015",
 ): string {
-  const chunks: string[] = [];
-  const extent = bounds3D(features);
-  const layerNames = [...new Set(features.map((feature) => sanitizeLayerName(feature.layer)))];
-  if (!layerNames.includes("0")) layerNames.unshift("0");
-  const colorByLayer = new Map((layerMetadata ?? []).map((metadata) => [sanitizeLayerName(metadata.name), metadata.color]));
-
-  pushPair(chunks, 0, "SECTION");
-  pushPair(chunks, 2, "HEADER");
-  pushPair(chunks, 9, "$ACADVER");
-  pushPair(chunks, 1, "AC1015");
-  pushPair(chunks, 9, "$INSUNITS");
-  pushPair(chunks, 70, insUnits);
-  writeExtent(chunks, "$EXTMIN", extent.min);
-  writeExtent(chunks, "$EXTMAX", extent.max);
-  pushPair(chunks, 999, "Normalized by geodata-inspector-cleaner using the Pointcloud Manager DXF export strategy");
-  if (coordinateSystemLabel) pushPair(chunks, 999, `CRS ${coordinateSystemLabel}`);
+  const comments = [
+    "Normalized by geodata-inspector-cleaner using the Pointcloud Manager DXF export strategy",
+    `DXF target format: ${acadVersion}`,
+  ];
   if (audit) {
-    pushPair(chunks, 999, `Cleaner source: ${audit.sourceFile}`);
-    pushPair(chunks, 999, `Cleaner retained features: ${audit.keptFeatureCount}`);
-    pushPair(chunks, 999, `Cleaner removed features: ${audit.removedFeatureCount}`);
-    pushPair(chunks, 999, `Cleaner spatially removed features: ${audit.spatialRemovedFeatureCount}`);
-    pushPair(chunks, 999, `Cleaner object-filter removed features: ${audit.filterRemovedFeatureCount}`);
-    pushPair(chunks, 999, `Cleaner confirmed main bounds: ${formatBounds(audit.primaryBounds)}`);
-    pushPair(chunks, 999, `Cleaner output bounds: ${formatBounds(audit.outputBounds)}`);
-    pushPair(chunks, 999, `Cleaner format conversion: ${audit.sourceFormat} -> ${audit.outputFormat}`);
-    for (const entry of audit.filterRemovedByLayerAndType) pushPair(chunks, 999, `Cleaner object filter: ${entry}`);
+    comments.push(
+      `Cleaner source: ${audit.sourceFile}`,
+      `Cleaner retained features: ${audit.keptFeatureCount}`,
+      `Cleaner removed features: ${audit.removedFeatureCount}`,
+      `Cleaner spatially removed features: ${audit.spatialRemovedFeatureCount}`,
+      `Cleaner object-filter removed features: ${audit.filterRemovedFeatureCount}`,
+      `Cleaner confirmed main bounds: ${formatBounds(audit.primaryBounds)}`,
+      `Cleaner output bounds: ${formatBounds(audit.outputBounds)}`,
+      `Cleaner format conversion: ${audit.sourceFormat} -> ${audit.outputFormat}`,
+      ...audit.filterRemovedByLayerAndType.map((entry) => `Cleaner object filter: ${entry}`),
+    );
   }
-  if (insUnits === 0) pushPair(chunks, 999, "Coordinate values preserved without reprojection; DXF units are Unitless");
-  pushPair(chunks, 0, "ENDSEC");
-
-  pushPair(chunks, 0, "SECTION");
-  pushPair(chunks, 2, "TABLES");
-  pushPair(chunks, 0, "TABLE");
-  pushPair(chunks, 2, "LAYER");
-  pushPair(chunks, 70, layerNames.length);
-  layerNames.forEach((name, index) => writeLayer(chunks, name, colorByLayer.get(name) ?? layerColor(index)));
-  pushPair(chunks, 0, "ENDTAB");
-  pushPair(chunks, 0, "ENDSEC");
-
-  pushPair(chunks, 0, "SECTION");
-  pushPair(chunks, 2, "ENTITIES");
-  features.forEach((feature) => writeFeature(chunks, feature, layerNames, colorByLayer));
-  pushPair(chunks, 0, "ENDSEC");
-  pushPair(chunks, 0, "EOF");
-  return `${chunks.join("\n")}\n`;
-}
-
-function writeExtent(chunks: string[], name: string, point: Position3): void {
-  pushPair(chunks, 9, name);
-  pushPair(chunks, 10, point.x);
-  pushPair(chunks, 20, point.y);
-  pushPair(chunks, 30, point.z);
-}
-
-function writeLayer(chunks: string[], name: string, color: string): void {
-  pushPair(chunks, 0, "LAYER");
-  pushPair(chunks, 2, name);
-  pushPair(chunks, 70, 0);
-  pushPair(chunks, 62, rgbToAci(color));
-  pushPair(chunks, 420, hexToTrueColor(color));
-  pushPair(chunks, 6, "CONTINUOUS");
-}
-
-function writeFeature(
-  chunks: string[],
-  feature: GeoFeature,
-  layerNames: string[],
-  colorByLayer: Map<string, string>,
-): void {
-  const layerName = sanitizeLayerName(feature.layer);
-  const layerIndex = Math.max(0, layerNames.indexOf(layerName));
-  const trueColor = hexToTrueColor(colorByLayer.get(layerName) ?? layerColor(layerIndex));
-  const points = dedupeClosing(feature.points);
-
-  if (feature.kind === "point" || feature.kind === "anchor" || points.length === 1) {
-    const point = points[0];
-    if (!point) return;
-    pushPair(chunks, 0, "POINT");
-    pushPair(chunks, 8, layerName);
-    pushPair(chunks, 420, trueColor);
-    pushPoint(chunks, point);
-    return;
-  }
-
-  const closed = feature.kind === "polygon";
-  pushPair(chunks, 0, "POLYLINE");
-  pushPair(chunks, 8, layerName);
-  pushPair(chunks, 66, 1);
-  pushPair(chunks, 70, closed ? 9 : 8);
-  pushPair(chunks, 420, trueColor);
-  for (const point of points) {
-    pushPair(chunks, 0, "VERTEX");
-    pushPair(chunks, 8, layerName);
-    pushPair(chunks, 70, 32);
-    pushPoint(chunks, point);
-  }
-  pushPair(chunks, 0, "SEQEND");
-  pushPair(chunks, 8, layerName);
-}
-
-function pushPoint(chunks: string[], point: Position3): void {
-  pushPair(chunks, 10, point.x);
-  pushPair(chunks, 20, point.y);
-  pushPair(chunks, 30, point.z);
+  if (insUnits === 0) comments.push("Coordinate values preserved without reprojection; DXF units are Unitless");
+  return exportNormalizedDxf(features, {
+    acadVersion,
+    insUnits: insUnits === 6 ? 6 : 0,
+    coordinateSystemLabel,
+    comments,
+    layerMetadata,
+  });
 }
 
 function exportFeaturesAsGeoJson(features: GeoFeature[], declaredCrs: string | null, audit: CleaningAudit): string {
@@ -291,22 +217,6 @@ function sameBounds(left: Bounds2D, right: Bounds2D): boolean {
     Math.abs(left.maxY - right.maxY) <= tolerance;
 }
 
-function bounds3D(features: GeoFeature[]): { min: Position3; max: Position3 } {
-  const points = features.flatMap((feature) => feature.points);
-  return {
-    min: {
-      x: Math.min(...points.map((point) => point.x)),
-      y: Math.min(...points.map((point) => point.y)),
-      z: Math.min(...points.map((point) => point.z)),
-    },
-    max: {
-      x: Math.max(...points.map((point) => point.x)),
-      y: Math.max(...points.map((point) => point.y)),
-      z: Math.max(...points.map((point) => point.z)),
-    },
-  };
-}
-
 function bounds2D(features: GeoFeature[]): Bounds2D {
   const points = features.flatMap((feature) => feature.points);
   return {
@@ -333,44 +243,6 @@ function dedupeClosing(points: Position3[]): Position3[] {
   const first = points[0];
   const last = points.at(-1);
   return first && last && first.x === last.x && first.y === last.y && first.z === last.z ? points.slice(0, -1) : points;
-}
-
-function layerColor(index: number): string {
-  const colors = ["#ffffff", "#4de2b1", "#4da3ff", "#ffd166", "#ff647c", "#b78cff", "#55d6d0"];
-  return colors[index % colors.length] ?? "#ffffff";
-}
-
-function pushPair(chunks: string[], code: number, value: string | number): void {
-  chunks.push(String(code), String(value));
-}
-
-function sanitizeLayerName(name: string): string {
-  return name.replace(/[<>\\/":;?*|=]/g, "_").slice(0, 255) || "Layer";
-}
-
-function rgbToAci(hex: string): number {
-  const [r, g, b] = hexToRgb(hex);
-  if (r >= 220 && g < 120 && b < 120) return 1;
-  if (r >= 220 && g >= 220 && b < 120) return 2;
-  if (g >= 180 && r < 160 && b < 160) return 3;
-  if (g >= 180 && b >= 180) return 4;
-  if (b >= 180 && r < 160 && g < 160) return 5;
-  if (r >= 200 && b >= 200) return 6;
-  return 7;
-}
-
-function hexToTrueColor(hex: string): number {
-  const [r, g, b] = hexToRgb(hex);
-  return (r << 16) + (g << 8) + b;
-}
-
-function hexToRgb(hex: string): readonly [number, number, number] {
-  const normalized = hex.replace("#", "");
-  const source = normalized.length === 3
-    ? normalized.split("").map((character) => character + character).join("")
-    : normalized;
-  const value = Number.parseInt(source, 16);
-  return [(value >> 16) & 255, (value >> 8) & 255, value & 255] as const;
 }
 
 function baseName(fileName: string): string {

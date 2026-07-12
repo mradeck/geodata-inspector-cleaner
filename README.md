@@ -5,9 +5,11 @@ und GeoJSON-Dateien. Der Schwerpunkt liegt auf Geometrie, die weit außerhalb
 des eigentlichen Projektbereichs liegt und dadurch Folgeprozesse wie „Zoom all",
 Bounds-Berechnungen, Exporte und GIS-/CAD-Weiterverarbeitung unbrauchbar macht.
 
+**Live-Anwendung:** [geodata-inspector-cleaner.netlify.app](https://geodata-inspector-cleaner.netlify.app/)
+
 ## Projektstatus
 
-**Version 2607.01.1 – lokaler Entwicklungsstand mit aktivem Cleaner.** Der
+**Version 2607.01.2 – lokaler Entwicklungsstand mit aktivem Cleaner.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -27,6 +29,8 @@ aktuelle Stand demonstriert bereits:
 - Layer- und Objekttypfilter mit DXF-Farbe, Linientyp, Linienstärke und
   Layerstatus,
 - GeoJSON-zu-DXF-Konvertierung mit beibehaltener Layerstruktur,
+- wählbaren DXF-Zielformaten AutoCAD 2000 (`AC1015`) und AutoCAD 2018
+  (`AC1032`) mit lokal gespeicherter Vorauswahl,
 - automatische Reimport-Prüfung von Feature-Anzahl, Clusterzahl und Bounds,
 - sofortige Deutsch-/Englisch-Umschaltung mit lokal gespeicherter Auswahl,
 - einen reproduzierbaren Demo-Datensatz.
@@ -86,6 +90,27 @@ normalisierte ASCII-DXF erzeugt:
   geschlossene `POLYLINE`,
 - ausschließlich Features des manuell bestätigten Hauptclusters.
 
+### DXF-Version und CAD-Kompatibilität auswählen
+
+Im Cleaner gilt die DXF-Versionsauswahl sowohl für bereinigte DXF-Dateien als
+auch für GeoJSON→DXF-Konvertierungen:
+
+- **AutoCAD 2000 (`AC1015`)** ist der Default. Dieses Profil ist für strenge
+  AutoCAD-OEM-Programme ausgelegt und entspricht der im Pointcloud-Manager
+  getesteten Variante, die beispielsweise in DATAFLOR GREENXPERT nicht nur
+  geöffnet, sondern auch weiterkopiert werden kann.
+- **AutoCAD 2018 (`AC1032`)** richtet sich an moderne AutoCAD-Workflows und
+  kennzeichnet die Datei ausdrücklich als aktuelleres Format mit offiziellem
+  TrueColor-Support.
+
+Die Wahl wird lokal im Browser gespeichert. Beide Profile verwenden dasselbe
+vollständige, vom Pointcloud-Manager übernommene DXF-Gerüst: fortlaufende
+Handles, Subclass-Marker, alle erwarteten Standardsymboltabellen,
+`*Model_Space`/`*Paper_Space`, `BLOCKS`, PlotStyle-Sentinel und das
+Named-Object-`DICTIONARY` in `OBJECTS`. Es wird also nicht lediglich der
+`$ACADVER`-Text ausgetauscht. Nach dem Export durchläuft jede Variante den
+internen Kontrollimport.
+
 ### GeoJSON als DXF exportieren
 
 Nach einem GeoJSON-Import bietet der Cleaner zusätzlich **Als DXF exportieren**
@@ -133,6 +158,10 @@ entitätserhaltenden Exportpfad erweitert werden.
 
 ## Schnellstart
 
+Die veröffentlichte Web-App ist unter
+[https://geodata-inspector-cleaner.netlify.app/](https://geodata-inspector-cleaner.netlify.app/)
+direkt im Browser nutzbar. Für lokale Entwicklung:
+
 ```bash
 npm install
 npm run dev
@@ -149,7 +178,7 @@ npm run build
 
 ## Versionierung
 
-Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.01.1`:
+Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.01.2`:
 
 - `JJMM`: Jahr und Monat,
 - `RR`: zweistellige Releasefolge innerhalb des Monats,
@@ -159,8 +188,8 @@ Eine bewusst eröffnete größere Release-Linie erhöht `RR` und setzt `P` auf `
 Jede abgeschlossene lokale Feature-Runde und jeder Bugfix erhöht anschließend
 `P`, sodass der aktive Stand direkt im lokalen Dev-Server erkennbar ist. Wegen
 der SemVer-Regeln ohne führende Nullen steht in `package.json` und
-`package-lock.json` technisch `2607.1.1`. Die App, Dokumentation und exportierten
-Prüfberichte verwenden `2607.01.1`.
+`package-lock.json` technisch `2607.1.2`. Die App, Dokumentation und exportierten
+Prüfberichte verwenden `2607.01.2`.
 
 ## Leitprinzipien
 
@@ -192,6 +221,7 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2607.01.2` | 13. Juli 2026 | DXF-Zielformate AC1015/AutoCAD 2000 und AC1032/AutoCAD 2018 mit gespeicherter Auswahl sowie vollständigem OEM-kompatiblem DXF-Gerüst aus dem Pointcloud-Manager. |
 | `2607.01.1` | 12. Juli 2026 | Cleaner mit normalisiertem DXF-Export, Haupt-/Störbereichskarten, CRS-gestützter Hauptbereichswahl, Layer-/Objekttypfilter und DXF-Layermetadaten, GeoJSON→DXF-Konvertierung, Inter-Typografie und lokal sichtbarer Patchversion. |
 | `2607.01.0` | 12. Juli 2026 | Erster main-Release mit DXF-/GeoJSON-Analyse, Cluster- und CRS-Prüfung, drei Vorschaufenstern, OSM-Geometrieüberlagerung, DE/EN-Oberfläche und realen privaten Regressionsfixtures. |
 

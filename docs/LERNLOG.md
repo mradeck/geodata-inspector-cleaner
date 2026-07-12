@@ -4,6 +4,47 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## 13. Juli 2026 – Subversion 2607.01.2
+
+### Ein anderer `$ACADVER`-Stempel allein schafft keine CAD-Kompatibilität
+
+**Problem:** Der bisherige normalisierte Export deklarierte AC1015, enthielt aber
+nur ein minimales Tabellen- und Entity-Gerüst. Tolerante Reader können solche
+Dateien öffnen; strenge AutoCAD-/OEM-Programme verlangen jedoch zusätzliche
+Symboltabellen, Handles, Subclass-Marker, Blockdefinitionen und das
+Named-Object-Dictionary. Eine reine Auswahl zwischen Versionsstrings hätte das
+eigentliche Kompatibilitätsproblem deshalb nicht gelöst.
+
+**Stabile Lösung:** Der Cleaner übernimmt die gehärtete Exportstruktur des
+Pointcloud-Managers. Beide wählbaren Profile enthalten fortlaufende Handles,
+`$HANDSEED`, Standardtabellen einschließlich APPID/DIMSTYLE/BLOCK_RECORD,
+`*Model_Space` und `*Paper_Space`, BLOCKS, PlotStyle-Sentinel sowie eine
+OBJECTS-Sektion mit Root- und ACAD_GROUP-Dictionary.
+
+### AC1015 bleibt der sichere Default, AC1032 die moderne Option
+
+**Erkenntnis:** Das im Pointcloud-Manager gegen DATAFLOR GREENXPERT geprüfte
+AC1015-Profil lässt sich in strengen OEM-Workflows öffnen und weiterkopieren.
+AC1032 ist für moderne AutoCAD-Workflows sinnvoll, kann in älteren OEM-Ketten
+aber Folgeoperationen verhindern.
+
+**Stabile Lösung:** Die UI bietet AutoCAD 2000 (`AC1015`) und AutoCAD 2018
+(`AC1032`) mit erklärendem Kompatibilitätshinweis. AC1015 ist Default; eine
+explizite AC1032-Auswahl wird lokal gespeichert. Die Struktur bleibt zwischen
+beiden Profilen identisch, während `$ACADVER` und das Cleaning-Protokoll das
+gewählte Ziel eindeutig kennzeichnen. Beide Varianten werden nach Erzeugung
+erneut importiert und validiert.
+
+### Symbolnamen müssen normalisiert und kollisionsfrei sein
+
+**Erkenntnis:** Umlaute, verbotene Zeichen oder nach der Transliterierung
+identische Layernamen können bei strengen CAD-Readern doppelte beziehungsweise
+ungültige LAYER-Records erzeugen.
+
+**Stabile Lösung:** Layernamen werden groß-/kleinschreibungserhaltend nach ASCII
+transliteriert und auf 255 Zeichen begrenzt. Kollisionen erhalten deterministische
+`_2`, `_3`, …-Suffixe; Tabelle und Entities verwenden dieselbe Namensabbildung.
+
 ## 12. Juli 2026 – Subversion 2607.01.1
 
 ### Lokale Versionen müssen den tatsächlich laufenden Stand kennzeichnen

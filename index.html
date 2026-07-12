@@ -202,6 +202,14 @@
             <span class="cleaner-label" data-i18n="cleaner.label">04 · Cleaner</span>
             <strong id="cleaner-title" data-i18n="cleaner.title">Bereinigte Datei speichern</strong>
             <p id="cleaner-summary" data-i18n="cleaner.empty">Datei laden und den korrekten Hauptbereich auf der Karte bestätigen.</p>
+            <label class="dxf-version-field" for="dxf-acad-version">
+              <span data-i18n="cleaner.dxfVersion">DXF-Zielformat</span>
+              <select id="dxf-acad-version">
+                <option value="AC1015" data-i18n="cleaner.dxfVersion.acad2000">AutoCAD 2000 (AC1015) · OEM-kompatibel</option>
+                <option value="AC1032" data-i18n="cleaner.dxfVersion.acad2018">AutoCAD 2018 (AC1032) · modern</option>
+              </select>
+              <small data-i18n="cleaner.dxfVersion.hint">AC1015 ist der kompatible Standard für strenge CAD-/OEM-Programme; AC1032 für moderne AutoCAD-Workflows.</small>
+            </label>
             <div class="cleaner-actions">
               <button id="download-cleaned" class="button cleaner-button" type="button" disabled data-i18n="cleaner.download">Bereinigte Datei speichern</button>
               <button id="download-geojson-as-dxf" class="button cleaner-button cleaner-convert-button" type="button" disabled hidden data-i18n="cleaner.convertDxf">Als DXF exportieren</button>
@@ -220,7 +228,7 @@
 
       <footer class="statusbar">
         <span id="status"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></span>
-        <span data-i18n="version.label">Version 2607.01.1</span>
+        <span data-i18n="version.label">Version 2607.01.2</span>
       </footer>
     </div>
     <script type="module" src="/src/main.ts"></script>

@@ -81,7 +81,7 @@ describe("bereinigter Export", () => {
     expect(result.removedFeatureCount).toBe(2);
     expect(result.content).toContain("Cleaner object filter: Plan/Kante / area: 1");
     expect(result.content).toContain("420\n65280");
-    expect(reparsed.features.map((feature) => feature.layer)).toEqual(["Gelände"]);
+    expect(reparsed.features.map((feature) => feature.layer)).toEqual(["Gelaende"]);
   });
 
   it("verweigert einen Objektfilter, der den Hauptbereich vollständig leert", () => {
@@ -131,5 +131,22 @@ describe("bereinigter Export", () => {
     expect(result.removedFeatureCount).toBe(0);
     expect(result.content).toContain("$INSUNITS\n70\n0");
     expect(result.content).toContain("Coordinate values preserved without reprojection");
+  });
+
+  it("bietet AC1015 als OEM-Default und AC1032 mit identischer Vollstruktur", () => {
+    const source = dataset("dxf");
+    const report = manuallySelectMain(source);
+    const ac1015 = createCleanedExport(source, report);
+    const ac1032 = createCleanedExport(source, report, { acadVersion: "AC1032" });
+
+    expect(ac1015.content).toContain("$ACADVER\n1\nAC1015");
+    expect(ac1032.content).toContain("$ACADVER\n1\nAC1032");
+    expect(ac1032.content).toContain("DXF target format: AC1032");
+    for (const structuralMarker of ["$HANDSEED", "BLOCK_RECORD", "*Model_Space", "OBJECTS", "AcDbDictionary", "AcDb3dPolyline"]) {
+      expect(ac1015.content).toContain(structuralMarker);
+      expect(ac1032.content).toContain(structuralMarker);
+    }
+    expect(ac1032.content.replaceAll("AC1032", "AC1015")).toBe(ac1015.content);
+    expect(parseDxf(ac1032.content, ac1032.fileName).features).toHaveLength(2);
   });
 });

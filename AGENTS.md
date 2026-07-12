@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2607.01.1`
-- **npm-kompatible Version:** `2607.1.1`
+- **Aktuelle Release-Version:** `2607.01.2`
+- **npm-kompatible Version:** `2607.1.2`
 - **Repository:** privates GitHub-Repository `mradeck/geodata-inspector-cleaner`
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md`
@@ -42,9 +42,9 @@ Arbeit lösen keinen Versionssprung aus. Beim Monatswechsel beginnt `RR` wieder
 mit `01`.
 
 SemVer verbietet führende Nullen in numerischen Segmenten. Deshalb verwenden
-`package.json` und `package-lock.json` für `2607.01.1` die npm-kompatible Form
-`2607.1.1`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
-Berichte und Dokumentation verwenden die kanonische Form `2607.01.1`.
+`package.json` und `package-lock.json` für `2607.01.2` die npm-kompatible Form
+`2607.1.2`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
+Berichte und Dokumentation verwenden die kanonische Form `2607.01.2`.
 
 ## Versionierungs-, Dokumentations- und Push-Regel
 
@@ -140,6 +140,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2607.01.2` | 2026-07-13 | Wählbare DXF-Zielformate AC1015/AutoCAD 2000 und AC1032/AutoCAD 2018 mit gespeicherter Auswahl; vollständiges, OEM-gehärtetes DXF-Gerüst aus dem Pointcloud-Manager mit Handles, Subclass-Markern, Standardtabellen, BLOCKS und OBJECTS. |
 | `2607.01.1` | 2026-07-12 | CRS-gestützte Hauptbereichswahl, Karten für Haupt-/Störbereich, normalisierter Cleaner-Export auf Basis des Pointcloud-Manager-Exporters, Layer-/Objekttypfilter mit DXF-Metadaten, GeoJSON→DXF-Konvertierung, Inter-Typografie und lokal sichtbares Patch-Versioning. |
 | `2607.01.0` | 2026-07-12 | Erster main-Release mit lokalem DXF-/GeoJSON-Import, Cluster-/CRS-/Z-Analyse, drei Diagnosevorschauen, OSM-Geometrieüberlagerung, manueller Hauptbereichswahl, DE/EN-Umschaltung, lokalisierten Konzeptseiten und realen privaten Regressionsfixtures. |
 

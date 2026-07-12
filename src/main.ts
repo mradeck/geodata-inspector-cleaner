@@ -26,6 +26,8 @@ import {
 } from "./i18n";
 import { readDataset } from "./io/readDataset";
 import { CleanerError, createCleanedExport } from "./io/exportCleaned";
+import { getDxfAcadVersion, setDxfAcadVersion } from "./io/dxfExportSettings";
+import type { DxfAcadVersion } from "./io/dxfNormalizedExporter";
 import type { Bounds2D, GeoDataset, InspectionFinding, InspectionReport } from "./model";
 import { renderPreview } from "./render/renderPreview";
 import { demoDataset } from "./sample/demoDataset";
@@ -48,6 +50,7 @@ const elements = {
   downloadCleaned: byId<HTMLButtonElement>("download-cleaned"),
   downloadGeoJsonAsDxf: byId<HTMLButtonElement>("download-geojson-as-dxf"),
   cleanerConversionNote: byId<HTMLElement>("cleaner-conversion-note"),
+  dxfAcadVersion: byId<HTMLSelectElement>("dxf-acad-version"),
   cleanerSummary: byId<HTMLElement>("cleaner-summary"),
   objectFilterTable: byId<HTMLElement>("object-filter-table"),
   objectFilterSummary: byId<HTMLElement>("object-filter-summary"),
@@ -86,6 +89,7 @@ let layerSummaries: LayerObjectSummary[] = [];
 let featureFilterSelection: FeatureFilterSelection = new Set();
 
 initI18n();
+elements.dxfAcadVersion.value = getDxfAcadVersion();
 syncLanguageControl();
 syncClusterDistanceLabel();
 
@@ -134,6 +138,11 @@ elements.filterPointsOff.addEventListener("click", () => setObjectFilter("point"
 elements.filterPointsOn.addEventListener("click", () => setObjectFilter("point", true));
 elements.filterAllOn.addEventListener("click", () => setObjectFilter(null, true));
 elements.filterAllOff.addEventListener("click", () => setObjectFilter(null, false));
+elements.dxfAcadVersion.addEventListener("change", () => {
+  const version = selectedDxfAcadVersion();
+  setDxfAcadVersion(version);
+  setStatus(t("status.dxfVersionChanged", { version }), "ok");
+});
 elements.filterConfirmPrimary.addEventListener("click", () => {
   const primary = currentReport?.clusters.find((cluster) => cluster.isPrimary);
   preferredPrimaryFeatureId = primary?.featureIds[0] ?? null;
@@ -182,6 +191,7 @@ elements.downloadReport.addEventListener("click", () => {
         ),
       })),
     },
+    dxfExportProfile: selectedDxfAcadVersion(),
     warnings: currentReport.dataset.warnings.map((warning) => ({
       ...warning,
       message: localizeWarning(warning.code, warning.message),
@@ -200,6 +210,7 @@ function exportCurrentSelection(outputFormat?: "dxf" | "geojson", allowUnchanged
       featureFilterSelection,
       outputFormat,
       allowUnchangedOutput,
+      acadVersion: selectedDxfAcadVersion(),
     });
     downloadText(cleaned.fileName, cleaned.content, cleaned.mimeType);
     elements.cleanerSummary.textContent = t("cleaner.validated", {
@@ -211,6 +222,10 @@ function exportCurrentSelection(outputFormat?: "dxf" | "geojson", allowUnchanged
     const message = error instanceof CleanerError ? t(`cleaner.error.${error.code}`) : t("cleaner.error.unknown");
     setStatus(message, "error");
   }
+}
+
+function selectedDxfAcadVersion(): DxfAcadVersion {
+  return elements.dxfAcadVersion.value === "AC1032" ? "AC1032" : "AC1015";
 }
 
 new ResizeObserver(() => renderCanvases()).observe(document.querySelector(".preview-grid") ?? document.body);
