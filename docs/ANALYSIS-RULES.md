@@ -55,6 +55,21 @@ Bei geringerer Dominanz gilt der Datensatz als mehrdeutig:
 - die Vorschau zeigt alle Gruppen gleichrangig,
 - der Benutzer muss Hauptbereich oder gültige Cluster explizit wählen.
 
+### Separate Störbereichsvorschau
+
+Die Störbereichsvorschau ist keine zusätzliche Heuristik, sondern eine
+Darstellung der vorhandenen Clusterentscheidung:
+
+- bei eindeutiger Dominanz oder manuell bestätigtem Hauptbereich zeigt sie die
+  zur Entfernung empfohlenen Nicht-Hauptcluster,
+- bei einer mehrdeutigen automatischen Wahl zeigt sie die Nicht-Hauptcluster
+  nur mit dem Status `prüfen`,
+- bei nur einem Cluster bleibt die Vorschau leer und meldet, dass kein separater
+  Störbereich erkannt wurde.
+
+Dadurch kann der Anwender die fragliche Geometrie im eigenen Maßstab prüfen,
+ohne dass die Darstellung bereits eine Löschfreigabe suggeriert.
+
 Spätere Versionen sollen ergänzende Scores berücksichtigen:
 
 - abgedeckte Geometrielänge oder -fläche
@@ -99,6 +114,31 @@ Die Heuristik liefert Kandidaten, keine automatische EPSG-Zuweisung:
 
 Nur explizite Metadaten dürfen als „deklariert“ erscheinen. Selbst dann soll
 eine Plausibilitätsprüfung Widersprüche melden.
+
+### Kartenbasierte Clusterprüfung
+
+Ein deklariertes CRS wird pro Cluster angewendet, nicht pauschal nur auf die
+Gesamt-Bounds. Ein Cluster gilt für die OSM-Vorschau als kartierbar, wenn:
+
+1. alle Bounds-Ecken endlich nach WGS84 transformiert werden,
+2. die Breite innerhalb des Web-Mercator-Bereichs liegt und
+3. der Mittelpunkt innerhalb des plausiblen Einsatzgebiets des CRS liegt.
+
+Eine formell mögliche Transformation ist kein Beweis für eine korrekte Lage.
+Beim private-project-Rohfixture ist der 101-Feature-Cluster minimal größer, liegt
+nach EPSG:25832-Transformation aber außerhalb des plausiblen UTM-32-Gebiets.
+Der 99-Feature-Cluster liegt dagegen kartierbar im tatsächlichen Projektbereich.
+
+Die Kartenwahl ist eine explizite Benutzerentscheidung. Erst danach dürfen die
+anderen Cluster als Entfernungskandidaten empfohlen werden.
+
+Transformierbare Feature-Geometrien werden zusätzlich über OSM dargestellt.
+Kartografisch plausible Geometrie erscheint grün und erhält einen blauen
+Ausdehnungsrahmen; CRS-unplausible Störbereiche erscheinen rot. Auch ein
+Cluster außerhalb des plausiblen CRS-Einsatzgebiets darf
+gezielt über „Auf Karte zeigen“ betrachtet werden, sofern seine transformierten
+Koordinaten technisch im Web-Mercator-Bereich liegen; sein Status bleibt dabei
+unverändert `CRS-unplausibel`.
 
 ## 8. Geplante zusätzliche Prüfungen
 

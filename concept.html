@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>Konzept · Geodata Inspector & Cleaner</title>
+  </head>
+  <body class="concept-body">
+    <div class="concept-shell">
+      <header class="topbar concept-topbar">
+        <a class="brand" href="./index.html" aria-label="Geodata Inspector & Cleaner Startseite" data-i18n-aria-label="brand.homeAria">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span><strong>Geodata Inspector</strong><small>& Cleaner</small></span>
+        </a>
+        <span class="concept-section-label" data-i18n="concept.section">Produkt- und UX-Konzept</span>
+        <nav class="top-actions" aria-label="Konzeptaktionen" data-i18n-aria-label="concept.actionsAria">
+          <a class="button button-quiet" href="./index.html" data-i18n="concept.back">Zur Anwendung</a>
+          <button id="btn-toggle-language" class="button button-quiet language-button" type="button" data-i18n-title="lang.toggle.title" title="Sprache umschalten">
+            <span id="language-flag" aria-hidden="true">🇩🇪</span>
+            <span id="language-code">DE</span>
+          </button>
+        </nav>
+      </header>
+      <main class="concept-main">
+        <article id="concept-content" class="concept-document"></article>
+      </main>
+    </div>
+    <script type="module" src="/src/concept.ts"></script>
+  </body>
+</html>

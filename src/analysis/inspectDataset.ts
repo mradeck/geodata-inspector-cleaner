@@ -6,6 +6,7 @@ import {
   type GeoDataset,
   type InspectionConfig,
   type InspectionFinding,
+  type InspectionOptions,
   type InspectionReport,
   type SpatialCluster,
 } from "../model";
@@ -54,11 +55,16 @@ class UnionFind {
 export function inspectDataset(
   dataset: GeoDataset,
   overrides: Partial<InspectionConfig> = {},
+  options: InspectionOptions = {},
 ): InspectionReport {
   const config: InspectionConfig = { ...DEFAULT_INSPECTION_CONFIG, ...overrides };
   const featureStatistics = collectFeatureStatistics(dataset, config);
   const clusters = buildClusters(featureStatistics, config.clusterDistanceMeters);
-  const primary = choosePrimaryCluster(clusters);
+  const manuallySelectedPrimary = options.preferredPrimaryFeatureId
+    ? clusters.find((cluster) => cluster.featureIds.includes(options.preferredPrimaryFeatureId!)) ?? null
+    : null;
+  const primary = manuallySelectedPrimary ?? choosePrimaryCluster(clusters);
+  const primarySelection: "automatic" | "manual" = manuallySelectedPrimary ? "manual" : "automatic";
 
   if (primary) {
     for (const cluster of clusters) {
@@ -80,7 +86,7 @@ export function inspectDataset(
   const findings: InspectionFinding[] = [];
   const recommendedRemovalIds = new Set<string>();
 
-  if (clusters.length > 1 && !primaryIsDominant) {
+  if (clusters.length > 1 && !primaryIsDominant && primarySelection === "automatic") {
     findings.push({
       id: "ambiguous-primary",
       category: "ambiguous-primary",
@@ -95,7 +101,7 @@ export function inspectDataset(
   if (primary) {
     for (const cluster of clusters.filter((item) => !item.isPrimary)) {
       const distance = cluster.distanceToPrimaryMeters;
-      const recommendation = primaryIsDominant ? "remove" : "review";
+      const recommendation = primaryIsDominant || primarySelection === "manual" ? "remove" : "review";
       findings.push({
         id: `remote-${cluster.id}`,
         category: "remote-cluster",
@@ -152,6 +158,7 @@ export function inspectDataset(
     featureStatistics,
     clusters,
     primaryClusterId: primary?.id ?? null,
+    primarySelection,
     primaryIsDominant,
     fullBounds,
     focusBounds,

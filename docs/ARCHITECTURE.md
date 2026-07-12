@@ -82,8 +82,61 @@ Der Prototyp verwendet Canvas 2D:
 - einfache lokale Origin-Verschiebung
 - Übersicht und Fokus können mit demselben Renderer erzeugt werden
 
+Der Renderer wird dreimal mit unterschiedlichen Featuremengen verwendet:
+Gesamtausdehnung, Hauptbereich und vermuteter Störbereich. Der Störbereich
+umfasst bei vorhandener Entfernungsempfehlung genau diese Features; in
+mehrdeutigen Fällen werden die Nicht-Hauptcluster lediglich als Prüfbereich
+dargestellt.
+
 Für sehr große Dateien bleibt ein WebGL-Renderer als spätere Ausbaustufe offen.
 Die normalisierte Daten- und Analyseebene darf davon nicht abhängen.
+
+### OSM-Kartenvorschau
+
+Die geografische Plausibilitätsprüfung verwendet Leaflet als reine 2D-Karten-
+UI. Die CRS-Definitionen und Aliase entsprechen der bestehenden
+`CrsProjection`-Implementierung des Pointcloud Managers:
+
+- EPSG:25832
+- EPSG:25833
+- EPSG:31468
+- EPSG:3857
+
+`proj4` transformiert Cluster-Bounds nach WGS84. Zusätzlich zur technischen
+Transformierbarkeit prüft die SPA das plausible Einsatzgebiet des CRS. So wird
+der reale Fast-50/50-Fehlerfall erkannt, bei dem die falschen Koordinaten formal
+transformierbar, aber für UTM Zone 32 geografisch unplausibel sind.
+
+Zusätzlich werden die tatsächlichen normalisierten Feature-Stützpunkte nach
+WGS84 transformiert und mit Leaflets Canvas-Renderer über OSM gezeichnet.
+Für kartografisch plausible Cluster wird die Geometrie grün und ihre Bounds als
+blauer Ausdehnungsrahmen dargestellt; CRS-unplausible Störbereiche bleiben rot.
+Um interaktive Karten bei sehr
+vertexreichen Dateien nicht zu blockieren, wird die Kartenüberlagerung auf ein
+globales Budget von 100.000 Stützpunkten ausgedünnt; erster und letzter Punkt
+eines Features bleiben erhalten. Die Analyse selbst arbeitet unverändert auf
+allen Punkten.
+
+Der initiale Kartenausschnitt fokussiert den plausiblen Hauptkandidaten statt
+alle möglicherweise weltweit getrennten Bounds. Jeder transformierbare Cluster
+kann über „Auf Karte zeigen“ einzeln fokussiert werden.
+
+OSM-Kacheln werden nur für den sichtbaren interaktiven Viewport geladen. Der
+Endpunkt ist über `VITE_OSM_TILE_URL` austauschbar. Attribution bleibt sichtbar;
+Prefetching und Offline-Download sind nicht vorgesehen.
+
+### Internationalisierung
+
+Die Oberfläche verwendet zentrale, typgeprüfte Deutsch-/Englisch-Kataloge in
+`src/i18n`. Statische DOM-Texte und barrierefreie Beschriftungen werden über
+`data-i18n`-Attribute aktualisiert; dynamische Analyse-, Karten-, Canvas- und
+Berichtstexte verwenden dieselbe Übersetzungsfunktion. Die Sprache kann ohne
+Neuladen gewechselt werden. Die Auswahl wird ausschließlich lokal unter
+`gic.lang` gespeichert; Zahlen und Prozentwerte folgen dem jeweiligen Locale.
+Der Konzept-Button öffnet keine rohe Markdown-Datei, sondern die UTF-8-
+deklarierte `concept.html`. Sie rendert abhängig von derselben Sprachwahl die
+deutsche oder englische Konzeptquelle und verhindert damit browserabhängige
+Zeichensatzfehler bei direkt angezeigten `.md`-Dateien.
 
 ## 6. Verarbeitung großer Dateien
 
@@ -126,6 +179,8 @@ Referenztests.
 - potenzielle native DWG-Konverter werden nie mit frei manipulierbaren
   Kommandozeilenargumenten gestartet
 - Größen- und Laufzeitlimits schützen vor absichtlich problematischen Dateien
+- die OSM-Karte überträgt keine DXF-Geometrie, erzeugt aber externe Tile-
+  Requests, aus denen Kartenbereich und IP-Adresse hervorgehen können
 
 ## 9. Erweiterungspunkte
 

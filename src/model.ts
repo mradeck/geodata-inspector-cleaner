@@ -86,12 +86,18 @@ export interface InspectionConfig {
   minimumRealZMagnitudeMeters: number;
 }
 
+export interface InspectionOptions {
+  /** Ein Feature aus dem vom Benutzer bestätigten Hauptcluster. */
+  preferredPrimaryFeatureId?: string | null;
+}
+
 export interface InspectionReport {
   dataset: GeoDataset;
   config: InspectionConfig;
   featureStatistics: FeatureStatistics[];
   clusters: SpatialCluster[];
   primaryClusterId: string | null;
+  primarySelection: "automatic" | "manual";
   primaryIsDominant: boolean;
   fullBounds: Bounds2D | null;
   focusBounds: Bounds2D | null;

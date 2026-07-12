@@ -1,10 +1,12 @@
 import type { Bounds2D, GeoDataset, InspectionReport, Position3 } from "../model";
+import { formatNumber, t } from "../i18n";
 
 interface RenderOptions {
   bounds: Bounds2D | null;
   visibleFeatureIds?: Set<string> | null;
   highlightedFeatureIds?: Set<string>;
   showClusterOverview?: boolean;
+  emptyMessage?: string;
 }
 
 export function renderPreview(
@@ -26,7 +28,10 @@ export function renderPreview(
   context.setTransform(ratio, 0, 0, ratio, 0, 0);
   context.clearRect(0, 0, rect.width, rect.height);
   drawBackground(context, rect.width, rect.height);
-  if (!options.bounds) return;
+  if (!options.bounds) {
+    if (options.emptyMessage) drawEmptyMessage(context, rect.width, rect.height, options.emptyMessage);
+    return;
+  }
 
   const padding = 26;
   const boundsWidth = Math.max(options.bounds.maxX - options.bounds.minX, 1e-9);
@@ -82,6 +87,21 @@ export function renderPreview(
   drawScale(context, rect.width, rect.height, scale);
 }
 
+function drawEmptyMessage(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  message: string,
+): void {
+  context.save();
+  context.fillStyle = "#8ba7a3";
+  context.font = "12px Inter, system-ui, sans-serif";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(message, width / 2, height / 2, Math.max(80, width - 48));
+  context.restore();
+}
+
 function drawClusterOverview(
   context: CanvasRenderingContext2D,
   report: InspectionReport,
@@ -131,7 +151,7 @@ function drawClusterOverview(
     context.font = "10px ui-monospace, SFMono-Regular, Menlo, monospace";
     context.textAlign = x > 90 ? "right" : "left";
     context.fillText(
-      `${cluster.isPrimary ? "Hauptbereich" : "Cluster"} · ${cluster.featureCount}`,
+      `${cluster.isPrimary ? t("legend.main") : t("metric.clusters")} · ${formatNumber(cluster.featureCount)}`,
       x + (x > 90 ? -13 : 13),
       y - 9,
     );
@@ -183,5 +203,7 @@ function drawScale(context: CanvasRenderingContext2D, width: number, height: num
 }
 
 function formatScale(meters: number): string {
-  return meters >= 1000 ? `${(meters / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 })} km` : `${meters.toLocaleString("de-DE", { maximumFractionDigits: 1 })} m`;
+  return meters >= 1000
+    ? t("unit.km", { value: formatNumber(meters / 1000, 1) })
+    : t("unit.m", { value: formatNumber(meters, 1) });
 }

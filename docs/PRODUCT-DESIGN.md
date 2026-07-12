@@ -34,6 +34,10 @@ Die App beantwortet vor einer Bereinigung nachvollziehbar vier Fragen:
 Die Anwendung ist kein CAD-Editor. Sie ist ein Diagnose-, Entscheidungs- und
 Bereinigungswerkzeug vor der Weiterverarbeitung.
 
+Die Bedienoberfläche ist unmittelbar zwischen Deutsch und Englisch umschaltbar.
+Die Wahl bleibt lokal im Browser gespeichert und gilt einheitlich für statische
+UI-Texte, Analysebefunde, Kartenhinweise, Zahlenformate und Prüfberichte.
+
 ## 3. Zielgruppen
 
 - Vermessungsbüros
@@ -72,15 +76,45 @@ flowchart LR
 
 ### Mitte: räumliche Vorschau
 
-Die Vorschau wird bewusst zweigeteilt:
+Die Vorschau wird bewusst in drei gekoppelte Bereiche geteilt:
 
 1. **Gesamtausdehnung** zeigt alle räumlichen Gruppen. Auch tausende Kilometer
    entfernte Elemente müssen sichtbar und auswählbar bleiben.
 2. **Fokusbereich** zeigt den wahrscheinlichen Hauptbereich ohne die als entfernt
    eingestuften Gruppen.
+3. **Vermuteter Störbereich** zeigt die Nicht-Hauptcluster separat. Bei einer
+   eindeutigen oder manuell bestätigten Hauptregion erscheint die Kennzeichnung
+   „Entfernung empfohlen“. Bei einer mehrdeutigen automatischen Wahl bleibt sie
+   ausdrücklich bei „prüfen“.
 
 Diese Gegenüberstellung macht das Problem verständlicher als ein einzelner
 Viewer, in dem die Hauptgeometrie nur als Pixel erscheint.
+
+### Kartenprüfung
+
+Bei deklariertem und unterstütztem CRS werden die Cluster zusätzlich auf einer
+OpenStreetMap-Karte geprüft:
+
+- kartierbare Cluster erscheinen mit Bounds und Mittelpunkt,
+- importierte DXF-/GeoJSON-Linien, Punkte und Polygone werden direkt über der
+  Karte dargestellt,
+- Haupt- und Störbereich erhalten zusätzlich klar unterscheidbare
+  Bereichsgrenzen,
+- kartografisch plausible Geometrie erscheint grün mit blauem
+  Ausdehnungsrahmen; der vermutete Störbereich erscheint rot,
+- transformierte Lagen außerhalb des plausiblen CRS-Einsatzgebiets werden
+  separat als unplausibel ausgewiesen,
+- der Anwender kann einen kartierbaren Cluster ausdrücklich als Hauptbereich
+  wählen,
+- eine manuelle Kartenwahl ersetzt die unsichere Mehrheitsentscheidung bei
+  nahezu gleich großen Clustern.
+- „Auf Karte zeigen“ fokussiert jeden technisch darstellbaren Cluster einzeln,
+  damit weit entfernte Bereiche nicht erneut einen unbrauchbaren Gesamtzoom
+  erzwingen.
+
+Die Geometrie bleibt lokal. OSM-Rasterkacheln werden jedoch online für den
+aktuellen Viewport geladen. Dieser externe Zugriff ist in der Oberfläche
+sichtbar zu erklären.
 
 ### Rechte Spalte: Befunde und Entscheidungen
 

@@ -11,6 +11,12 @@ Bereinigung, danach zusätzliche Formate.
 - [x] erste DXF-/GeoJSON-Adapter
 - [x] Clusteranalyse als pure Logik
 - [x] Gesamt- und Fokusvorschau
+- [x] separate Störbereichsvorschau mit metrischen XY-Bounds
+- [x] OSM-Plausibilitätsansicht pro Cluster
+- [x] DXF-/GeoJSON-Geometrieüberlagerung und Bereichsrahmen auf OSM
+- [x] explizite Hauptbereichswahl aus dem Kartenkontext
+- [x] Deutsch-/Englisch-Umschaltung einschließlich Konzeptdokument
+- [x] reale private DXF-Regressionsfixtures
 - [x] Produkt-, Architektur- und Analysedokumente
 - [x] DWG-Entscheidungsdokument
 - [x] Unit-Tests für Kernfälle
@@ -32,7 +38,7 @@ Bereinigung, danach zusätzliche Formate.
 ### Analyse
 
 - [ ] Multi-Skalen-Clusterung evaluieren
-- [ ] manuell wählbaren Hauptbereich ergänzen
+- [x] manuell wählbaren Hauptbereich ergänzen
 - [ ] optionale Referenz-Bounds importieren
 - [ ] Cluster nach Layern und Entitätstypen aufschlüsseln
 - [ ] Entfernungs- und Extent-Wirkung pro Cluster berechnen

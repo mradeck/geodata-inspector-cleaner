@@ -1,0 +1,4 @@
+# Reale CAD-Fixtures müssen byteidentisch bleiben. Insbesondere darf
+# core.autocrlf die DXF-Zeilenenden nicht verändern, da Regressionstests
+# Dateigröße und SHA-256 prüfen.
+*.dxf binary
