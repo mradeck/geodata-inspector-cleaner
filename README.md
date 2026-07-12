@@ -9,7 +9,7 @@ Bounds-Berechnungen, Exporte und GIS-/CAD-Weiterverarbeitung unbrauchbar macht.
 
 ## Projektstatus
 
-**Version 2607.01.2 – lokaler Entwicklungsstand mit aktivem Cleaner.** Der
+**Version 2607.01.3 – lokaler Entwicklungsstand mit aktivem Cleaner.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -33,11 +33,40 @@ aktuelle Stand demonstriert bereits:
   (`AC1032`) mit lokal gespeicherter Vorauswahl,
 - automatische Reimport-Prüfung von Feature-Anzahl, Clusterzahl und Bounds,
 - sofortige Deutsch-/Englisch-Umschaltung mit lokal gespeicherter Auswahl,
+- ein dauerhaft gespeichertes helles oder dunkles Interface,
+- eine integrierte Hilfeseite, die diese README-Dokumentation als lesbares HTML
+  darstellt,
+- eine zweisprachige „Über mich“-Ansicht mit Hintergrund und Projektlinks von
+  Michael Radeck,
 - einen reproduzierbaren Demo-Datensatz.
 
 Die Quelldatei wird niemals überschrieben. Der Cleaner erzeugt eine neue Datei
 mit dem Suffix `-cleaned` und prüft sie vor dem Download durch einen internen
 Kontrollimport.
+
+## Hilfe, Sprache und Darstellung
+
+Der frühere **Konzept**-Button in der Kopfleiste ist durch **Hilfe** ersetzt.
+Die Hilfeseite rendert den Inhalt dieser `README.md` direkt als formatiertes
+HTML. Dadurch bleiben Bedienhinweise, Exportgrenzen, Versionsangaben und
+Screenshots an einer einzigen redaktionellen Quelle gebunden. Das weiterhin
+versionierte Produkt-/UX-Konzept ist über den Dokumentationsabschnitt dieser
+README erreichbar, aber nicht mehr die primäre Anwenderhilfe.
+
+Die Sprachschaltfläche wechselt die Bedienoberfläche unmittelbar zwischen
+Deutsch und Englisch und speichert die Auswahl lokal im Browser. Die Hilfe-
+Navigation folgt dieser Auswahl; die eigentliche README-Fachdokumentation wird
+derzeit in ihrer gepflegten deutschen Originalfassung angezeigt.
+
+Über die Sonnen-/Mondsymbol-Schaltfläche lässt sich die gesamte Oberfläche
+zwischen hellem und dunklem Design umstellen. Die Wahl gilt auch für die
+Hilfeseite und bleibt unter `gic.theme` lokal gespeichert. Es werden dafür keine
+Einstellungen an einen Server übertragen.
+
+**Über mich** öffnet eine zweisprachige Kurzvorstellung von Michael Radeck. Die
+Texte wurden aus dem Pointcloud Manager übernommen und um den Bezug zum Geodata
+Inspector & Cleaner ergänzt. Verlinkt sind Multikopterschule XMS,
+DroneMediaMunich, XING und Crew United.
 
 ## Störbereich entfernen und bereinigte Datei speichern
 
@@ -178,7 +207,7 @@ npm run build
 
 ## Versionierung
 
-Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.01.2`:
+Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.01.3`:
 
 - `JJMM`: Jahr und Monat,
 - `RR`: zweistellige Releasefolge innerhalb des Monats,
@@ -188,8 +217,8 @@ Eine bewusst eröffnete größere Release-Linie erhöht `RR` und setzt `P` auf `
 Jede abgeschlossene lokale Feature-Runde und jeder Bugfix erhöht anschließend
 `P`, sodass der aktive Stand direkt im lokalen Dev-Server erkennbar ist. Wegen
 der SemVer-Regeln ohne führende Nullen steht in `package.json` und
-`package-lock.json` technisch `2607.1.2`. Die App, Dokumentation und exportierten
-Prüfberichte verwenden `2607.01.2`.
+`package-lock.json` technisch `2607.1.3`. Die App, Dokumentation und exportierten
+Prüfberichte verwenden `2607.01.3`.
 
 ## Leitprinzipien
 
@@ -221,6 +250,7 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2607.01.3` | 13. Juli 2026 | README-basierte Hilfeseite statt Konzept-Schaltfläche, übernommene und zweisprachig ergänzte „Über mich“-Information sowie lokal gespeicherter Hell-/Dunkelmodus für App und Hilfe. |
 | `2607.01.2` | 13. Juli 2026 | DXF-Zielformate AC1015/AutoCAD 2000 und AC1032/AutoCAD 2018 mit gespeicherter Auswahl sowie vollständigem OEM-kompatiblem DXF-Gerüst aus dem Pointcloud-Manager. |
 | `2607.01.1` | 12. Juli 2026 | Cleaner mit normalisiertem DXF-Export, Haupt-/Störbereichskarten, CRS-gestützter Hauptbereichswahl, Layer-/Objekttypfilter und DXF-Layermetadaten, GeoJSON→DXF-Konvertierung, Inter-Typografie und lokal sichtbarer Patchversion. |
 | `2607.01.0` | 12. Juli 2026 | Erster main-Release mit DXF-/GeoJSON-Analyse, Cluster- und CRS-Prüfung, drei Vorschaufenstern, OSM-Geometrieüberlagerung, DE/EN-Oberfläche und realen privaten Regressionsfixtures. |

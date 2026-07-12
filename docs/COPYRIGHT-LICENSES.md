@@ -1,6 +1,6 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2607.01.2
+**Release:** 2607.01.3
 
 **Prüfstand:** 13. Juli 2026
 
@@ -29,7 +29,7 @@ veröffentlicht werden.
 |---|---:|---|---|
 | [Leaflet](https://github.com/Leaflet/Leaflet/blob/main/LICENSE) | 1.9.4 | BSD-2-Clause | Interaktive OSM-Karte; Copyright- und Lizenzhinweise bei Weitergabe beibehalten. |
 | [proj4js](https://github.com/proj4js/proj4js/blob/main/LICENSE.md) | 2.20.9 | MIT | CRS-Transformation; Copyright- und Lizenzhinweis beibehalten. |
-| [marked](https://github.com/markedjs/marked/blob/master/LICENSE.md) | 18.0.6 | MIT plus mitgeführte Markdown-BSD-Hinweise | Rendering der fest eingebauten Konzeptdokumente; Notices bei Weitergabe beibehalten. |
+| [marked](https://github.com/markedjs/marked/blob/master/LICENSE.md) | 18.0.6 | MIT plus mitgeführte Markdown-BSD-Hinweise | Rendering der fest eingebauten Konzept- und README-Hilfedokumente; Notices bei Weitergabe beibehalten. |
 
 Relevante indirekte Laufzeitkomponenten:
 
@@ -85,11 +85,15 @@ DXF-, GeoJSON- oder andere Benutzerinhalte werden nicht als Markdown/HTML an
 `marked` übergeben. Sollte später fremdes Markdown unterstützt werden, ist vor
 der Aktivierung eine Sanitizing-Schicht verpflichtend.
 
-## Release-Prüfung 2607.01.2
+## Release-Prüfung 2607.01.3
 
 - direkte Abhängigkeiten gegen `package.json` und Lockfile abgeglichen,
 - vollständigen npm-Lizenzscan geprüft,
 - keine GPL-/AGPL-/Non-Commercial-Abhängigkeit gefunden,
 - OpenStreetMap-Attribution im Leaflet-Viewport sichtbar,
 - kein Tile-Prefetch oder Offline-Download implementiert,
+- README-Hilfe rendert weiterhin ausschließlich eine zur Buildzeit eingebundene
+  und versionierte Projektdatei; keine fremden Markdown-Inhalte,
+- Theme- und Sprachwahl verwenden nur lokalen Browser-Speicher und übertragen
+  keine Daten an externe Dienste,
 - `npm audit` ohne bekannte Schwachstellen.

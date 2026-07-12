@@ -1,6 +1,6 @@
 .concept-body {
   min-width: 0;
-  background: radial-gradient(circle at 50% -20%, #143235 0, transparent 36%), var(--bg);
+  background: var(--page-background);
 }
 
 .concept-shell { min-height: 100vh; }
@@ -9,23 +9,23 @@
 .concept-section-label { margin-right: auto; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 .concept-main { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 52px 0 90px; }
 .concept-document { color: var(--text); font-size: 15px; line-height: 1.72; }
-.concept-document h1, .concept-document h2, .concept-document h3 { font-family: var(--font-ui); font-weight: 600; color: #f1fbf8; }
+.concept-document h1, .concept-document h2, .concept-document h3 { font-family: var(--font-ui); font-weight: 600; color: var(--text); }
 .concept-document h1 { max-width: none; margin: 0 0 14px; font-size: clamp(34px, 5vw, 54px); line-height: 1.05; }
 .concept-document h2 { margin: 52px 0 15px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 27px; }
 .concept-document h3 { margin: 28px 0 10px; font-size: 20px; }
-.concept-document p { color: #bdd1cd; }
+.concept-document p { color: var(--muted); }
 .concept-document > p:first-of-type { color: var(--green); font-family: ui-monospace, SFMono-Regular, monospace; font-size: 12px; }
-.concept-document strong { color: #eef9f6; }
+.concept-document strong { color: var(--text); }
 .concept-document a { color: var(--green); }
-.concept-document li { margin: 5px 0; color: #bdd1cd; }
-.concept-document code { color: #9ff1d4; background: rgba(77,226,177,.08); padding: 2px 5px; border-radius: 4px; }
-.concept-document pre { overflow: auto; padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: #091315; }
+.concept-document li { margin: 5px 0; color: var(--muted); }
+.concept-document code { color: var(--green); background: var(--green-soft); padding: 2px 5px; border-radius: 4px; }
+.concept-document pre { overflow: auto; padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
 .concept-document pre code { padding: 0; background: transparent; }
 .concept-document blockquote { margin: 22px 0; padding: 2px 20px; border-left: 3px solid var(--green); background: rgba(77,226,177,.04); }
 .concept-document table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
 .concept-document th, .concept-document td { padding: 10px 12px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
 .concept-document th { color: var(--green); background: rgba(77,226,177,.06); }
-.concept-document td { color: #bdd1cd; }
+.concept-document td { color: var(--muted); }
 
 @media (max-width: 720px) {
   .concept-topbar { gap: 12px; padding: 10px 14px; flex-wrap: wrap; }

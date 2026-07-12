@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2607.01.2`
-- **npm-kompatible Version:** `2607.1.2`
+- **Aktuelle Release-Version:** `2607.01.3`
+- **npm-kompatible Version:** `2607.1.3`
 - **Repository:** privates GitHub-Repository `mradeck/geodata-inspector-cleaner`
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md`
@@ -42,9 +42,9 @@ Arbeit lösen keinen Versionssprung aus. Beim Monatswechsel beginnt `RR` wieder
 mit `01`.
 
 SemVer verbietet führende Nullen in numerischen Segmenten. Deshalb verwenden
-`package.json` und `package-lock.json` für `2607.01.2` die npm-kompatible Form
-`2607.1.2`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
-Berichte und Dokumentation verwenden die kanonische Form `2607.01.2`.
+`package.json` und `package-lock.json` für `2607.01.3` die npm-kompatible Form
+`2607.1.3`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
+Berichte und Dokumentation verwenden die kanonische Form `2607.01.3`.
 
 ## Versionierungs-, Dokumentations- und Push-Regel
 
@@ -120,6 +120,12 @@ Merksätze:
   beibehalten, kein Prefetch/Offline-Download und Kartenprovider konfigurierbar halten.
 - Sichtbare und barrierefreie UI-Texte in beiden zentralen Sprachkatalogen
   (`src/i18n/de.ts`, `src/i18n/en.ts`) ergänzen; Katalog-Parität testen.
+- Die Anwenderhilfe rendert `README.md` über `help.html`; Bedienänderungen müssen
+  deshalb in der README so beschrieben sein, dass sie auch innerhalb der App als
+  Hilfe verständlich bleiben. Das Produktkonzept bleibt separat versioniert.
+- Hell-/Dunkelwahl wird ausschließlich lokal unter `gic.theme` gespeichert.
+  Neue Oberflächen müssen in beiden Themes auf Kontrast und Lesbarkeit geprüft
+  werden; Hauptansicht und Hilfeseite verwenden dieselbe Theme-Schicht.
 - Reale DXF-Referenzfixtures gelten als sensibel. Sie dürfen nur nach
   ausdrücklicher Freigabe in ein weiterhin privates Repository gepusht werden.
   Eine öffentliche Freigabe benötigt eine gesonderte Anonymisierungs- und
@@ -140,6 +146,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2607.01.3` | 2026-07-13 | README-basierte Hilfeseite statt Konzept-Schaltfläche, zweisprachige „Über mich“-Ansicht aus dem Pointcloud Manager und lokal gespeicherter Hell-/Dunkelmodus für Hauptansicht und Hilfe. |
 | `2607.01.2` | 2026-07-13 | Wählbare DXF-Zielformate AC1015/AutoCAD 2000 und AC1032/AutoCAD 2018 mit gespeicherter Auswahl; vollständiges, OEM-gehärtetes DXF-Gerüst aus dem Pointcloud-Manager mit Handles, Subclass-Markern, Standardtabellen, BLOCKS und OBJECTS. |
 | `2607.01.1` | 2026-07-12 | CRS-gestützte Hauptbereichswahl, Karten für Haupt-/Störbereich, normalisierter Cleaner-Export auf Basis des Pointcloud-Manager-Exporters, Layer-/Objekttypfilter mit DXF-Metadaten, GeoJSON→DXF-Konvertierung, Inter-Typografie und lokal sichtbares Patch-Versioning. |
 | `2607.01.0` | 2026-07-12 | Erster main-Release mit lokalem DXF-/GeoJSON-Import, Cluster-/CRS-/Z-Analyse, drei Diagnosevorschauen, OSM-Geometrieüberlagerung, manueller Hauptbereichswahl, DE/EN-Umschaltung, lokalisierten Konzeptseiten und realen privaten Regressionsfixtures. |

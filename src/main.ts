@@ -32,6 +32,7 @@ import type { Bounds2D, GeoDataset, InspectionFinding, InspectionReport } from "
 import { renderPreview } from "./render/renderPreview";
 import { demoDataset } from "./sample/demoDataset";
 import { OsmClusterMap } from "./map/osmClusterMap";
+import { getTheme, initTheme, onThemeChange, toggleTheme } from "./theme";
 import { APP_VERSION } from "./version";
 
 const elements = {
@@ -61,7 +62,11 @@ const elements = {
   objectFilterConfirmation: byId<HTMLElement>("object-filter-confirmation"),
   objectFilterConfirmationText: byId<HTMLElement>("object-filter-confirmation-text"),
   filterConfirmPrimary: byId<HTMLButtonElement>("filter-confirm-primary"),
-  conceptLink: byId<HTMLAnchorElement>("concept-link"),
+  helpLink: byId<HTMLAnchorElement>("help-link"),
+  openAbout: byId<HTMLButtonElement>("open-about"),
+  closeAbout: byId<HTMLButtonElement>("close-about"),
+  confirmAbout: byId<HTMLButtonElement>("confirm-about"),
+  aboutDialog: byId<HTMLElement>("about-dialog"),
   overviewCanvas: byId<HTMLCanvasElement>("overview-canvas"),
   focusCanvas: byId<HTMLCanvasElement>("focus-canvas"),
   focusOsmMap: byId<HTMLElement>("focus-osm-map"),
@@ -76,6 +81,8 @@ const elements = {
   languageToggle: byId<HTMLButtonElement>("btn-toggle-language"),
   languageFlag: byId<HTMLElement>("language-flag"),
   languageCode: byId<HTMLElement>("language-code"),
+  themeToggle: byId<HTMLButtonElement>("btn-toggle-theme"),
+  themeIcon: byId<HTMLElement>("theme-icon"),
 };
 
 let currentDataset: GeoDataset | null = null;
@@ -87,18 +94,39 @@ let focusOsmMap: OsmClusterMap | null = null;
 let disturbanceOsmMap: OsmClusterMap | null = null;
 let layerSummaries: LayerObjectSummary[] = [];
 let featureFilterSelection: FeatureFilterSelection = new Set();
+let previousAboutFocus: HTMLElement | null = null;
 
+initTheme();
 initI18n();
 elements.dxfAcadVersion.value = getDxfAcadVersion();
 syncLanguageControl();
+syncThemeControl();
 syncClusterDistanceLabel();
 
 elements.languageToggle.addEventListener("click", () => {
   setLanguage(getLanguage() === "de" ? "en" : "de");
 });
 
+elements.themeToggle.addEventListener("click", () => {
+  const theme = toggleTheme();
+  setStatus(t(theme === "light" ? "status.themeLight" : "status.themeDark"), "ok");
+});
+
+elements.openAbout.addEventListener("click", openAboutDialog);
+elements.closeAbout.addEventListener("click", closeAboutDialog);
+elements.confirmAbout.addEventListener("click", closeAboutDialog);
+elements.aboutDialog.addEventListener("click", (event) => {
+  if (event.target === elements.aboutDialog) closeAboutDialog();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !elements.aboutDialog.hidden) closeAboutDialog();
+});
+
+onThemeChange(() => syncThemeControl());
+
 onLanguageChange((language) => {
   syncLanguageControl();
+  syncThemeControl();
   syncClusterDistanceLabel();
   if (currentReport) renderDashboard(currentReport);
   setStatus(t("status.languageChanged", { language: LANGUAGE_LABELS[language].name }), "ok");
@@ -873,7 +901,28 @@ function syncLanguageControl(): void {
   elements.languageFlag.textContent = LANGUAGE_LABELS[language].flag;
   elements.languageCode.textContent = language.toUpperCase();
   elements.languageToggle.setAttribute("aria-label", t("lang.toggle.title"));
-  elements.conceptLink.href = `./concept.html?lang=${language}`;
+  elements.helpLink.href = `./help.html?lang=${language}`;
+}
+
+function syncThemeControl(): void {
+  const isDark = getTheme() === "dark";
+  elements.themeIcon.textContent = isDark ? "☀" : "☾";
+  const label = t(isDark ? "theme.toggle.toLight" : "theme.toggle.toDark");
+  elements.themeToggle.title = label;
+  elements.themeToggle.setAttribute("aria-label", label);
+}
+
+function openAboutDialog(): void {
+  previousAboutFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  elements.aboutDialog.hidden = false;
+  elements.closeAbout.focus();
+}
+
+function closeAboutDialog(): void {
+  if (elements.aboutDialog.hidden) return;
+  elements.aboutDialog.hidden = true;
+  previousAboutFocus?.focus();
+  previousAboutFocus = null;
 }
 
 function syncClusterDistanceLabel(): void {

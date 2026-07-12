@@ -5,6 +5,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: "index.html",
+        help: "help.html",
         concept: "concept.html",
       },
     },

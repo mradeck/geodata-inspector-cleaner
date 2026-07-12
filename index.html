@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
     <meta name="description" content="Lokale Inspektion und Bereinigung räumlicher Ausreißer in DXF- und GeoJSON-Dateien." />
     <title>Geodata Inspector & Cleaner</title>
   </head>
@@ -21,7 +22,11 @@
         <div class="privacy-chip"><span></span><span data-i18n="header.privacy">Geometrie lokal · OSM-Karte online</span></div>
         <nav class="top-actions" aria-label="Projektaktionen" data-i18n-aria-label="header.actionsAria">
           <button id="download-report" class="button button-quiet" disabled data-i18n="header.report">Prüfbericht</button>
-          <a id="concept-link" class="button button-quiet" href="./concept.html?lang=de" target="_blank" data-i18n="header.concept">Konzept</a>
+          <a id="help-link" class="button button-quiet" href="./help.html?lang=de" target="_blank" rel="noopener" data-i18n="header.help">Hilfe</a>
+          <button id="open-about" class="button button-quiet" type="button" data-i18n="header.about">Über mich</button>
+          <button id="btn-toggle-theme" class="button button-quiet theme-button" type="button" data-i18n-title="theme.toggle.title" title="Interface-Design umschalten">
+            <span id="theme-icon" aria-hidden="true">☀</span>
+          </button>
           <button id="btn-toggle-language" class="button button-quiet language-button" type="button" data-i18n-title="lang.toggle.title" title="Sprache umschalten">
             <span id="language-flag" aria-hidden="true">🇩🇪</span>
             <span id="language-code">DE</span>
@@ -228,8 +233,36 @@
 
       <footer class="statusbar">
         <span id="status"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></span>
-        <span data-i18n="version.label">Version 2607.01.2</span>
+        <span data-i18n="version.label">Version 2607.01.3</span>
       </footer>
+    </div>
+
+    <div id="about-dialog" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="about-title" hidden>
+      <section class="about-panel">
+        <header class="about-header">
+          <div>
+            <p class="eyebrow" data-i18n="about.eyebrow">Über den Entwickler</p>
+            <h2 id="about-title" data-i18n="about.title">Über Michael Radeck</h2>
+            <p data-i18n="about.subtitle">DroneMediaMunich, Multikopterschule XMS, Pointcloud Manager und Geodata Inspector & Cleaner.</p>
+          </div>
+          <button id="close-about" class="button about-close-icon" type="button" aria-label="Über-mich-Fenster schließen" data-i18n-aria-label="about.closeAria">×</button>
+        </header>
+        <div class="about-body">
+          <p data-i18n="about.p1">Michael Radeck arbeitet seit vielen Jahren an der Schnittstelle von Medienproduktion, Drohnentechnik, Vermessung und Ausbildung.</p>
+          <p data-i18n="about.p2">Mit DroneMediaMunich realisiert er Luftaufnahmen, Drohnenvideos, Inspektions- und Vermessungsflüge sowie photogrammetrische Auswertungen.</p>
+          <p data-i18n="about.p3">Der Pointcloud Manager entsteht aus diesem praktischen Arbeitsumfeld als lokales Werkzeug für nachvollziehbare Geodaten-Workflows.</p>
+          <p data-i18n="about.p4">Der Geodata Inspector & Cleaner überträgt diesen Ansatz auf die nachvollziehbare Prüfung und Bereinigung problematischer CAD- und Geodaten.</p>
+          <nav class="about-links" aria-label="Profile und Projekte" data-i18n-aria-label="about.linksAria">
+            <a href="https://multikopterschule.de/" target="_blank" rel="noopener">multikopterschule.de</a>
+            <a href="https://www.dronemedia-munich.de/" target="_blank" rel="noopener">dronemedia-munich.de</a>
+            <a href="https://www.xing.com/profile/Michael_Radeck" target="_blank" rel="noopener" data-i18n="about.link.xing">XING-Profil</a>
+            <a href="https://www.crew-united.com/de/Michael-Radeck_71557.html" target="_blank" rel="noopener">Crew United</a>
+          </nav>
+        </div>
+        <footer class="about-footer">
+          <button id="confirm-about" class="button" type="button" data-i18n="about.close">OK</button>
+        </footer>
+      </section>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

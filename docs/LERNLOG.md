@@ -4,6 +4,50 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## 13. Juli 2026 – Subversion 2607.01.3
+
+### Anwenderhilfe und Produktkonzept haben unterschiedliche Aufgaben
+
+**Problem:** Die bisherige Kopfaktion öffnete das ausführliche Produkt- und
+UX-Konzept. Dieses Dokument erklärt Ziele, Architekturentscheidungen und
+Erfolgskriterien, ist aber keine schnell auffindbare Bedienhilfe für Import,
+Hauptbereichsbestätigung, Objektfilter, DXF-Version und Exportgrenzen.
+
+**Stabile Lösung:** Die primäre Kopfaktion heißt jetzt **Hilfe** und rendert die
+versionierte `README.md` über `help.html` mit `marked`. Damit sind Repository-
+Dokumentation und In-App-Hilfe dieselbe redaktionelle Quelle. Das Produktkonzept
+bleibt als Entscheidungsdokument erhalten und ist aus der README erreichbar.
+Wie beim Konzept werden ausschließlich fest in den Build eingebundene Dateien
+gerendert; importierte Nutzerinhalte gelangen nicht in den Markdown-Renderer.
+
+### Ein Theme braucht gemeinsame Zustands- und Farbregeln
+
+**Problem:** Ein nur optisch invertierter Einzelbildschirm würde spätestens bei
+Kartenflächen, Tabellen, deaktivierten Buttons und Dokumentseiten inkonsistent.
+Außerdem wäre nach einem Reload unklar, welches Design aktiv sein sollte.
+
+**Stabile Lösung:** `src/theme.ts` verwaltet `dark` und `light` zentral, setzt
+`data-theme` sowie `color-scheme` am Dokument und speichert die Wahl fehlertolerant
+unter `gic.theme`. Hauptansicht und Hilfeseite nutzen dieselbe Schicht. Die
+CSS-Farbvariablen bilden Text, Flächen, Linien und Statusfarben ab; zusätzliche
+Light-Theme-Regeln erhalten die semantische Trennung von Hauptbereich, Warnung,
+Cleaner und Kartenseitenleiste. Tests sichern den dunklen Default und die
+Normalisierung gespeicherter Werte, die Browserprüfung beide Designs und die
+Persistenz nach Reload.
+
+### Übernommene Projekttexte müssen in den Zielkontext eingeordnet werden
+
+**Erkenntnis:** Die „Über mich“-Texte aus dem Pointcloud Manager beschreiben den
+fachlichen Hintergrund vollständig, nennen die neue App aber naturgemäß noch
+nicht. Eine wortlose Kopie würde deshalb wie ein Fremdkörper wirken.
+
+**Stabile Lösung:** Die drei deutschen und englischen Ausgangsabsätze sowie die
+vier Profil-/Projektlinks wurden übernommen. Ein vierter, ebenfalls
+zweisprachiger Absatz erklärt den Bezug des Geodata Inspector & Cleaner zu
+nachvollziehbaren CAD-/Geodaten-Workflows. Der Dialog lässt sich über
+Schließen-Schaltfläche, OK, Klick auf die Überlagerung und Escape verlassen und
+gibt den Fokus an das auslösende Element zurück.
+
 ## 13. Juli 2026 – Subversion 2607.01.2
 
 ### Ein anderer `$ACADVER`-Stempel allein schafft keine CAD-Kompatibilität
