@@ -36,6 +36,7 @@ import { getTheme, initTheme, onThemeChange, toggleTheme } from "./theme";
 import { APP_VERSION } from "./version";
 
 const elements = {
+  headerVersion: byId<HTMLElement>("header-version"),
   fileInput: byId<HTMLInputElement>("file-input"),
   dropZone: byId<HTMLElement>("drop-zone"),
   loadDemo: byId<HTMLButtonElement>("load-demo"),
@@ -63,15 +64,24 @@ const elements = {
   objectFilterConfirmationText: byId<HTMLElement>("object-filter-confirmation-text"),
   filterConfirmPrimary: byId<HTMLButtonElement>("filter-confirm-primary"),
   helpLink: byId<HTMLAnchorElement>("help-link"),
+  aboutMenu: byId<HTMLDetailsElement>("about-menu"),
   openAbout: byId<HTMLButtonElement>("open-about"),
+  openCopyright: byId<HTMLButtonElement>("open-copyright"),
   closeAbout: byId<HTMLButtonElement>("close-about"),
   confirmAbout: byId<HTMLButtonElement>("confirm-about"),
   aboutDialog: byId<HTMLElement>("about-dialog"),
+  closeCopyright: byId<HTMLButtonElement>("close-copyright"),
+  confirmCopyright: byId<HTMLButtonElement>("confirm-copyright"),
+  copyrightDialog: byId<HTMLElement>("copyright-dialog"),
+  copyrightContent: byId<HTMLElement>("copyright-content"),
   overviewCanvas: byId<HTMLCanvasElement>("overview-canvas"),
   focusCanvas: byId<HTMLCanvasElement>("focus-canvas"),
   focusOsmMap: byId<HTMLElement>("focus-osm-map"),
   focusPreviewVisual: byId<HTMLElement>("focus-preview-visual"),
   disturbanceCanvas: byId<HTMLCanvasElement>("disturbance-canvas"),
+  disturbancePreviewCard: byId<HTMLDetailsElement>("disturbance-preview-card"),
+  disturbancePreviewToggle: byId<HTMLElement>("disturbance-preview-toggle"),
+  disturbanceToggleLabel: byId<HTMLElement>("disturbance-toggle-label"),
   disturbanceOsmMap: byId<HTMLElement>("disturbance-osm-map"),
   disturbancePreviewVisual: byId<HTMLElement>("disturbance-preview-visual"),
   disturbanceBadge: byId<HTMLElement>("disturbance-badge"),
@@ -95,12 +105,16 @@ let disturbanceOsmMap: OsmClusterMap | null = null;
 let layerSummaries: LayerObjectSummary[] = [];
 let featureFilterSelection: FeatureFilterSelection = new Set();
 let previousAboutFocus: HTMLElement | null = null;
+let previousCopyrightFocus: HTMLElement | null = null;
+let copyrightLoaded = false;
 
 initTheme();
 initI18n();
+syncAppIdentity();
 elements.dxfAcadVersion.value = getDxfAcadVersion();
 syncLanguageControl();
 syncThemeControl();
+syncDisturbanceDisclosure();
 syncClusterDistanceLabel();
 
 elements.languageToggle.addEventListener("click", () => {
@@ -112,21 +126,44 @@ elements.themeToggle.addEventListener("click", () => {
   setStatus(t(theme === "light" ? "status.themeLight" : "status.themeDark"), "ok");
 });
 
+elements.disturbancePreviewCard.addEventListener("toggle", () => {
+  syncDisturbanceDisclosure();
+  if (!elements.disturbancePreviewCard.open) return;
+  window.requestAnimationFrame(() => {
+    renderCanvases();
+    if (currentReport) renderDetailMaps(currentReport, assessClustersForMap(currentReport));
+  });
+});
+
 elements.openAbout.addEventListener("click", openAboutDialog);
+elements.openCopyright.addEventListener("click", openCopyrightDialog);
 elements.closeAbout.addEventListener("click", closeAboutDialog);
 elements.confirmAbout.addEventListener("click", closeAboutDialog);
+elements.closeCopyright.addEventListener("click", closeCopyrightDialog);
+elements.confirmCopyright.addEventListener("click", closeCopyrightDialog);
 elements.aboutDialog.addEventListener("click", (event) => {
   if (event.target === elements.aboutDialog) closeAboutDialog();
 });
+elements.copyrightDialog.addEventListener("click", (event) => {
+  if (event.target === elements.copyrightDialog) closeCopyrightDialog();
+});
+document.addEventListener("click", (event) => {
+  if (!elements.aboutMenu.contains(event.target as Node)) elements.aboutMenu.open = false;
+});
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !elements.aboutDialog.hidden) closeAboutDialog();
+  if (event.key !== "Escape") return;
+  if (!elements.copyrightDialog.hidden) closeCopyrightDialog();
+  else if (!elements.aboutDialog.hidden) closeAboutDialog();
+  else elements.aboutMenu.open = false;
 });
 
 onThemeChange(() => syncThemeControl());
 
 onLanguageChange((language) => {
+  syncAppIdentity();
   syncLanguageControl();
   syncThemeControl();
+  syncDisturbanceDisclosure();
   syncClusterDistanceLabel();
   if (currentReport) renderDashboard(currentReport);
   setStatus(t("status.languageChanged", { language: LANGUAGE_LABELS[language].name }), "ok");
@@ -553,6 +590,11 @@ function renderDetailMaps(report: InspectionReport, mapReport: ClusterMapReport)
     : false;
   setDetailMapAvailability(elements.focusPreviewVisual, elements.focusOsmMap, focusHasMap);
 
+  if (!elements.disturbancePreviewCard.open) {
+    setDetailMapAvailability(elements.disturbancePreviewVisual, elements.disturbanceOsmMap, false);
+    return;
+  }
+
   const disturbance = selectDisturbanceArea(report);
   const disturbanceClusterIds = new Set(report.clusters
     .filter((cluster) => !cluster.isPrimary && cluster.featureIds.some((id) => disturbance?.featureIds.has(id)))
@@ -688,13 +730,15 @@ function renderCanvases(): void {
     visibleFeatureIds: filteredPrimaryIds,
     highlightedFeatureIds: highlightedIds,
   });
-  const disturbance = selectDisturbanceArea(currentReport);
-  renderPreview(elements.disturbanceCanvas, currentDataset, currentReport, {
-    bounds: disturbance?.bounds ?? null,
-    visibleFeatureIds: disturbance?.featureIds ?? new Set<string>(),
-    highlightedFeatureIds: highlightedIds,
-    emptyMessage: t("preview.noDisturbance"),
-  });
+  if (elements.disturbancePreviewCard.open) {
+    const disturbance = selectDisturbanceArea(currentReport);
+    renderPreview(elements.disturbanceCanvas, currentDataset, currentReport, {
+      bounds: disturbance?.bounds ?? null,
+      visibleFeatureIds: disturbance?.featureIds ?? new Set<string>(),
+      highlightedFeatureIds: highlightedIds,
+      emptyMessage: t("preview.noDisturbance"),
+    });
+  }
 }
 
 function setStatus(message: string, type: "working" | "error" | "warning" | "ok"): void {
@@ -904,6 +948,12 @@ function syncLanguageControl(): void {
   elements.helpLink.href = `./help.html?lang=${language}`;
 }
 
+function syncAppIdentity(): void {
+  const version = `v${APP_VERSION}`;
+  elements.headerVersion.textContent = version;
+  document.title = `${t("app.title")} ${version}`;
+}
+
 function syncThemeControl(): void {
   const isDark = getTheme() === "dark";
   elements.themeIcon.textContent = isDark ? "☀" : "☾";
@@ -912,8 +962,22 @@ function syncThemeControl(): void {
   elements.themeToggle.setAttribute("aria-label", label);
 }
 
+function syncDisturbanceDisclosure(): void {
+  const expanded = elements.disturbancePreviewCard.open;
+  elements.disturbanceToggleLabel.textContent = t(expanded
+    ? "preview.disturbanceCollapse"
+    : "preview.disturbanceExpand");
+  const label = t(expanded
+    ? "preview.disturbanceCollapseAria"
+    : "preview.disturbanceExpandAria");
+  elements.disturbancePreviewToggle.setAttribute("aria-label", label);
+  elements.disturbancePreviewToggle.setAttribute("aria-expanded", String(expanded));
+  elements.disturbancePreviewToggle.title = label;
+}
+
 function openAboutDialog(): void {
-  previousAboutFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  elements.aboutMenu.open = false;
+  previousAboutFocus = elements.aboutMenu.querySelector<HTMLElement>("summary");
   elements.aboutDialog.hidden = false;
   elements.closeAbout.focus();
 }
@@ -923,6 +987,42 @@ function closeAboutDialog(): void {
   elements.aboutDialog.hidden = true;
   previousAboutFocus?.focus();
   previousAboutFocus = null;
+}
+
+function openCopyrightDialog(): void {
+  elements.aboutMenu.open = false;
+  previousCopyrightFocus = elements.aboutMenu.querySelector<HTMLElement>("summary");
+  elements.copyrightDialog.hidden = false;
+  elements.closeCopyright.focus();
+  setStatus(t("status.copyrightOpened"), "ok");
+  if (!copyrightLoaded) void loadCopyrightContent();
+}
+
+async function loadCopyrightContent(): Promise<void> {
+  try {
+    const [{ marked }, copyrightDocument] = await Promise.all([
+      import("marked"),
+      import("../docs/COPYRIGHT-LICENSES.md?raw"),
+    ]);
+    elements.copyrightContent.innerHTML = marked.parse(copyrightDocument.default, { async: false }) as string;
+    elements.copyrightContent.querySelectorAll<HTMLAnchorElement>("a").forEach((anchor) => {
+      anchor.target = "_blank";
+      anchor.rel = "noopener";
+    });
+    copyrightLoaded = true;
+  } catch {
+    elements.copyrightContent.innerHTML = "";
+    const message = document.createElement("p");
+    message.textContent = t("copyright.error");
+    elements.copyrightContent.append(message);
+  }
+}
+
+function closeCopyrightDialog(): void {
+  if (elements.copyrightDialog.hidden) return;
+  elements.copyrightDialog.hidden = true;
+  previousCopyrightFocus?.focus();
+  previousCopyrightFocus = null;
 }
 
 function syncClusterDistanceLabel(): void {

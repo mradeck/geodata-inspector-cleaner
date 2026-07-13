@@ -4,6 +4,66 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## 13. Juli 2026 – Release 2607.02.0
+
+### Eine Versionsanzeige muss sichtbar und trotzdem platzsparend sein
+
+**Problem:** Die Version stand zwar in der unteren Statuszeile, war beim ersten
+Blick auf die App aber nicht so präsent wie im Pointcloud Manager. Eine große
+Versionszeichenfolge im eigentlichen Titel würde die ohnehin dichte Kopfleiste
+unnötig verbreitern oder umbrechen.
+
+**Stabile Lösung:** App-Name und Version besitzen in der Marke getrennte,
+nicht umbrechende Spans. Die vollständige kanonische Version wird kleiner und
+zurückhaltend direkt neben `Geodata Inspector` angezeigt. `syncAppIdentity()`
+setzt Header und Browser-Tab gemeinsam aus `APP_VERSION`; Statuszeile und
+Prüfbericht lesen dieselbe zentrale Quelle. Der statische HTML-Fallback wird im
+Versionskonsistenztest gegen `displayVersion` geprüft.
+
+### Verborgene Karten und Canvas-Flächen erst beim Öffnen rendern
+
+**Problem:** Eine per CSS versteckte Vorschau besitzt beim Rendern keine
+verlässliche Breite und Höhe. Canvas würde dadurch zunächst nur 1×1 Pixel groß,
+Leaflet berechnete Zoom und Bounds gegen einen unsichtbaren Container. Reines
+Ein-/Ausblenden könnte deshalb beim ersten Öffnen eine leere oder falsch
+zentrierte Störbereichsvorschau zeigen.
+
+**Stabile Lösung:** Die Störbereichskarte ist ein natives, standardmäßig
+geschlossenes `details`-Element. Solange es geschlossen ist, überspringen
+Canvas- und Detailkartenpfad die teure Darstellung. Beim `toggle` nach `open`
+wartet die App einen Layout-Frame ab und rendert Canvas sowie Leaflet-Detailkarte
+mit den dann realen Abmessungen neu. Ausdehnung, Featurezahl und fachlicher
+Prüfstatus bleiben auch im geschlossenen Summary sichtbar; Analyse- und
+Exportzustand werden durch das Disclosure nicht verändert.
+
+## 13. Juli 2026 – Subversion 2607.01.4
+
+### Lizenzinformationen brauchen eine einzige redaktionelle Quelle
+
+**Problem:** Eine separat in HTML gepflegte Copyright-Tabelle würde mit
+`docs/COPYRIGHT-LICENSES.md` früher oder später auseinanderlaufen. Gerade die
+bei jedem Release vorgeschriebene Prüfung von Paketversionen, Lizenzen und
+OpenStreetMap-Pflichten darf nicht zwei unabhängige Darstellungen aktualisieren
+müssen.
+
+**Stabile Lösung:** Das neue Kopfmenü **Über** folgt dem Pointcloud-Manager-
+Muster und enthält **Über mich** sowie **Copyright**. Der Copyright-Dialog lädt
+die versionierte Markdown-Datei bei Bedarf per dynamischem Import und rendert
+sie mit dem bereits verwendeten `marked`. Dadurch bleibt `marked` außerhalb des
+initialen Hauptbundles und die Markdown-Datei ist zugleich Repository- und
+In-App-Quelle. Externe Links werden als neue, von der App getrennte Tabs mit
+`noopener` geöffnet.
+
+### Eine eingeschränkte Demo muss am Link selbst eingeordnet werden
+
+**Erkenntnis:** Ein bloßer Link mit dem Produktnamen kann den Eindruck erwecken,
+die verlinkte Anwendung bilde den vollständigen Pointcloud Manager ab.
+
+**Stabile Lösung:** Der Über-mich-Text kennzeichnet die verlinkte Netlify-Version
+in Deutsch und Englisch ausdrücklich als reduzierte Online-Version mit
+Funktionslimits und Upgrade-/Upsell-Hinweisen. Damit ist die Einschränkung vor
+dem Öffnen sichtbar und nicht erst innerhalb der Zielanwendung.
+
 ## 13. Juli 2026 – Subversion 2607.01.3
 
 ### Anwenderhilfe und Produktkonzept haben unterschiedliche Aufgaben

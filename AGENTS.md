@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2607.01.3`
-- **npm-kompatible Version:** `2607.1.3`
+- **Aktuelle Release-Version:** `2607.02.0`
+- **npm-kompatible Version:** `2607.2.0`
 - **Repository:** privates GitHub-Repository `mradeck/geodata-inspector-cleaner`
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md`
@@ -42,9 +42,9 @@ Arbeit lösen keinen Versionssprung aus. Beim Monatswechsel beginnt `RR` wieder
 mit `01`.
 
 SemVer verbietet führende Nullen in numerischen Segmenten. Deshalb verwenden
-`package.json` und `package-lock.json` für `2607.01.3` die npm-kompatible Form
-`2607.1.3`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
-Berichte und Dokumentation verwenden die kanonische Form `2607.01.3`.
+`package.json` und `package-lock.json` für `2607.02.0` die npm-kompatible Form
+`2607.2.0`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
+Berichte und Dokumentation verwenden die kanonische Form `2607.02.0`.
 
 ## Versionierungs-, Dokumentations- und Push-Regel
 
@@ -123,9 +123,21 @@ Merksätze:
 - Die Anwenderhilfe rendert `README.md` über `help.html`; Bedienänderungen müssen
   deshalb in der README so beschrieben sein, dass sie auch innerhalb der App als
   Hilfe verständlich bleiben. Das Produktkonzept bleibt separat versioniert.
+- Das Kopfmenü `Über` rendert Copyright-/Lizenzinformationen dynamisch aus
+  `docs/COPYRIGHT-LICENSES.md`. Diese Datei ist die einzige redaktionelle Quelle;
+  der Dialog darf keine abweichende zweite Lizenzliste pflegen. Externe Demo-
+  Links müssen Funktionslimits und Upgrade-/Upsell-Hinweise transparent benennen.
 - Hell-/Dunkelwahl wird ausschließlich lokal unter `gic.theme` gespeichert.
   Neue Oberflächen müssen in beiden Themes auf Kontrast und Lesbarkeit geprüft
   werden; Hauptansicht und Hilfeseite verwenden dieselbe Theme-Schicht.
+- Die Störbereichsvorschau ist ein standardmäßig geschlossenes `details`-
+  Element. Solange sie geschlossen ist, werden ihr Canvas und ihre Leaflet-Karte
+  nicht gerendert; beim Öffnen müssen beide nach dem Layout-Frame mit der
+  sichtbaren Größe neu aufgebaut werden. Analyse und Export bleiben unabhängig
+  vom Offen-/Geschlossen-Zustand.
+- Die Versionsnummer neben dem App-Titel, im Browser-Tab, in der Statuszeile und
+  in Exportberichten stammt zentral aus `displayVersion`; keine zweite
+  handgepflegte Laufzeitkonstante einführen.
 - Reale DXF-Referenzfixtures gelten als sensibel. Sie dürfen nur nach
   ausdrücklicher Freigabe in ein weiterhin privates Repository gepusht werden.
   Eine öffentliche Freigabe benötigt eine gesonderte Anonymisierungs- und
@@ -146,6 +158,8 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2607.02.0` | 2026-07-13 | Neue Release-Linie mit vollständiger Version neben App-Titel und im Browser-Tab sowie standardmäßig eingeklappter, bedarfsgerecht gerenderter Störbereichsvorschau; schließt 2607.01.4 ein. |
+| `2607.01.4` | 2026-07-13 | Über-Menü mit Über-mich- und Copyright-Eintrag, dynamisch gerenderter Lizenzübersicht und transparent gekennzeichnetem Link zur reduzierten Pointcloud-Manager-Onlineversion. |
 | `2607.01.3` | 2026-07-13 | README-basierte Hilfeseite statt Konzept-Schaltfläche, zweisprachige „Über mich“-Ansicht aus dem Pointcloud Manager und lokal gespeicherter Hell-/Dunkelmodus für Hauptansicht und Hilfe. |
 | `2607.01.2` | 2026-07-13 | Wählbare DXF-Zielformate AC1015/AutoCAD 2000 und AC1032/AutoCAD 2018 mit gespeicherter Auswahl; vollständiges, OEM-gehärtetes DXF-Gerüst aus dem Pointcloud-Manager mit Handles, Subclass-Markern, Standardtabellen, BLOCKS und OBJECTS. |
 | `2607.01.1` | 2026-07-12 | CRS-gestützte Hauptbereichswahl, Karten für Haupt-/Störbereich, normalisierter Cleaner-Export auf Basis des Pointcloud-Manager-Exporters, Layer-/Objekttypfilter mit DXF-Metadaten, GeoJSON→DXF-Konvertierung, Inter-Typografie und lokal sichtbares Patch-Versioning. |

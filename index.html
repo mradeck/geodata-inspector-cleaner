@@ -14,8 +14,11 @@
           <span class="brand-mark" aria-hidden="true">
             <span></span><span></span><span></span>
           </span>
-          <span>
-            <strong>Geodata Inspector</strong>
+          <span class="brand-copy">
+            <span class="brand-title-line">
+              <strong>Geodata Inspector</strong>
+              <span id="header-version" class="brand-version">v2607.02.0</span>
+            </span>
             <small>& Cleaner</small>
           </span>
         </a>
@@ -23,7 +26,13 @@
         <nav class="top-actions" aria-label="Projektaktionen" data-i18n-aria-label="header.actionsAria">
           <button id="download-report" class="button button-quiet" disabled data-i18n="header.report">Prüfbericht</button>
           <a id="help-link" class="button button-quiet" href="./help.html?lang=de" target="_blank" rel="noopener" data-i18n="header.help">Hilfe</a>
-          <button id="open-about" class="button button-quiet" type="button" data-i18n="header.about">Über mich</button>
+          <details id="about-menu" class="header-menu">
+            <summary class="button button-quiet" data-i18n="header.aboutMenu">Über</summary>
+            <div class="header-menu-panel">
+              <button id="open-about" type="button" data-i18n="header.about">Über mich</button>
+              <button id="open-copyright" type="button" data-i18n="header.copyright">Copyright</button>
+            </div>
+          </details>
           <button id="btn-toggle-theme" class="button button-quiet theme-button" type="button" data-i18n-title="theme.toggle.title" title="Interface-Design umschalten">
             <span id="theme-icon" aria-hidden="true">☀</span>
           </button>
@@ -117,14 +126,23 @@
                 </div>
                 <div id="focus-coordinate-range" class="preview-coordinate-range">XY-Koordinatenbereich: –</div>
               </article>
-              <article class="preview-card disturbance-preview-card">
-                <header><div><span data-i18n="preview.disturbance">Vermuteter Störbereich</span><small id="disturbance-extent">–</small></div><b id="disturbance-badge" data-i18n="preview.disturbanceReview">PRÜFEN</b></header>
-                <div id="disturbance-preview-visual" class="preview-visual map-backed-preview">
-                  <canvas id="disturbance-canvas" aria-label="Vorschau des vermuteten Störbereichs" data-i18n-aria-label="preview.disturbanceAria"></canvas>
-                  <div id="disturbance-osm-map" class="mini-osm-map" aria-label="OSM-Unterlage des vermuteten Störbereichs" data-i18n-aria-label="preview.disturbanceMapAria" aria-hidden="true" inert></div>
+              <details id="disturbance-preview-card" class="preview-card disturbance-preview-card">
+                <summary id="disturbance-preview-toggle" class="disturbance-preview-summary">
+                  <div><span data-i18n="preview.disturbance">Vermuteter Störbereich</span><small id="disturbance-extent">–</small></div>
+                  <span class="disturbance-summary-actions">
+                    <b id="disturbance-badge" data-i18n="preview.disturbanceReview">PRÜFEN</b>
+                    <span id="disturbance-toggle-label" class="disturbance-toggle-label" data-i18n="preview.disturbanceExpand">Einblenden</span>
+                    <span class="disturbance-chevron" aria-hidden="true">⌄</span>
+                  </span>
+                </summary>
+                <div class="disturbance-preview-content">
+                  <div id="disturbance-preview-visual" class="preview-visual map-backed-preview">
+                    <canvas id="disturbance-canvas" aria-label="Vorschau des vermuteten Störbereichs" data-i18n-aria-label="preview.disturbanceAria"></canvas>
+                    <div id="disturbance-osm-map" class="mini-osm-map" aria-label="OSM-Unterlage des vermuteten Störbereichs" data-i18n-aria-label="preview.disturbanceMapAria" aria-hidden="true" inert></div>
+                  </div>
+                  <div id="disturbance-coordinate-range" class="preview-coordinate-range">XY-Koordinatenbereich: –</div>
                 </div>
-                <div id="disturbance-coordinate-range" class="preview-coordinate-range">XY-Koordinatenbereich: –</div>
-              </article>
+              </details>
             </div>
 
             <article class="map-card">
@@ -233,7 +251,7 @@
 
       <footer class="statusbar">
         <span id="status"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></span>
-        <span data-i18n="version.label">Version 2607.01.3</span>
+        <span data-i18n="version.label">Version 2607.02.0</span>
       </footer>
     </div>
 
@@ -250,7 +268,11 @@
         <div class="about-body">
           <p data-i18n="about.p1">Michael Radeck arbeitet seit vielen Jahren an der Schnittstelle von Medienproduktion, Drohnentechnik, Vermessung und Ausbildung.</p>
           <p data-i18n="about.p2">Mit DroneMediaMunich realisiert er Luftaufnahmen, Drohnenvideos, Inspektions- und Vermessungsflüge sowie photogrammetrische Auswertungen.</p>
-          <p data-i18n="about.p3">Der Pointcloud Manager entsteht aus diesem praktischen Arbeitsumfeld als lokales Werkzeug für nachvollziehbare Geodaten-Workflows.</p>
+          <p>
+            <span data-i18n="about.p3">Der Pointcloud Manager entsteht aus diesem praktischen Arbeitsumfeld als lokales Werkzeug für nachvollziehbare Geodaten-Workflows.</span>
+            <span data-i18n="about.pointcloudDemoIntro">Eine reduzierte Online-Version mit Funktionslimits und Upgrade-/Upsell-Hinweisen ist hier verfügbar:</span>
+            <a class="about-inline-link" href="https://stable-v53--pointcloud-manager.netlify.app/" target="_blank" rel="noopener" data-i18n="about.pointcloudDemoLink">Pointcloud Manager – reduzierte Online-Version</a>.
+          </p>
           <p data-i18n="about.p4">Der Geodata Inspector & Cleaner überträgt diesen Ansatz auf die nachvollziehbare Prüfung und Bereinigung problematischer CAD- und Geodaten.</p>
           <nav class="about-links" aria-label="Profile und Projekte" data-i18n-aria-label="about.linksAria">
             <a href="https://multikopterschule.de/" target="_blank" rel="noopener">multikopterschule.de</a>
@@ -261,6 +283,25 @@
         </div>
         <footer class="about-footer">
           <button id="confirm-about" class="button" type="button" data-i18n="about.close">OK</button>
+        </footer>
+      </section>
+    </div>
+
+    <div id="copyright-dialog" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="copyright-title" hidden>
+      <section class="about-panel copyright-panel">
+        <header class="about-header">
+          <div>
+            <p class="eyebrow" data-i18n="copyright.eyebrow">Projektinformationen</p>
+            <h2 id="copyright-title" data-i18n="copyright.title">Copyright &amp; Lizenzen</h2>
+            <p data-i18n="copyright.subtitle">Direkte Bibliotheken, Build-Komponenten und externe Kartendienste.</p>
+          </div>
+          <button id="close-copyright" class="button about-close-icon" type="button" aria-label="Copyright- und Lizenzfenster schließen" data-i18n-aria-label="copyright.closeAria">×</button>
+        </header>
+        <div id="copyright-content" class="copyright-content">
+          <p data-i18n="copyright.loading">Lizenzübersicht wird geladen …</p>
+        </div>
+        <footer class="about-footer">
+          <button id="confirm-copyright" class="button" type="button" data-i18n="copyright.close">OK</button>
         </footer>
       </section>
     </div>

@@ -9,7 +9,7 @@ Bounds-Berechnungen, Exporte und GIS-/CAD-Weiterverarbeitung unbrauchbar macht.
 
 ## Projektstatus
 
-**Version 2607.01.3 – lokaler Entwicklungsstand mit aktivem Cleaner.** Der
+**Version 2607.02.0 – lokaler Entwicklungsstand mit aktivem Cleaner.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -36,8 +36,12 @@ aktuelle Stand demonstriert bereits:
 - ein dauerhaft gespeichertes helles oder dunkles Interface,
 - eine integrierte Hilfeseite, die diese README-Dokumentation als lesbares HTML
   darstellt,
-- eine zweisprachige „Über mich“-Ansicht mit Hintergrund und Projektlinks von
-  Michael Radeck,
+- ein **Über**-Menü mit zweisprachiger „Über mich“-Ansicht, transparenter
+  Pointcloud-Manager-Demoverlinkung und integrierter Copyright-/Lizenzübersicht,
+- die vollständige Release-Version direkt neben dem App-Titel und zusätzlich in
+  Browser-Tab und Statuszeile,
+- eine standardmäßig eingeklappte, bedarfsgerecht rendernde
+  Störbereichsvorschau,
 - einen reproduzierbaren Demo-Datensatz.
 
 Die Quelldatei wird niemals überschrieben. Der Cleaner erzeugt eine neue Datei
@@ -63,10 +67,36 @@ zwischen hellem und dunklem Design umstellen. Die Wahl gilt auch für die
 Hilfeseite und bleibt unter `gic.theme` lokal gespeichert. Es werden dafür keine
 Einstellungen an einen Server übertragen.
 
-**Über mich** öffnet eine zweisprachige Kurzvorstellung von Michael Radeck. Die
-Texte wurden aus dem Pointcloud Manager übernommen und um den Bezug zum Geodata
-Inspector & Cleaner ergänzt. Verlinkt sind Multikopterschule XMS,
-DroneMediaMunich, XING und Crew United.
+Das Kopfmenü **Über** enthält wie im Pointcloud Manager die Einträge **Über
+mich** und **Copyright**. „Über mich“ öffnet eine zweisprachige Kurzvorstellung
+von Michael Radeck. Die Texte wurden aus dem Pointcloud Manager übernommen und
+um den Bezug zum Geodata Inspector & Cleaner ergänzt. Verlinkt sind
+Multikopterschule XMS, DroneMediaMunich, XING und Crew United. Der dort ebenfalls
+verlinkte [Pointcloud Manager](https://stable-v53--pointcloud-manager.netlify.app/)
+ist ausdrücklich als reduzierte Online-Version mit Funktionslimits und
+Upgrade-/Upsell-Hinweisen gekennzeichnet.
+
+**Copyright** öffnet die versionierte
+[`docs/COPYRIGHT-LICENSES.md`](docs/COPYRIGHT-LICENSES.md) direkt in einem
+App-Dialog. Die Datei bleibt damit die gemeinsame Quelle für Release-Stand,
+Bibliothekslizenzen, OpenStreetMap-Pflichten und die Sicherheitsgrenze des
+Markdown-Renderers.
+
+## Versionsanzeige und kompakte Störbereichsvorschau
+
+Die kanonische Version steht nun wie beim Pointcloud Manager direkt neben dem
+App-Titel, beispielsweise `v2607.02.0`. Browser-Tab und untere Statuszeile zeigen
+denselben Stand. Die Anzeige wird zentral aus `package.json` bezogen und nicht
+als unabhängiger Versionswert gepflegt.
+
+Die dritte Vorschau **Vermuteter Störbereich** ist standardmäßig eingeklappt,
+damit die Hauptbereichsprüfung und die große OSM-Karte schneller erreichbar
+bleiben. Die Kopfzeile zeigt weiterhin Ausdehnung, Featurezahl und die fachliche
+Kennzeichnung **PRÜFEN** beziehungsweise **ENTFERNUNG EMPFOHLEN**. Mit
+**Einblenden** wird die Detailansicht geöffnet; erst dann werden Canvas und
+Störbereichskarte in ihrer sichtbaren Größe neu gerendert. Erneutes Anklicken
+oder **Einklappen** schließt sie wieder. Die Entscheidung betrifft nur die
+Darstellung und verändert weder Analyse noch Exportauswahl.
 
 ## Störbereich entfernen und bereinigte Datei speichern
 
@@ -207,7 +237,7 @@ npm run build
 
 ## Versionierung
 
-Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.01.3`:
+Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.02.0`:
 
 - `JJMM`: Jahr und Monat,
 - `RR`: zweistellige Releasefolge innerhalb des Monats,
@@ -217,8 +247,8 @@ Eine bewusst eröffnete größere Release-Linie erhöht `RR` und setzt `P` auf `
 Jede abgeschlossene lokale Feature-Runde und jeder Bugfix erhöht anschließend
 `P`, sodass der aktive Stand direkt im lokalen Dev-Server erkennbar ist. Wegen
 der SemVer-Regeln ohne führende Nullen steht in `package.json` und
-`package-lock.json` technisch `2607.1.3`. Die App, Dokumentation und exportierten
-Prüfberichte verwenden `2607.01.3`.
+`package-lock.json` technisch `2607.2.0`. Die App, Dokumentation und exportierten
+Prüfberichte verwenden `2607.02.0`.
 
 ## Leitprinzipien
 
@@ -250,6 +280,8 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2607.02.0` | 13. Juli 2026 | Neue Release-Linie mit vollständiger Versionsnummer neben dem App-Titel sowie standardmäßig eingeklappter, bedarfsgerecht gerenderter Störbereichsvorschau; enthält zusätzlich den zuvor lokalen Über-/Copyright-Stand aus 2607.01.4. |
+| `2607.01.4` | 13. Juli 2026 | Über-Menü mit Über-mich- und Copyright-Eintrag, In-App-Rendering der Lizenzübersicht sowie transparent gekennzeichneter Link zur reduzierten Pointcloud-Manager-Onlineversion. |
 | `2607.01.3` | 13. Juli 2026 | README-basierte Hilfeseite statt Konzept-Schaltfläche, übernommene und zweisprachig ergänzte „Über mich“-Information sowie lokal gespeicherter Hell-/Dunkelmodus für App und Hilfe. |
 | `2607.01.2` | 13. Juli 2026 | DXF-Zielformate AC1015/AutoCAD 2000 und AC1032/AutoCAD 2018 mit gespeicherter Auswahl sowie vollständigem OEM-kompatiblem DXF-Gerüst aus dem Pointcloud-Manager. |
 | `2607.01.1` | 12. Juli 2026 | Cleaner mit normalisiertem DXF-Export, Haupt-/Störbereichskarten, CRS-gestützter Hauptbereichswahl, Layer-/Objekttypfilter und DXF-Layermetadaten, GeoJSON→DXF-Konvertierung, Inter-Typografie und lokal sichtbarer Patchversion. |

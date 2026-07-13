@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import packageMetadata from "../package.json";
+import indexPage from "../index.html?raw";
 import { de } from "./i18n/de";
 import { en } from "./i18n/en";
 import { APP_VERSION } from "./version";
@@ -14,5 +15,10 @@ describe("Versionskonsistenz", () => {
   it("bildet die kanonische Version npm-kompatibel ohne führende Release-Null ab", () => {
     const [period, release, patch] = packageMetadata.displayVersion.split(".");
     expect(packageMetadata.version).toBe(`${period}.${Number(release)}.${patch}`);
+  });
+
+  it("zeigt die vollständige Version neben dem App-Titel an", () => {
+    expect(indexPage).toContain('id="header-version"');
+    expect(indexPage).toContain(`v${packageMetadata.displayVersion}</span>`);
   });
 });
