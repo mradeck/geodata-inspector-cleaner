@@ -1,5 +1,8 @@
 .concept-body {
   min-width: 0;
+  height: auto;
+  min-height: 100vh;
+  overflow: auto;
   background: var(--page-background);
 }
 

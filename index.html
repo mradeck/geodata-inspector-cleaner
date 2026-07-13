@@ -17,7 +17,7 @@
           <span class="brand-copy">
             <span class="brand-title-line">
               <strong>Geodata Inspector</strong>
-              <span id="header-version" class="brand-version">v2607.02.0</span>
+              <span id="header-version" class="brand-version">v2607.03.0</span>
             </span>
             <small>& Cleaner</small>
           </span>
@@ -62,6 +62,29 @@
 
           <section class="settings-section">
             <p class="eyebrow" data-i18n="analysis.eyebrow">02 · Analyse</p>
+            <label class="analysis-crs-field" for="analysis-crs">
+              <span data-i18n="analysis.crs">CRS / EPSG</span>
+              <input
+                id="analysis-crs"
+                type="text"
+                value="EPSG:25832"
+                placeholder="z. B. EPSG:25832"
+                data-i18n-placeholder="analysis.crsPlaceholder"
+                spellcheck="false"
+                autocomplete="off"
+                inputmode="text"
+                list="analysis-crs-options"
+                aria-describedby="analysis-crs-help"
+              />
+            </label>
+            <datalist id="analysis-crs-options">
+              <option value="EPSG:25832"></option>
+              <option value="EPSG:25833"></option>
+              <option value="EPSG:31468"></option>
+              <option value="EPSG:4326"></option>
+              <option value="EPSG:3857"></option>
+            </datalist>
+            <p id="analysis-crs-help" class="field-help analysis-crs-help" data-i18n="analysis.crsHelp">Standard EPSG:25832. Änderungen starten die Analyse neu; es findet keine Reprojektion statt.</p>
             <label class="field-label" for="cluster-distance">
               <span data-i18n="analysis.clusterDistance">Cluster-Abstand</span>
               <span id="cluster-distance-value">1.000 m</span>
@@ -240,18 +263,12 @@
             <small id="cleaner-conversion-note" hidden data-i18n="cleaner.conversionNote">Koordinaten bleiben unverändert; es erfolgt keine automatische Reprojektion.</small>
             <small data-i18n="cleaner.normalized">Erzeugt eine neue normalisierte Datei; die Quelldatei bleibt unverändert.</small>
           </section>
-          <div class="roadmap-card">
-            <span class="roadmap-label" data-i18n="roadmap.label">Roadmap</span>
-            <strong data-i18n="roadmap.title">DWG ist kein einfacher zweiter Parser.</strong>
-            <p data-i18n="roadmap.detail">Geplant ist zunächst lokale DWG→DXF-Konvertierung. LibreDWG, ODA und RealDWG werden getrennt nach Lizenz, Genauigkeit und Deployment bewertet.</p>
-            <a href="./docs/ADR-001-DWG-STRATEGY.md" target="_blank" data-i18n="roadmap.link">Entscheidungsdokument öffnen →</a>
-          </div>
         </aside>
       </main>
 
       <footer class="statusbar">
         <span id="status"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></span>
-        <span data-i18n="version.label">Version 2607.02.0</span>
+        <span data-i18n="version.label">Version 2607.03.0</span>
       </footer>
     </div>
 

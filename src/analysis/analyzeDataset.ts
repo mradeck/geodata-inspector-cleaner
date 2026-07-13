@@ -3,13 +3,15 @@ import type { GeoDataset, InspectionConfig, InspectionReport } from "../model";
 import { inspectDataset } from "./inspectDataset";
 
 export interface AnalyzeDatasetOptions {
+  analysisCrs?: string | null;
   preferredPrimaryFeatureId?: string | null;
 }
 
 /**
  * Verbindet die formatneutrale Clusteranalyse mit einer vorsichtigen
- * CRS-Plausibilitätswahl. Nur ein deklariertes CRS und genau ein kartierbarer
- * Cluster dürfen die reine Größenheuristik als Kandidat überstimmen.
+ * CRS-Plausibilitätswahl. Nur eine explizite Benutzervorgabe oder ein
+ * deklariertes CRS und genau ein kartierbarer Cluster dürfen die reine
+ * Größenheuristik als Kandidat überstimmen.
  */
 export function analyzeDataset(
   dataset: GeoDataset,
@@ -18,16 +20,17 @@ export function analyzeDataset(
 ): InspectionReport {
   if (options.preferredPrimaryFeatureId) {
     return inspectDataset(dataset, overrides, {
+      analysisCrs: options.analysisCrs,
       preferredPrimaryFeatureId: options.preferredPrimaryFeatureId,
       preferredPrimarySource: "manual",
     });
   }
 
-  const initial = inspectDataset(dataset, overrides);
+  const initial = inspectDataset(dataset, overrides, { analysisCrs: options.analysisCrs });
   if (initial.clusters.length < 2) return initial;
 
   const mapReport = assessClustersForMap(initial);
-  if (mapReport.source !== "declared") return initial;
+  if (mapReport.source !== "input" && mapReport.source !== "declared") return initial;
   const mappable = mapReport.clusters.filter((cluster) => cluster.status === "mappable");
   if (mappable.length !== 1) return initial;
 
@@ -35,6 +38,7 @@ export function analyzeDataset(
   if (!preferredPrimaryFeatureId || mappable[0]?.clusterId === initial.primaryClusterId) return initial;
 
   return inspectDataset(dataset, overrides, {
+    analysisCrs: options.analysisCrs,
     preferredPrimaryFeatureId,
     preferredPrimarySource: "crs",
   });

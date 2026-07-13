@@ -13,7 +13,7 @@ import {
 } from "./analysis/layerFilter";
 import { selectDisturbanceArea } from "./analysis/selectDisturbanceArea";
 import { median } from "./analysis/statistics";
-import { assessClustersForMap, type ClusterMapReport, type MapClusterAssessment } from "./geo/mapProjection";
+import { assessClustersForMap, normalizeEpsg, type ClusterMapReport, type MapClusterAssessment } from "./geo/mapProjection";
 import {
   formatNumber,
   formatPercent,
@@ -42,6 +42,8 @@ const elements = {
   loadDemo: byId<HTMLButtonElement>("load-demo"),
   clusterDistance: byId<HTMLInputElement>("cluster-distance"),
   clusterDistanceValue: byId<HTMLElement>("cluster-distance-value"),
+  analysisCrs: byId<HTMLInputElement>("analysis-crs"),
+  analysisCrsHelp: byId<HTMLElement>("analysis-crs-help"),
   fileFacts: byId<HTMLElement>("file-facts"),
   emptyState: byId<HTMLElement>("empty-state"),
   results: byId<HTMLElement>("results"),
@@ -107,6 +109,8 @@ let featureFilterSelection: FeatureFilterSelection = new Set();
 let previousAboutFocus: HTMLElement | null = null;
 let previousCopyrightFocus: HTMLElement | null = null;
 let copyrightLoaded = false;
+let analysisCrsWasEdited = false;
+let analysisCrsUpdateTimer: number | null = null;
 
 initTheme();
 initI18n();
@@ -116,6 +120,7 @@ syncLanguageControl();
 syncThemeControl();
 syncDisturbanceDisclosure();
 syncClusterDistanceLabel();
+setAnalysisCrsValidity(true);
 
 elements.languageToggle.addEventListener("click", () => {
   setLanguage(getLanguage() === "de" ? "en" : "de");
@@ -165,6 +170,7 @@ onLanguageChange((language) => {
   syncThemeControl();
   syncDisturbanceDisclosure();
   syncClusterDistanceLabel();
+  setAnalysisCrsValidity(elements.analysisCrs.getAttribute("aria-invalid") !== "true");
   if (currentReport) renderDashboard(currentReport);
   setStatus(t("status.languageChanged", { language: LANGUAGE_LABELS[language].name }), "ok");
 });
@@ -193,6 +199,7 @@ elements.dropZone.addEventListener("drop", (event) => {
 
 elements.loadDemo.addEventListener("click", () => {
   currentDataset = demoDataset;
+  syncAnalysisCrsFromDataset(currentDataset);
   resetObjectFilter();
   highlightedIds.clear();
   preferredPrimaryFeatureId = null;
@@ -222,6 +229,55 @@ elements.clusterDistance.addEventListener("input", () => {
   if (currentDataset) analyzeAndRender(t("status.parametersUpdated"));
 });
 
+elements.analysisCrs.addEventListener("input", () => {
+  cancelAnalysisCrsUpdate();
+  analysisCrsUpdateTimer = window.setTimeout(() => {
+    analysisCrsUpdateTimer = null;
+    applyAnalysisCrsInput();
+  }, 350);
+});
+
+elements.analysisCrs.addEventListener("change", () => {
+  cancelAnalysisCrsUpdate();
+  applyAnalysisCrsInput();
+});
+
+elements.analysisCrs.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter") return;
+  event.preventDefault();
+  cancelAnalysisCrsUpdate();
+  applyAnalysisCrsInput();
+});
+
+function applyAnalysisCrsInput(): void {
+  const raw = elements.analysisCrs.value.trim();
+  const normalized = normalizeEpsg(raw);
+  analysisCrsWasEdited = true;
+  if (raw && !normalized) {
+    setAnalysisCrsValidity(false);
+    setStatus(t("status.crsInvalid"), "error");
+    return;
+  }
+
+  elements.analysisCrs.value = normalized ?? "";
+  setAnalysisCrsValidity(true);
+  const alreadyApplied = currentReport?.analysisCrs === normalized;
+  if (alreadyApplied) {
+    setStatus(t("status.crsUpdated", { crs: normalized ?? t("metric.unknown") }), "ok");
+    return;
+  }
+  preferredPrimaryFeatureId = null;
+  highlightedIds.clear();
+  if (currentDataset) analyzeAndRender(t("status.crsUpdated", { crs: normalized ?? t("metric.unknown") }));
+  else setStatus(t("status.crsUpdated", { crs: normalized ?? t("metric.unknown") }), "ok");
+}
+
+function cancelAnalysisCrsUpdate(): void {
+  if (analysisCrsUpdateTimer === null) return;
+  window.clearTimeout(analysisCrsUpdateTimer);
+  analysisCrsUpdateTimer = null;
+}
+
 elements.downloadReport.addEventListener("click", () => {
   if (!currentReport) return;
   const serializable = {
@@ -232,6 +288,8 @@ elements.downloadReport.addEventListener("click", () => {
     format: currentReport.dataset.format,
     config: currentReport.config,
     declaredCrs: currentReport.dataset.declaredCrs,
+    analysisCrs: currentReport.analysisCrs,
+    analysisCrsSource: currentReport.crs.source,
     crsAssessment: localizeCrsAssessment(currentReport),
     fullBounds: currentReport.fullBounds,
     focusBounds: currentReport.focusBounds,
@@ -276,6 +334,7 @@ function exportCurrentSelection(outputFormat?: "dxf" | "geojson", allowUnchanged
       outputFormat,
       allowUnchangedOutput,
       acadVersion: selectedDxfAcadVersion(),
+      coordinateSystemLabel: currentReport.analysisCrs ?? currentDataset.declaredCrs,
     });
     downloadText(cleaned.fileName, cleaned.content, cleaned.mimeType);
     elements.cleanerSummary.textContent = t("cleaner.validated", {
@@ -299,6 +358,7 @@ async function loadFile(file: File): Promise<void> {
   setStatus(t("status.reading", { file: file.name }), "working");
   try {
     currentDataset = await readDataset(file);
+    syncAnalysisCrsFromDataset(currentDataset);
     resetObjectFilter();
     highlightedIds.clear();
     preferredPrimaryFeatureId = null;
@@ -312,9 +372,20 @@ async function loadFile(file: File): Promise<void> {
 
 function analyzeAndRender(status: string): void {
   if (!currentDataset) return;
+  const rawCrs = elements.analysisCrs.value.trim();
+  const analysisCrs = normalizeEpsg(rawCrs);
+  if (rawCrs && !analysisCrs) {
+    setAnalysisCrsValidity(false);
+    setStatus(t("status.crsInvalid"), "error");
+    return;
+  }
+  const declaredCrs = normalizeEpsg(currentDataset.declaredCrs);
+  const analysisCrsOverride = !analysisCrsWasEdited && analysisCrs === declaredCrs
+    ? null
+    : analysisCrs;
   currentReport = analyzeDataset(currentDataset, {
     clusterDistanceMeters: Number(elements.clusterDistance.value),
-  }, { preferredPrimaryFeatureId });
+  }, { preferredPrimaryFeatureId, analysisCrs: analysisCrsOverride });
   renderDashboard(currentReport);
   setStatus(status, currentReport.findings.some((finding) => finding.severity === "critical") ? "warning" : "ok");
 }
@@ -338,7 +409,7 @@ function renderDashboard(report: InspectionReport): void {
         : t("metric.primaryShare", { share: formatPercent(primary.featureCount / report.dataset.features.length) })
     : t("metric.noGeometry"));
   setText("metric-inflation", report.extentInflationFactor === null ? "–" : `${formatNumber(report.extentInflationFactor)}×`);
-  setText("metric-crs", report.dataset.declaredCrs ?? (report.crs.status === "plausible" ? t("metric.candidate") : t("metric.unknown")));
+  setText("metric-crs", report.analysisCrs ?? report.dataset.declaredCrs ?? (report.crs.status === "plausible" ? t("metric.candidate") : t("metric.unknown")));
   setText("metric-crs-status", report.crs.status);
   setText("overview-extent", formatBoundsSize(report.fullBounds));
   setText("overview-coordinate-range", formatCoordinateRange(report.fullBounds));
@@ -569,7 +640,11 @@ function renderCleaner(report: InspectionReport): void {
 function renderMapSection(report: InspectionReport): void {
   const mapReport = assessClustersForMap(report);
   setText("map-crs-label", mapReport.sourceCrs
-    ? t(mapReport.source === "declared" ? "map.crs.declared" : "map.crs.heuristic", { crs: mapReport.sourceCrs })
+    ? t(mapReport.source === "input"
+      ? "map.crs.input"
+      : mapReport.source === "declared"
+        ? "map.crs.declared"
+        : "map.crs.heuristic", { crs: mapReport.sourceCrs })
     : t("map.crs.missing"));
   const drawable = mapReport.clusters.filter(isDrawableMapCluster);
   elements.mapEmpty.hidden = drawable.length > 0;
@@ -868,17 +943,17 @@ function localizeFinding(finding: InspectionFinding, report: InspectionReport): 
 
 function localizeCrsAssessment(report: InspectionReport): { label: string; explanation: string } {
   const heuristic = crsHeuristicLabel(report.focusBounds ?? report.fullBounds);
-  const crs = report.dataset.declaredCrs ?? "–";
+  const crs = report.analysisCrs ?? report.dataset.declaredCrs ?? "–";
   if (report.crs.status === "declared") {
     return {
-      label: t("crs.declared.title", { crs }),
-      explanation: t("crs.declared.detail", { heuristic }),
+      label: t(report.crs.source === "input" ? "crs.input.title" : "crs.declared.title", { crs }),
+      explanation: t(report.crs.source === "input" ? "crs.input.detail" : "crs.declared.detail", { heuristic }),
     };
   }
   if (report.crs.status === "contradictory") {
     return {
       label: t("crs.contradictory.title", { crs }),
-      explanation: t("crs.contradictory.detail", { heuristic }),
+      explanation: t(report.crs.source === "input" ? "crs.contradictory.inputDetail" : "crs.contradictory.detail", { heuristic }),
     };
   }
   if (report.crs.status === "plausible") {
@@ -888,6 +963,19 @@ function localizeCrsAssessment(report: InspectionReport): { label: string; expla
     };
   }
   return { label: t("crs.unknown.title"), explanation: t("crs.unknown.detail") };
+}
+
+function syncAnalysisCrsFromDataset(dataset: GeoDataset): void {
+  if (analysisCrsWasEdited) return;
+  elements.analysisCrs.value = normalizeEpsg(dataset.declaredCrs) ?? "EPSG:25832";
+  setAnalysisCrsValidity(true);
+}
+
+function setAnalysisCrsValidity(valid: boolean): void {
+  elements.analysisCrs.setAttribute("aria-invalid", String(!valid));
+  elements.analysisCrsHelp.classList.toggle("error", !valid);
+  elements.analysisCrsHelp.dataset.i18n = valid ? "analysis.crsHelp" : "analysis.crsInvalid";
+  elements.analysisCrsHelp.textContent = t(valid ? "analysis.crsHelp" : "analysis.crsInvalid");
 }
 
 function crsHeuristicLabel(bounds: Bounds2D | null): string {

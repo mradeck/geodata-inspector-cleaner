@@ -52,6 +52,8 @@ export interface CleanedExportOptions {
   allowUnchangedOutput?: boolean;
   /** DXF-Zielformat; AC1015 bleibt der OEM-kompatible Default. */
   acadVersion?: DxfAcadVersion;
+  /** CRS-Hinweis aus der Analysevorgabe; Koordinaten werden nicht reprojiziert. */
+  coordinateSystemLabel?: string | null;
 }
 
 /**
@@ -80,6 +82,7 @@ export function createCleanedExport(
   if (removedFeatureCount === 0 && !options.allowUnchangedOutput) throw new CleanerError("nothing-to-remove");
   const outputBounds = bounds2D(keptFeatures);
   const outputFormat = options.outputFormat ?? dataset.format;
+  const coordinateSystemLabel = options.coordinateSystemLabel ?? dataset.declaredCrs;
 
   const extension = outputFormat === "dxf" ? "dxf" : "geojson";
   const suffix = removedFeatureCount === 0 && outputFormat !== dataset.format ? "converted" : "cleaned";
@@ -99,13 +102,13 @@ export function createCleanedExport(
   const content = outputFormat === "dxf"
     ? exportFeaturesAsDxf(
         keptFeatures,
-        dataset.declaredCrs,
+        coordinateSystemLabel,
         audit,
         dataset.layerMetadata,
-        dataset.format === "geojson" ? inferGeoJsonDxfUnits(dataset.declaredCrs) : 6,
+        dataset.format === "geojson" ? inferGeoJsonDxfUnits(coordinateSystemLabel) : 6,
         options.acadVersion,
       )
-    : exportFeaturesAsGeoJson(keptFeatures, dataset.declaredCrs, audit);
+    : exportFeaturesAsGeoJson(keptFeatures, coordinateSystemLabel, audit);
   const reparsed = outputFormat === "dxf"
     ? parseDxf(content, outputName)
     : parseGeoJson(content, outputName);

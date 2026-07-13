@@ -28,7 +28,7 @@ export interface MapClusterAssessment {
 
 export interface ClusterMapReport {
   sourceCrs: string | null;
-  source: "declared" | "heuristic" | "missing";
+  source: "input" | "declared" | "heuristic" | "missing";
   clusters: MapClusterAssessment[];
 }
 
@@ -100,6 +100,8 @@ export function normalizeEpsg(value: string | null | undefined): string | null {
   if (alias) return alias;
   const direct = compact.match(/^EPSG:?([0-9]{4,6})$/);
   if (direct?.[1]) return `EPSG:${direct[1]}`;
+  const digitsOnly = compact.match(/^([0-9]{4,6})$/);
+  if (digitsOnly?.[1]) return `EPSG:${digitsOnly[1]}`;
   if (/EPSG/i.test(value)) {
     const codes = value.match(/\d{4,6}/g);
     if (codes?.length) return `EPSG:${codes[codes.length - 1]}`;
@@ -121,7 +123,9 @@ export function projectPositionToMap(point: Pick<Position3, "x" | "y">, sourceCr
   }
 }
 
-function resolveSourceCrs(report: InspectionReport): { crs: string | null; source: "declared" | "heuristic" | "missing" } {
+function resolveSourceCrs(report: InspectionReport): { crs: string | null; source: "input" | "declared" | "heuristic" | "missing" } {
+  const input = normalizeEpsg(report.analysisCrs);
+  if (input) return { crs: input, source: "input" };
   const declared = normalizeEpsg(report.dataset.declaredCrs);
   if (declared) return { crs: declared, source: "declared" };
   const bounds = report.fullBounds;

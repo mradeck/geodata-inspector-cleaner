@@ -115,6 +115,23 @@ Die Heuristik liefert Kandidaten, keine automatische EPSG-Zuweisung:
 Nur explizite Metadaten dürfen als „deklariert“ erscheinen. Selbst dann soll
 eine Plausibilitätsprüfung Widersprüche melden.
 
+### Manuelle Analysevorgabe
+
+Das Feld **CRS / EPSG** beginnt mit `EPSG:25832` und akzeptiert normalisierbare
+Schreibweisen wie `25832`, `EPSG 25832` oder `EPSG:25832`. Die Herkunft bleibt
+fachlich getrennt:
+
+1. eine manuell bearbeitete Eingabe gilt als `input`,
+2. andernfalls gilt ein aus der Datei gelesenes CRS als `metadata`,
+3. ohne beides bleibt nur `heuristic` beziehungsweise `missing`.
+
+Die Benutzervorgabe darf Clusterwahl und Kartenprojektion genauso unterstützen
+wie ein deklariertes CRS, wird im Prüfbericht aber niemals als Dateimetadatum
+bezeichnet. Sie verändert keine Koordinaten und löst keine Reprojektion aus.
+Jede tatsächliche Änderung startet die räumliche Prüfung erneut und verwirft
+eine vorhandene manuelle Hauptbereichsbestätigung. Der Cleaner bleibt gesperrt,
+bis der Hauptbereich unter der neuen CRS-Annahme erneut bestätigt wurde.
+
 ### Kartenbasierte Clusterprüfung
 
 Ein deklariertes CRS wird pro Cluster angewendet, nicht pauschal nur auf die

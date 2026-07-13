@@ -9,7 +9,7 @@ Bounds-Berechnungen, Exporte und GIS-/CAD-Weiterverarbeitung unbrauchbar macht.
 
 ## Projektstatus
 
-**Version 2607.02.0 – lokaler Entwicklungsstand mit aktivem Cleaner.** Der
+**Version 2607.03.0 – Release mit aktivem Cleaner.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -17,7 +17,8 @@ aktuelle Stand demonstriert bereits:
 - räumliche Clustererkennung ohne quadratischen Vollvergleich,
 - Erkennung entfernter Zeichnungsgruppen,
 - Gegenüberstellung von Gesamt-Ausdehnung und empfohlenem Fokusbereich,
-- vorsichtige CRS-Plausibilitätsanalyse,
+- vorsichtige CRS-Plausibilitätsanalyse mit manuell pflegbarem EPSG-Feld und
+  `EPSG:25832` als Standard,
 - Z=0-Hinweise bei gemischten 2D-/3D-Daten,
 - getrennte Übersicht- und Fokusvorschau,
 - eigene Vorschau für den vermuteten Störbereich mit vorsichtiger
@@ -42,6 +43,8 @@ aktuelle Stand demonstriert bereits:
   Browser-Tab und Statuszeile,
 - eine standardmäßig eingeklappte, bedarfsgerecht rendernde
   Störbereichsvorschau,
+- eine an die Browserhöhe gebundene Startansicht ohne äußeren vertikalen
+  Scrollbalken sowie theme-spezifisch lesbare Vorschauraster,
 - einen reproduzierbaren Demo-Datensatz.
 
 Die Quelldatei wird niemals überschrieben. Der Cleaner erzeugt eine neue Datei
@@ -85,7 +88,7 @@ Markdown-Renderers.
 ## Versionsanzeige und kompakte Störbereichsvorschau
 
 Die kanonische Version steht nun wie beim Pointcloud Manager direkt neben dem
-App-Titel, beispielsweise `v2607.02.0`. Browser-Tab und untere Statuszeile zeigen
+App-Titel, beispielsweise `v2607.03.0`. Browser-Tab und untere Statuszeile zeigen
 denselben Stand. Die Anzeige wird zentral aus `package.json` bezogen und nicht
 als unabhängiger Versionswert gepflegt.
 
@@ -97,6 +100,56 @@ Kennzeichnung **PRÜFEN** beziehungsweise **ENTFERNUNG EMPFOHLEN**. Mit
 Störbereichskarte in ihrer sichtbaren Größe neu gerendert. Erneutes Anklicken
 oder **Einklappen** schließt sie wieder. Die Entscheidung betrifft nur die
 Darstellung und verändert weder Analyse noch Exportauswahl.
+
+Im geschlossenen Zustand belegt die Störbereichsvorschau ausschließlich ihre
+Kopfzeile; es bleibt keine leere Canvas- oder Grid-Fläche stehen. Die rechte
+Seitenleiste hält die Cleaner-Karte dauerhaft erreichbar und scrollt längere
+Befundlisten in einem eigenen Bereich. Die frühere Roadmap-Kachel wurde aus der
+Seitenleiste entfernt; die DWG-Strategie bleibt weiterhin im Abschnitt
+**Dokumentation** verlinkt.
+
+### Startansicht und Vorschauraster
+
+Die App-Hülle belegt exakt die verfügbare Browserhöhe. Kopfzeile, Arbeitsbereich
+und Statuszeile bleiben dadurch gemeinsam im Viewport; die leere Startansicht
+erzeugt keinen äußeren vertikalen Scrollbalken mehr. Nach einem Import scrollen
+lange Analyseergebnisse weiterhin innerhalb der mittleren Bühne, Seitenleisten
+bei Bedarf in ihrem eigenen Bereich. Die langen Hilfe- und Konzeptseiten bleiben
+unabhängig davon normal scrollbar.
+
+Das technische Raster der leeren Vorschau verwendet getrennte Theme-Werte. Im
+hellen Interface sind die Linien nun mit einem zurückhaltenden dunklen Grünton
+sichtbar. Im dunklen Interface wurde der bisher sehr schwache helle Grünton
+leicht angehoben. Das Raster dient nur der räumlichen Orientierung und verändert
+keine Geometrie oder Analyse.
+
+## CRS / EPSG für die Analyse festlegen
+
+Im linken Abschnitt **02 · Analyse** steht wie im Pointcloud Manager ein
+manuell pflegbares Feld **CRS / EPSG**. Der Startwert ist `EPSG:25832`. Zulässig
+sind unter anderem `25832`, `EPSG 25832` und `EPSG:25832`; die App normalisiert
+diese Schreibweisen auf `EPSG:25832`. Direkt angeboten werden derzeit
+`EPSG:25832`, `EPSG:25833`, `EPSG:31468`, `EPSG:4326` und `EPSG:3857`.
+
+Eine Eingabe wird nach kurzer Tipp-Pause, mit **Enter** oder beim Verlassen des
+Feldes übernommen. Danach laufen Clusterbewertung, CRS-Plausibilitätsprüfung,
+CRS-gestützte Hauptbereichswahl und alle OSM-Vorschauen erneut. Wenn die Datei
+ein eindeutig lesbares CRS deklariert und das Feld noch nicht manuell bearbeitet
+wurde, übernimmt die App diesen Wert; andernfalls bleibt `EPSG:25832` der
+Standard. Ein leeres Feld fällt auf Dateimetadaten beziehungsweise die vorsichtige
+Koordinatenheuristik zurück.
+
+Die Eingabe ist eine **Analyse- und Exportvorgabe**, keine Reprojektion. XY-/Z-
+Koordinaten werden nicht verändert. Beim Cleaner-Export wird der normalisierte
+Code lediglich als CRS-Metadatum beziehungsweise DXF-Kommentar übernommen. Ein
+formal gültiger, aber für die Kartenvorschau nicht registrierter EPSG-Code bleibt
+im Bericht sichtbar; die OSM-Projektion wird dafür nicht erfunden.
+
+Weil ein anderes CRS zu einer anderen räumlichen Bewertung führen kann, setzt
+jede CRS-Änderung eine bereits manuell bestätigte Hauptbereichswahl zurück. Der
+korrekte grüne Bereich muss danach erneut auf der Karte geprüft und bestätigt
+werden. So kann keine Cleaner-Freigabe unbemerkt unter einer geänderten
+CRS-Annahme weiterverwendet werden.
 
 ## Störbereich entfernen und bereinigte Datei speichern
 
@@ -140,7 +193,8 @@ normalisierte ASCII-DXF erzeugt:
   geografische oder nicht deklarierte GeoJSON-Koordinatensysteme werden beim
   DXF-Export sicherheitshalber als einheitenlos markiert,
 - neu berechnete `$EXTMIN`- und `$EXTMAX`-Werte des bestätigten Hauptbereichs,
-- CRS-Hinweis als DXF-Kommentar, sofern ein CRS deklariert ist,
+- CRS-Hinweis als DXF-Kommentar, sofern ein CRS in der Datei deklariert oder im
+  Analysefeld vorgegeben ist,
 - nachvollziehbares Cleaning-Protokoll mit Quelldatei, Anzahl der behaltenen und
   entfernten Features sowie den bestätigten Bounds,
 - bereinigte, CAD-taugliche Layernamen,
@@ -237,7 +291,7 @@ npm run build
 
 ## Versionierung
 
-Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.02.0`:
+Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.03.0`:
 
 - `JJMM`: Jahr und Monat,
 - `RR`: zweistellige Releasefolge innerhalb des Monats,
@@ -247,8 +301,8 @@ Eine bewusst eröffnete größere Release-Linie erhöht `RR` und setzt `P` auf `
 Jede abgeschlossene lokale Feature-Runde und jeder Bugfix erhöht anschließend
 `P`, sodass der aktive Stand direkt im lokalen Dev-Server erkennbar ist. Wegen
 der SemVer-Regeln ohne führende Nullen steht in `package.json` und
-`package-lock.json` technisch `2607.2.0`. Die App, Dokumentation und exportierten
-Prüfberichte verwenden `2607.02.0`.
+`package-lock.json` technisch `2607.3.0`. Die App, Dokumentation und exportierten
+Prüfberichte verwenden `2607.03.0`.
 
 ## Leitprinzipien
 
@@ -280,6 +334,10 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2607.03.0` | 13. Juli 2026 | Neue Release-Linie mit viewportgerechter Startansicht und Theme-Rastern, manuellem CRS-/EPSG-Analysefeld samt sicherer Neuanalyse sowie kompakter Störbereichs-Summary, scrollbar stabilisierten Befunden und bereinigter rechter Seitenleiste; konsolidiert 2607.02.1 bis 2607.02.3. |
+| `2607.02.3` | 13. Juli 2026 | Geschlossene Störbereichsvorschau auf die reine Kopfzeile reduziert, rechte Befundliste als eigener Scrollbereich stabilisiert und Roadmap-Kachel aus der Seitenleiste entfernt. |
+| `2607.02.2` | 13. Juli 2026 | Manuell pflegbares, zweisprachiges CRS-/EPSG-Analysefeld mit `EPSG:25832` als Standard, normalisierten Eingabeformen, automatischer Neuanalyse und sicherem Zurücksetzen früherer Cleaner-Bestätigungen. |
+| `2607.02.1` | 13. Juli 2026 | Startansicht exakt an die Browserhöhe gebunden, äußerer vertikaler Scrollbalken entfernt und Vorschauraster in hellem sowie dunklem Theme gezielt kontrastiert. |
 | `2607.02.0` | 13. Juli 2026 | Neue Release-Linie mit vollständiger Versionsnummer neben dem App-Titel sowie standardmäßig eingeklappter, bedarfsgerecht gerenderter Störbereichsvorschau; enthält zusätzlich den zuvor lokalen Über-/Copyright-Stand aus 2607.01.4. |
 | `2607.01.4` | 13. Juli 2026 | Über-Menü mit Über-mich- und Copyright-Eintrag, In-App-Rendering der Lizenzübersicht sowie transparent gekennzeichneter Link zur reduzierten Pointcloud-Manager-Onlineversion. |
 | `2607.01.3` | 13. Juli 2026 | README-basierte Hilfeseite statt Konzept-Schaltfläche, übernommene und zweisprachig ergänzte „Über mich“-Information sowie lokal gespeicherter Hell-/Dunkelmodus für App und Hilfe. |

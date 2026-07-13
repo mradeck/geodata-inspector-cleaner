@@ -91,6 +91,7 @@ export interface InspectionFinding {
 
 export interface CrsAssessment {
   status: "declared" | "plausible" | "unknown" | "contradictory";
+  source: "input" | "metadata" | "heuristic" | "missing";
   label: string;
   confidence: "high" | "medium" | "low";
   explanation: string;
@@ -104,6 +105,8 @@ export interface InspectionConfig {
 }
 
 export interface InspectionOptions {
+  /** Manuell gesetztes CRS für Analyse, Kartenprojektion und Exporthinweis. */
+  analysisCrs?: string | null;
   /** Ein Feature aus dem bevorzugten Hauptcluster. */
   preferredPrimaryFeatureId?: string | null;
   /** Herkunft der bevorzugten Auswahl; manuell bestätigte Auswahl bleibt stärker. */
@@ -112,6 +115,8 @@ export interface InspectionOptions {
 
 export interface InspectionReport {
   dataset: GeoDataset;
+  /** Operative CRS-Vorgabe aus dem Eingabefeld; Dateimetadaten bleiben separat. */
+  analysisCrs: string | null;
   config: InspectionConfig;
   featureStatistics: FeatureStatistics[];
   clusters: SpatialCluster[];

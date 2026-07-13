@@ -84,7 +84,8 @@ export function inspectDataset(
   const fullBounds = mergeBounds(featureStatistics.map((stat) => stat.bounds));
   const focusBounds = primary?.bounds ?? fullBounds;
   const extentInflationFactor = calculateInflation(fullBounds, focusBounds);
-  const crs = assessCrs(dataset, focusBounds);
+  const analysisCrs = options.analysisCrs?.trim() || null;
+  const crs = assessCrs(dataset, focusBounds, analysisCrs);
   const findings: InspectionFinding[] = [];
   const recommendedRemovalIds = new Set<string>();
 
@@ -156,6 +157,7 @@ export function inspectDataset(
 
   return {
     dataset,
+    analysisCrs,
     config,
     featureStatistics,
     clusters,
@@ -282,9 +284,11 @@ function appendZeroZFinding(
   });
 }
 
-function assessCrs(dataset: GeoDataset, bounds: Bounds2D | null): CrsAssessment {
+function assessCrs(dataset: GeoDataset, bounds: Bounds2D | null, analysisCrs: string | null): CrsAssessment {
+  const effectiveCrs = analysisCrs ?? dataset.declaredCrs;
+  const source = analysisCrs ? "input" : dataset.declaredCrs ? "metadata" : "missing";
   if (!bounds) {
-    return { status: "unknown", label: "Koordinatensystem nicht bestimmbar", confidence: "low", explanation: "Keine gültigen XY-Koordinaten vorhanden." };
+    return { status: "unknown", source, label: "Koordinatensystem nicht bestimmbar", confidence: "low", explanation: "Keine gültigen XY-Koordinaten vorhanden." };
   }
   const center = boundsCenter(bounds);
   const looksLonLat = bounds.minX >= -180 && bounds.maxX <= 180 && bounds.minY >= -90 && bounds.maxY <= 90;
@@ -295,27 +299,30 @@ function assessCrs(dataset: GeoDataset, bounds: Bounds2D | null): CrsAssessment 
       ? "Projiziertes metrisches Koordinatensystem, beispielsweise UTM oder Gauß-Krüger"
       : "Lokales oder anhand der Werte nicht eindeutig erkennbares Koordinatensystem";
 
-  if (dataset.declaredCrs) {
-    const declaredLooksGeographic = /(?:4326|CRS84)/i.test(dataset.declaredCrs);
+  if (effectiveCrs) {
+    const declaredLooksGeographic = /(?:4326|CRS84)/i.test(effectiveCrs);
     const contradictory = declaredLooksGeographic !== looksLonLat && (declaredLooksGeographic || looksLonLat);
     return contradictory
       ? {
           status: "contradictory",
-          label: `CRS-Widerspruch: ${dataset.declaredCrs}`,
+          source,
+          label: `CRS-Widerspruch: ${effectiveCrs}`,
           confidence: "high",
-          explanation: `Die Datei deklariert ${dataset.declaredCrs}, der Koordinatenwertebereich wirkt jedoch wie: ${heuristic}.`,
+          explanation: `${effectiveCrs} widerspricht dem erkannten Koordinatenwertebereich: ${heuristic}.`,
         }
       : {
           status: "declared",
-          label: `Deklariertes CRS: ${dataset.declaredCrs}`,
+          source,
+          label: `${source === "input" ? "Vorgegebenes" : "Deklariertes"} CRS: ${effectiveCrs}`,
           confidence: "high",
-          explanation: `Das CRS stammt aus Dateimetadaten. Plausibilitätsbild: ${heuristic}.`,
+          explanation: `Das CRS stammt aus ${source === "input" ? "der Benutzereingabe" : "Dateimetadaten"}. Plausibilitätsbild: ${heuristic}.`,
         };
   }
 
   if (looksLonLat || looksProjectedMetric) {
     return {
       status: "plausible",
+      source: "heuristic",
       label: `CRS-Kandidat: ${heuristic}`,
       confidence: "medium",
       explanation: "Die Zuordnung beruht nur auf Koordinatenbereichen und beweist keinen konkreten EPSG-Code. Vor Transformation oder Export bestätigen.",
@@ -324,6 +331,7 @@ function assessCrs(dataset: GeoDataset, bounds: Bounds2D | null): CrsAssessment 
 
   return {
     status: "unknown",
+    source: "missing",
     label: "Koordinatensystem unbekannt",
     confidence: "low",
     explanation: `${heuristic}. Ohne Metadaten oder Benutzerangabe ist keine sichere Transformation möglich.`,

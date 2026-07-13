@@ -1,6 +1,6 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2607.02.0
+**Release:** 2607.03.0
 
 **Prüfstand:** 13. Juli 2026
 
@@ -85,19 +85,29 @@ DXF-, GeoJSON- oder andere Benutzerinhalte werden nicht als Markdown/HTML an
 `marked` übergeben. Sollte später fremdes Markdown unterstützt werden, ist vor
 der Aktivierung eine Sanitizing-Schicht verpflichtend.
 
-## Release-Prüfung 2607.02.0
+## Release-Prüfung 2607.03.0
 
 - direkte Abhängigkeiten gegen `package.json` und Lockfile abgeglichen,
 - vollständigen npm-Lizenzscan geprüft,
 - keine GPL-/AGPL-/Non-Commercial-Abhängigkeit gefunden,
 - OpenStreetMap-Attribution im Leaflet-Viewport sichtbar,
 - kein Tile-Prefetch oder Offline-Download implementiert,
+- offizielle OpenStreetMap-Copyright-/ODbL-Hinweise und Tile Usage Policy am
+  13. Juli 2026 erneut geprüft; HTTPS-Endpunkt, sichtbare Attribution,
+  viewportbezogene Nutzung und Browser-Caching bleiben regelkonform,
 - README-Hilfe rendert weiterhin ausschließlich eine zur Buildzeit eingebundene
   und versionierte Projektdatei; keine fremden Markdown-Inhalte,
 - der Copyright-Dialog rendert diese Datei per dynamischem Import als einzige
   redaktionelle Lizenzquelle; keine zweite HTML-Lizenzliste,
 - Versionsanzeige und Störbereichs-Disclosure verwenden ausschließlich
   vorhandenen Projektcode und Browser-APIs; keine neue Abhängigkeit,
+- Viewportbindung und theme-spezifische Rasterkontraste sind reine CSS-
+  Änderungen ohne neue Bibliothek, Datenquelle oder externe Anfrage,
+- das CRS-/EPSG-Eingabefeld verwendet die vorhandene `proj4`-Integration und
+  lokale Browserlogik; es ergänzt weder Abhängigkeiten noch externe Anfragen,
+- die kompakte Störbereichs-Summary, der interne Befund-Scrollbereich und die
+  entfernte Roadmap-Kachel sind reine HTML-/CSS-Änderungen ohne neue Bibliothek,
+  Datenquelle oder externe Anfrage,
 - Theme- und Sprachwahl verwenden nur lokalen Browser-Speicher und übertragen
   keine Daten an externe Dienste,
 - `npm audit` ohne bekannte Schwachstellen.

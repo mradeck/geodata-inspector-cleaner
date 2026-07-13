@@ -4,6 +4,144 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## 13. Juli 2026 – Release 2607.03.0
+
+Release `2607.03.0` konsolidiert die drei lokal verifizierten Subversionen der
+vorherigen Release-Linie:
+
+- `2607.02.1`: exakt viewportgebundene Startansicht und getrennt abgestimmte
+  Vorschauraster für helles und dunkles Theme,
+- `2607.02.2`: manuell pflegbares CRS-/EPSG-Feld mit `EPSG:25832` als Standard,
+  transparenter Quellenherkunft, automatischer Neuanalyse und sicherem
+  Zurücksetzen früherer Cleaner-Freigaben,
+- `2607.02.3`: auf die Summary reduzierte geschlossene Störbereichsvorschau,
+  intern scrollbare Befundliste und Entfernung der Roadmap-Kachel aus der
+  rechten Seitenleiste.
+
+Der Release verändert keine Abhängigkeiten und führt keine neue externe
+Datenübertragung ein. Geometrie bleibt lokal; nur sichtbar angeforderte
+OpenStreetMap-Kacheln verwenden weiterhin den dokumentierten Onlinepfad.
+
+## 13. Juli 2026 – Subversion 2607.02.3
+
+### Ein geschlossenes `details` kann trotz verborgenem Inhalt groß bleiben
+
+**Fehlerbild:** Der Inhalt der Störbereichsvorschau war mit
+`:not([open]) > .disturbance-preview-content { display: none; }` korrekt
+verborgen. Trotzdem blieb darunter eine mehrere hundert Pixel hohe leere Fläche.
+
+**Ursache:** `.disturbance-preview-card { display: block; }` stand vor der
+allgemeinen `.preview-card`-Regel. Bei gleicher Spezifität gewann die spätere
+Regel und setzte das `details` wieder auf Grid mit
+`grid-template-rows: 54px minmax(340px, 1fr) auto`. Die unsichtbare Inhaltszeile
+blieb dadurch als Mindesthöhe im Grid bestehen; zusätzlich streckte das
+Elterngrid den Eintrag auf seine Zeilenhöhe.
+
+**Stabile Lösung:** Die spezifischere Regel
+`.preview-card.disturbance-preview-card` setzt `display: block`, `min-height: 0`
+und `align-self: start`. Das Vorschau-Elterngrid verwendet ebenfalls
+`align-items: start`. Im Browsertest ist der geschlossene Rahmen damit 56 px
+hoch – 54 px Summary plus Rahmen – und wächst nur im geöffneten Zustand wieder
+auf die Karten-/Canvas-Höhe.
+
+### Befunde brauchen einen eigenen Flex-Scrollbereich
+
+**Fehlerbild:** Bei vielen Befunden wurde die erste Karte am unteren Rand
+abgeschnitten, während Cleaner und Roadmap in derselben rechten Seitenleiste
+zusätzlichen Platz beanspruchten.
+
+**Ursache:** `.findings-list` besaß zwar `overflow: auto`, war aber kein
+definierter wachsender Flex-Abschnitt. Ohne `flex: 1` und `min-height: 0` schrumpfte
+die Liste innerhalb der Spalte, ohne eine belastbare Scrollbox zu bilden.
+
+**Stabile Lösung:** Überschrift und Cleaner sind feste Flex-Kinder; die
+Befundliste erhält `flex: 1 1 auto`, `min-height: 0`, `overflow-y: auto`,
+`scrollbar-gutter: stable` und einen dezenten Scrollbar. Die rechte Seitenleiste
+selbst bleibt ohne äußeren Überlauf. Bei 1280×720 wurden 168 px sichtbare
+Befundhöhe und 587 px scrollbarer Inhalt gemessen; Cleaner und Statuszeile
+bleiben vollständig sichtbar. Die Roadmap-Kachel wurde aus der knappen
+Seitenleiste entfernt, ihr ADR bleibt über die Dokumentation erreichbar.
+
+## 13. Juli 2026 – Subversion 2607.02.2
+
+### Ein manuelles CRS darf nicht als Dateimetadatum ausgegeben werden
+
+**Problem:** Die Analyse konnte bisher nur ein in DXF/GeoJSON deklariertes CRS
+oder eine grobe Koordinatenheuristik verwenden. Ein einfaches Überschreiben von
+`GeoDataset.declaredCrs` durch ein neues Eingabefeld hätte zwar die Karte
+aktualisiert, im Prüfbericht aber fälschlich behauptet, der EPSG-Code stamme aus
+der Quelldatei.
+
+**Stabile Lösung:** Die normalisierte Benutzervorgabe liegt separat in
+`InspectionReport.analysisCrs`; `GeoDataset.declaredCrs` bleibt unverändert. Die
+CRS-Bewertung führt zusätzlich die Herkunft `input`, `metadata`, `heuristic` oder
+`missing`. Kartenkopf, Befundtext und JSON-Prüfbericht können damit transparent
+zwischen manueller Vorgabe und Dateimetadaten unterscheiden. Der Cleaner darf
+die Vorgabe als CRS-Hinweis in DXF/GeoJSON übernehmen, führt aber ausdrücklich
+keine Reprojektion der Koordinaten durch.
+
+### CRS-Wechsel invalidiert räumliche Freigaben
+
+**Problem:** Ein anderes Quell-CRS kann denselben XY-Wertebereich an eine völlig
+andere Kartenlage projizieren und dadurch ändern, welcher Cluster innerhalb des
+plausiblen Einsatzgebiets liegt. Eine zuvor bestätigte Cleaner-Auswahl dürfte
+deshalb nach einem CRS-Wechsel nicht still weiter als manuelle Freigabe gelten.
+
+**Stabile Lösung:** Jede tatsächlich geänderte CRS-Vorgabe leert bevorzugten
+Hauptbereich und Hervorhebung, startet Cluster-/Kartenanalyse neu und sperrt den
+Export wieder bis zur erneuten manuellen Bestätigung. Eingaben wie `25832`,
+`EPSG 25832` und `EPSG:25832` werden gleich normalisiert. Eine 350-ms-Verzögerung
+vermeidet Neuberechnungen für jeden einzelnen Tastenanschlag; Enter und Blur
+übernehmen sofort. Ungültige Eingaben bleiben sichtbar markiert und ersetzen
+kein zuvor gültiges Analyseergebnis. Label, Hilfetext, Fehlermeldung und
+Placeholder werden über die zentralen DE-/EN-Kataloge umgeschaltet.
+
+### Neue Felder gegen den tatsächlichen Scrollcontainer prüfen
+
+**Problem:** Der äußere Viewport blieb zwar scrollbarfrei, bei 1280×720 ragte
+das CRS-Feld zunächst wenige Pixel unter das sichtbare Ende der intern
+scrollenden linken Seitenleiste. Eine reine Prüfung von `body.scrollHeight`
+hätte das nicht erkannt.
+
+**Stabile Lösung:** Dropzone und Abstand des Analyseabschnitts wurden moderat
+verdichtet. Der Browsertest vergleicht zusätzlich die Bounding-Box des Feldes
+mit der sichtbaren Seitenleisten-Box. Das Feld ist nun bei 1280×720 vollständig
+sichtbar, während längere Inventar- und Analyseinformationen weiterhin
+innerhalb der Seitenleiste scrollen.
+
+## 13. Juli 2026 – Subversion 2607.02.1
+
+### Ein `min-height` kann trotz Grid einen äußeren Scrollbalken erzwingen
+
+**Fehlerbild:** Die App-Hülle besaß bereits die Zeilen Kopf, Arbeitsbereich und
+Status. Die leere Vorschau forderte zusätzlich `min-height: calc(100vh - 190px)`.
+Zusammen mit Bühnen-Padding, Überschrift und den festen Kopf-/Statuszeilen wurde
+die Hülle bei einem 900-px-Viewport 930 px hoch. Der Browser zeigte deshalb
+einen äußeren Scrollbalken, obwohl alle sichtbaren Elemente scheinbar in die
+Ansicht passten.
+
+**Stabile Lösung:** `body` und `.app-shell` sind exakt `100vh` hoch und unterbinden
+äußeres Überlaufen. Die Bühne ist eine vertikale Flexbox; die leere Vorschau
+nimmt nur den tatsächlich verbleibenden Raum ein. Lange Ergebnisansichten
+scrollen weiterhin in `.stage`, Seitenleisten in ihrem eigenen Container. Weil
+Hilfe und Konzept dieselbe Basis-CSS importieren, hebt `concept.css` die feste
+Höhe dort ausdrücklich mit `height:auto`, `min-height:100vh` und `overflow:auto`
+auf. Der Browsertest vergleicht `scrollHeight === clientHeight` und prüft die
+Dokumentseite separat auf erhaltene Scrollbarkeit.
+
+### Rasterkontrast muss relativ zum Theme definiert werden
+
+**Problem:** Ein einzelnes fast transparentes hellgrünes Raster funktionierte
+auf dem dunklen Hintergrund gerade noch, verschwand auf der hellen Fläche aber
+nahezu vollständig. Eine pauschale stärkere Deckkraft hätte umgekehrt das
+dunkle Theme zu dominant gemacht.
+
+**Stabile Lösung:** `--empty-grid-line` und `--empty-grid-accent` besitzen
+getrennte Dark-/Light-Werte. Dunkel verwendet eine etwas präsentere helle Linie,
+hell eine dezente dunkle Grünlinie. Beide bleiben bei 32 px Abstand und dienen
+nur als technische Orientierung. Die visuelle Browserprüfung bei 1440×900
+bestätigte sichtbare Raster in beiden Themes ohne zusätzlichen Scrollraum.
+
 ## 13. Juli 2026 – Release 2607.02.0
 
 ### Eine Versionsanzeige muss sichtbar und trotzdem platzsparend sein

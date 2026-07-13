@@ -51,6 +51,10 @@ export function applyDomTranslations(): void {
     const key = element.dataset.i18nTitle as TranslationKey | undefined;
     if (key) element.title = t(key);
   });
+  document.querySelectorAll<HTMLInputElement>("[data-i18n-placeholder]").forEach((element) => {
+    const key = element.dataset.i18nPlaceholder as TranslationKey | undefined;
+    if (key) element.placeholder = t(key);
+  });
   document.querySelectorAll<HTMLElement>("[data-i18n-aria-label]").forEach((element) => {
     const key = element.dataset.i18nAriaLabel as TranslationKey | undefined;
     if (key) element.setAttribute("aria-label", t(key));

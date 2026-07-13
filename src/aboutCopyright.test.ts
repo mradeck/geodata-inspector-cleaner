@@ -12,7 +12,7 @@ describe("Über- und Copyright-Informationen", () => {
   it("bietet Copyright im Über-Menü und eine belastbare Lizenzquelle", () => {
     expect(page).toContain('id="open-copyright"');
     expect(page).toContain('id="copyright-dialog"');
-    expect(copyrightDocument).toContain("**Release:** 2607.02.0");
+    expect(copyrightDocument).toContain("**Release:** 2607.03.0");
     expect(copyrightDocument).toContain("## Direkte Laufzeitabhängigkeiten");
     expect(copyrightDocument).toContain("## OpenStreetMap");
   });

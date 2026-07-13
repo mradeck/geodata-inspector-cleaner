@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2607.02.0`
-- **npm-kompatible Version:** `2607.2.0`
+- **Aktuelle Release-Version:** `2607.03.0`
+- **npm-kompatible Version:** `2607.3.0`
 - **Repository:** privates GitHub-Repository `mradeck/geodata-inspector-cleaner`
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md`
@@ -42,9 +42,9 @@ Arbeit lösen keinen Versionssprung aus. Beim Monatswechsel beginnt `RR` wieder
 mit `01`.
 
 SemVer verbietet führende Nullen in numerischen Segmenten. Deshalb verwenden
-`package.json` und `package-lock.json` für `2607.02.0` die npm-kompatible Form
-`2607.2.0`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
-Berichte und Dokumentation verwenden die kanonische Form `2607.02.0`.
+`package.json` und `package-lock.json` für `2607.03.0` die npm-kompatible Form
+`2607.3.0`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
+Berichte und Dokumentation verwenden die kanonische Form `2607.03.0`.
 
 ## Versionierungs-, Dokumentations- und Push-Regel
 
@@ -134,10 +134,30 @@ Merksätze:
   Element. Solange sie geschlossen ist, werden ihr Canvas und ihre Leaflet-Karte
   nicht gerendert; beim Öffnen müssen beide nach dem Layout-Frame mit der
   sichtbaren Größe neu aufgebaut werden. Analyse und Export bleiben unabhängig
-  vom Offen-/Geschlossen-Zustand.
+  vom Offen-/Geschlossen-Zustand. Der geschlossene Zustand darf ausschließlich
+  die Summary-Kopfzeile belegen; die spezifische
+  `.preview-card.disturbance-preview-card`-Regel muss das allgemeine
+  Preview-Grid deshalb überschreiben und darf sich im Elterngrid nicht strecken.
+- Die rechte Seitenleiste scrollt nicht als Ganzes: Überschrift und Cleaner
+  bleiben stehen, ausschließlich `.findings-list` wächst mit `flex: 1` und
+  scrollt intern. Die DWG-Roadmap bleibt in der Dokumentation, erhält aber keine
+  separate Kachel in der knappen Seitenleiste.
 - Die Versionsnummer neben dem App-Titel, im Browser-Tab, in der Statuszeile und
   in Exportberichten stammt zentral aus `displayVersion`; keine zweite
   handgepflegte Laufzeitkonstante einführen.
+- Die Haupt-App bindet `body` und `.app-shell` an `100vh` und hält den äußeren
+  Viewport scrollbarfrei; `.stage` und `.sidebar` übernehmen langes Material
+  intern. `concept.css` muss diese Regel für Hilfe-/Konzeptseiten mit
+  `height:auto` und `overflow:auto` aufheben, damit Dokumente scrollbar bleiben.
+- Das Raster der leeren Vorschau nutzt `--empty-grid-line` und
+  `--empty-grid-accent` mit getrennten Werten für helles und dunkles Theme.
+  Theme-Kontrast immer visuell prüfen, nicht nur die Variablendefinition.
+- Das Analysefeld `CRS / EPSG` verwendet `EPSG:25832` als Standard, normalisiert
+  Pointcloud-Manager-kompatible Schreibweisen und hält die manuelle Vorgabe in
+  `InspectionReport.analysisCrs` getrennt von `GeoDataset.declaredCrs`. Eine
+  Änderung muss Cluster-/Kartenanalyse neu ausführen und eine frühere manuelle
+  Hauptbereichsbestätigung verwerfen. Exporter dürfen den Wert als CRS-Hinweis
+  übernehmen, aber niemals stillschweigend Koordinaten reprojizieren.
 - Reale DXF-Referenzfixtures gelten als sensibel. Sie dürfen nur nach
   ausdrücklicher Freigabe in ein weiterhin privates Repository gepusht werden.
   Eine öffentliche Freigabe benötigt eine gesonderte Anonymisierungs- und
@@ -158,6 +178,10 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2607.03.0` | 2026-07-13 | Neue Release-Linie mit viewportgerechter Startansicht, Theme-Rastern, manuellem CRS-/EPSG-Analysefeld und verdichteter Ergebnis-GUI; konsolidiert 2607.02.1 bis 2607.02.3. |
+| `2607.02.3` | 2026-07-13 | Geschlossene Störbereichsvorschau auf Summary-Höhe begrenzt, Befundliste intern scrollbar gemacht und Roadmap-Kachel aus der rechten Seitenleiste entfernt. |
+| `2607.02.2` | 2026-07-13 | Manuell pflegbares CRS-/EPSG-Feld mit Default 25832, normalisierter Eingabe, automatischer Neuanalyse und zurückgesetzter Cleaner-Bestätigung bei CRS-Wechsel. |
+| `2607.02.1` | 2026-07-13 | Startansicht an die Browserhöhe gebunden, äußerer vertikaler Scrollbalken entfernt und Vorschauraster für helles/dunkles Theme gezielt verstärkt. |
 | `2607.02.0` | 2026-07-13 | Neue Release-Linie mit vollständiger Version neben App-Titel und im Browser-Tab sowie standardmäßig eingeklappter, bedarfsgerecht gerenderter Störbereichsvorschau; schließt 2607.01.4 ein. |
 | `2607.01.4` | 2026-07-13 | Über-Menü mit Über-mich- und Copyright-Eintrag, dynamisch gerenderter Lizenzübersicht und transparent gekennzeichnetem Link zur reduzierten Pointcloud-Manager-Onlineversion. |
 | `2607.01.3` | 2026-07-13 | README-basierte Hilfeseite statt Konzept-Schaltfläche, zweisprachige „Über mich“-Ansicht aus dem Pointcloud Manager und lokal gespeicherter Hell-/Dunkelmodus für Hauptansicht und Hilfe. |
