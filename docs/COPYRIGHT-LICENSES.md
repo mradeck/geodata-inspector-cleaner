@@ -1,8 +1,8 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2607.03.0
+**Release:** 2607.03.2
 
-**Prüfstand:** 13. Juli 2026
+**Prüfstand:** 19. September 2026
 
 **Repository:** privat
 
@@ -10,6 +10,11 @@ Diese Übersicht dokumentiert die direkt verwendeten Bibliotheken, relevante
 Build-Komponenten und externe Kartendienste. Sie ersetzt keine individuelle
 Rechtsberatung. Vor jedem beauftragten Git-Push wird sie gegen `package.json`,
 `package-lock.json` und die externen Nutzungsbedingungen geprüft.
+
+Duplikatcheck `2607.03.2`: keine neuen oder geänderten Bibliotheken bzw.
+externen Dienste. Lockfile-Lizenzen erneut geprüft; Repository weiterhin privat.
+Der Sicherheitscheck meldet vier bestehende Befunde in Entwicklungsabhängigkeiten
+(@vitest/mocker, vitest, nanoid, postcss); keine neuen Laufzeitabhängigkeiten.
 
 ## Projektlizenz
 
@@ -85,7 +90,7 @@ DXF-, GeoJSON- oder andere Benutzerinhalte werden nicht als Markdown/HTML an
 `marked` übergeben. Sollte später fremdes Markdown unterstützt werden, ist vor
 der Aktivierung eine Sanitizing-Schicht verpflichtend.
 
-## Release-Prüfung 2607.03.0
+## Release-Prüfung 2607.03.2
 
 - direkte Abhängigkeiten gegen `package.json` und Lockfile abgeglichen,
 - vollständigen npm-Lizenzscan geprüft,
@@ -110,4 +115,5 @@ der Aktivierung eine Sanitizing-Schicht verpflichtend.
   Datenquelle oder externe Anfrage,
 - Theme- und Sprachwahl verwenden nur lokalen Browser-Speicher und übertragen
   keine Daten an externe Dienste,
-- `npm audit` ohne bekannte Schwachstellen.
+- `npm audit`: vier bestehende Befunde in Entwicklungsabhängigkeiten (2 moderat,
+  2 hoch); `npm audit --omit=dev`: keine bekannten Schwachstellen.

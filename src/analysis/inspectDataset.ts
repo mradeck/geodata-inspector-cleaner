@@ -1,3 +1,4 @@
+import { duplicateCounts } from "../duplicates/dxfDuplicates";
 import {
   DEFAULT_INSPECTION_CONFIG,
   type Bounds2D,
@@ -88,6 +89,17 @@ export function inspectDataset(
   const crs = assessCrs(dataset, focusBounds, analysisCrs);
   const findings: InspectionFinding[] = [];
   const recommendedRemovalIds = new Set<string>();
+  const duplicateCheck = dataset.dxfDuplicates;
+  if (duplicateCheck) {
+    const counts = duplicateCounts(duplicateCheck);
+    findings.push({
+      id: "dxf-duplicates", category: "dxf-duplicates",
+      severity: duplicateCheck.error || duplicateCheck.candidates.length ? "warning" : "info",
+      title: "DXF-Duplikatprüfung",
+      detail: duplicateCheck.error ?? `${counts.sameLayer} identische Duplikate; ${counts.crossLayer} zusätzliche layerübergreifende Duplikate.`,
+      featureIds: [], recommendation: duplicateCheck.error || duplicateCheck.candidates.length ? "review" : "keep",
+    });
+  }
 
   if (clusters.length > 1 && !primaryIsDominant && primarySelection === "automatic") {
     findings.push({

@@ -1,3 +1,4 @@
+import { inspectDxfDuplicates } from "../duplicates/dxfDuplicates";
 import type { GeoDataset, GeoFeature, GeoLayerMetadata, GeometryKind, ImportWarning, Position3 } from "../model";
 
 interface DxfGroup {
@@ -56,6 +57,7 @@ export function parseDxf(text: string, fileName: string): GeoDataset {
   return {
     fileName,
     format: "dxf",
+    dxfDuplicates: inspectDxfDuplicates(text),
     features: state.features,
     declaredCrs: findDeclaredCrs(groups),
     warnings,

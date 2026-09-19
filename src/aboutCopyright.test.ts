@@ -1,3 +1,4 @@
+import { APP_VERSION } from "./version";
 import { describe, expect, it } from "vitest";
 import page from "../index.html?raw";
 import copyrightDocument from "../docs/COPYRIGHT-LICENSES.md?raw";
@@ -12,7 +13,7 @@ describe("Über- und Copyright-Informationen", () => {
   it("bietet Copyright im Über-Menü und eine belastbare Lizenzquelle", () => {
     expect(page).toContain('id="open-copyright"');
     expect(page).toContain('id="copyright-dialog"');
-    expect(copyrightDocument).toContain("**Release:** 2607.03.0");
+    expect(copyrightDocument).toContain(`**Release:** ${APP_VERSION}`);
     expect(copyrightDocument).toContain("## Direkte Laufzeitabhängigkeiten");
     expect(copyrightDocument).toContain("## OpenStreetMap");
   });

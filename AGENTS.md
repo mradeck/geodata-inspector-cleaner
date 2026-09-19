@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2607.03.0`
-- **npm-kompatible Version:** `2607.3.0`
+- **Aktuelle Release-Version:** `2607.03.2`
+- **npm-kompatible Version:** `2607.3.2`
 - **Repository:** privates GitHub-Repository `mradeck/geodata-inspector-cleaner`
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md`
@@ -42,9 +42,9 @@ Arbeit lösen keinen Versionssprung aus. Beim Monatswechsel beginnt `RR` wieder
 mit `01`.
 
 SemVer verbietet führende Nullen in numerischen Segmenten. Deshalb verwenden
-`package.json` und `package-lock.json` für `2607.03.0` die npm-kompatible Form
-`2607.3.0`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
-Berichte und Dokumentation verwenden die kanonische Form `2607.03.0`.
+`package.json` und `package-lock.json` für `2607.03.2` die npm-kompatible Form
+`2607.3.2`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
+Berichte und Dokumentation verwenden die kanonische Form `2607.03.2`.
 
 ## Versionierungs-, Dokumentations- und Push-Regel
 
@@ -163,6 +163,24 @@ Merksätze:
   Eine öffentliche Freigabe benötigt eine gesonderte Anonymisierungs- und
   Rechteprüfung.
 
+## DXF-Duplikatprüfung
+
+- `src/duplicates/dxfDuplicates.ts` vergleicht originale Tags, niemals die
+  approximierten `GeoFeature.points`. Klassische Polylinien und INSERT-Attribute
+  bleiben zusammenhängende Sequenzen; Handle-Referenzen werden konservativ geprüft.
+- Der Duplikat-Export ist ein eigener, strukturerhaltender Workflow. Die Auswahl
+  startet leer. Nach erfolgreichem Export wird die bereinigte DXF als aktiver
+  Datensatz neu analysiert; alle Ansichten und der nachfolgende Cleaner müssen
+  diesen Stand nutzen. Alte Feature-IDs, Löschliste und Hauptbereichsbestätigung
+  verwerfen, gültige CRS-Vorgabe beibehalten.
+- Der Export darf nur bekannte, nicht referenzierte Kandidaten entfernen und
+  muss den exakten Inhalt aller übrigen Entitäten beim Kontrollimport vergleichen.
+- Den privaten HBF-Test optional mit `DXF_DUPLICATE_FIXTURE=/absoluter/pfad.dxf`
+  aktivieren. Die Datei nicht in das Repository kopieren. Erwartung: 1285 Objekte,
+  647 gleiche-Layer- und 30 zusätzliche Cross-Layer-Duplikate, 608 verbleibend.
+- Diese Runde führt die bestehende Release-Linie als `2607.03.2` fort; eine neue
+  Monats-/RR-Linie wurde nicht beauftragt.
+
 ## Standardbefehle
 
 | Zweck | Kommando |
@@ -178,6 +196,8 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2607.03.2` | 2026-09-19 | Bereinigte DXF nach Duplikat-Export automatisch als Arbeitsstand übernehmen; Objektzahlen, Layer, Karten und Befunde neu berechnen. |
+| `2607.03.1` | 2026-09-19 | Automatischer DXF-Duplikatcheck mit optionaler Löschliste, getrennten Layer-Kategorien, strukturerhaltendem Export und Kontrollimport. |
 | `2607.03.0` | 2026-07-13 | Neue Release-Linie mit viewportgerechter Startansicht, Theme-Rastern, manuellem CRS-/EPSG-Analysefeld und verdichteter Ergebnis-GUI; konsolidiert 2607.02.1 bis 2607.02.3. |
 | `2607.02.3` | 2026-07-13 | Geschlossene Störbereichsvorschau auf Summary-Höhe begrenzt, Befundliste intern scrollbar gemacht und Roadmap-Kachel aus der rechten Seitenleiste entfernt. |
 | `2607.02.2` | 2026-07-13 | Manuell pflegbares CRS-/EPSG-Feld mit Default 25832, normalisierter Eingabe, automatischer Neuanalyse und zurückgesetzter Cleaner-Bestätigung bei CRS-Wechsel. |

@@ -188,3 +188,16 @@ eine belastbare Version wird ein anonymisierter Referenzkorpus benötigt:
 
 Jede neue Regel benötigt positive und negative Referenzfälle, damit die Zahl
 der Fehlalarme sichtbar bleibt.
+
+## Exakte DXF-Duplikate (2607.03.1)
+
+Der zusätzliche Check vergleicht vollständige Originalentitäten in ENTITIES.
+Handle-Code 5 wird ignoriert, interne Owner-Handles (330) werden pro Objekt
+kanonisiert. Alle anderen Tags bleiben relevant; für die zweite Kategorie werden
+zusätzlich Layer-Tags (8) ignoriert. Keine Rundung, keine Toleranz, keine
+Richtungsumkehr oder zyklische Umordnung. POLYLINE/VERTEX/SEQEND und
+INSERT/ATTRIB/SEQEND sind atomare Objekte. Externe Referenzen verhindern die
+Löschung betroffener Handles. Die Auswahl ist zunächst leer; die Befunde werden
+nicht zu räumlichen Löschvorschlägen addiert. Ein eigener Export entfernt nur
+explizit ausgewählte Entitätsbereiche und verifiziert die unveränderten
+verbleibenden Inhalte.

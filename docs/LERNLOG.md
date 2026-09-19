@@ -4,6 +4,56 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## 19. September 2026 – Subversion 2607.03.2
+
+Fehler mit der HBF-Datei reproduziert: Der Duplikat-Export meldete 638 verbleibende
+Objekte, während die Layerübersicht weiterhin 1285 zeigte. Ursache war ein rein
+lokaler Download im DuplicatePanel ohne Rückmeldung an den aktiven App-Datensatz.
+
+Nach dem validierten Export wird die erzeugte DXF jetzt eingelesen und über einen
+verbindlichen Callback zum aktiven Arbeitsstand. Analyse, Layerübersicht, Karten,
+Befunde, Prüfbericht und räumlicher Cleaner verwenden denselben neuen Datensatz.
+Die bisherige Hauptbereichsbestätigung, Hervorhebungen und Löschliste werden
+verworfen, da beim Reimport IDs neu vergeben werden. Die letzte gültige
+CRS-Analysevorgabe bleibt erhalten; eine noch ungültige Eingabe oder ausstehende
+Eingabe-Verzögerung darf keine alten Zahlen auf dem neuen Datensatz hinterlassen.
+Die Originaldatei bleibt unverändert. Keine neuen Abhängigkeiten oder Dienste.
+
+Mit der Originaldatei im Browser verifiziert: 1285 → 638 → 608 in Inventar,
+Layerübersicht und Duplikatcheck; Hauptbereichsbestätigung zurückgesetzt.
+75 Tests, Build und Diff-Check bestanden. Audit unverändert mit vier bestehenden
+Entwicklungsabhängigkeitsbefunden; Repository weiterhin privat.
+
+## 19. September 2026 – Subversion 2607.03.1
+
+Die HBF-Bereinigung ist als automatische DXF-Prüfung mit optionaler Löschliste
+integriert. Der Vergleich verwendet die vollständigen Originaltags und erhält
+POLYLINE/VERTEX/SEQEND sowie INSERT/ATTRIB/SEQEND als atomare Objekte. Vorschau-
+Polygone oder bloße Textanker reichen für eine sichere Duplikatentscheidung nicht.
+Interne Owner-Handles dürfen vereinheitlicht werden; externe Referenzen und
+mehrdeutige Handles sperren die Löschung. Der Export schneidet nur bestätigte
+Entitätsbereiche aus dem Quelltext. ASCII/UTF-8, BOM und Zeilenenden bleiben
+bestehen; unsicher dekodierte Zeichen und unvollständige Strukturen sperren ihn.
+
+Die Zählung erfolgt in zwei Stufen: gleiche-Layer-Kopien und anschließend
+zusätzliche Vertreter auf anderen Layern. Damit überschneiden sich die
+Löschkandidaten nicht, und nach Auswahl beider Kategorien bleibt mindestens ein
+Exemplar jeder identischen Gruppe erhalten. A bezeichnet die erste Fundstelle,
+nicht eine fachlich bevorzugte Layerbedeutung. Der Duplikat-Export ist bewusst
+ein eigener Workflow; der normalisierte räumliche Cleaner bleibt separat.
+
+Validierung: privater HBF-Test über lokale Umgebungsvariable, ohne neue Geodaten
+im Repository: 1285 → 638 → 608; finale Ausgabe bytegleich mit der früheren
+manuellen Bereinigung. Unabhängiger ezdxf-Audit: 0 Fehler, 0 Reparaturen.
+Browserprüfung: Einzel-/Sammelauswahl, DE/EN, Hell/Dunkel und Auswahlbilanz.
+Keine neuen Bibliotheken oder externen Dienste.
+
+Der vorgeschriebene npm-Audit meldet vier bereits im unveränderten Lockfile
+bestehende Entwicklungsabhängigkeitsbefunde: @vitest/mocker, vitest, nanoid und
+postcss (2 moderat, 2 hoch). Abhängigkeitsupdates sind nicht Teil dieser
+Feature-Runde. Produktionsabhängigkeiten weisen im Audit keine Befunde auf.
+Die bestehende Release-Linie wird ohne neue RR-Freigabe als 2607.03.1 fortgeführt.
+
 ## 13. Juli 2026 – Release 2607.03.0
 
 Release `2607.03.0` konsolidiert die drei lokal verifizierten Subversionen der

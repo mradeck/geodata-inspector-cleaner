@@ -1,3 +1,5 @@
+import { DuplicatePanel } from "./duplicates/renderDuplicatePanel";
+import { duplicateCounts } from "./duplicates/dxfDuplicates";
 import "./styles.css";
 import { analyzeDataset } from "./analysis/analyzeDataset";
 import {
@@ -96,6 +98,8 @@ const elements = {
   themeToggle: byId<HTMLButtonElement>("btn-toggle-theme"),
   themeIcon: byId<HTMLElement>("theme-icon"),
 };
+
+const duplicatePanel = new DuplicatePanel(byId<HTMLElement>("duplicate-panel"), downloadText, applyDuplicateCleanup);
 
 let currentDataset: GeoDataset | null = null;
 let currentReport: InspectionReport | null = null;
@@ -302,6 +306,7 @@ elements.downloadReport.addEventListener("click", () => {
       ...localizeFinding(finding, currentReport!),
     })),
     recommendedRemovalIds: [...currentReport.recommendedRemovalIds],
+    duplicates: duplicatePanel.report(),
     objectFilter: {
       selectedFeatureCount: countSelected(currentReport.dataset.features, featureFilterSelection),
       totalFeatureCount: currentReport.dataset.features.length,
@@ -353,6 +358,25 @@ function selectedDxfAcadVersion(): DxfAcadVersion {
 }
 
 new ResizeObserver(() => renderCanvases()).observe(document.querySelector(".preview-grid") ?? document.body);
+
+function applyDuplicateCleanup(dataset: GeoDataset, status: string): void {
+  // Reparsed feature IDs and cluster membership belong to a new working dataset.
+  // Retain the last valid CRS; an unfinished input must not leave stale counts.
+  const analysisCrs = currentReport?.analysisCrs ?? null;
+  const report = analyzeDataset(dataset, {
+    clusterDistanceMeters: Number(elements.clusterDistance.value),
+  }, { analysisCrs });
+  cancelAnalysisCrsUpdate();
+  currentDataset = dataset;
+  currentReport = report;
+  elements.analysisCrs.value = analysisCrs ?? normalizeEpsg(dataset.declaredCrs) ?? "";
+  setAnalysisCrsValidity(true);
+  preferredPrimaryFeatureId = null;
+  highlightedIds.clear();
+  resetObjectFilter();
+  renderDashboard(report);
+  setStatus(status, "ok");
+}
 
 async function loadFile(file: File): Promise<void> {
   setStatus(t("status.reading", { file: file.name }), "working");
@@ -448,6 +472,7 @@ function renderDashboard(report: InspectionReport): void {
       <div><dt>${escapeHtml(t("inventory.warnings"))}</dt><dd>${formatNumber(report.dataset.warnings.length)}</dd></div>
     </dl>`;
 
+  duplicatePanel.render(report.dataset);
   renderFindings(report);
   renderObjectFilter(report.dataset);
   renderCleaner(report);
@@ -781,6 +806,12 @@ function renderFindings(report: InspectionReport): void {
       </span>
       <span class="finding-count">${finding.featureIds.length ? formatNumber(finding.featureIds.length) : "–"}</span>`;
     article.addEventListener("click", () => {
+      if (finding.category === "dxf-duplicates") {
+        const panel = byId<HTMLElement>("duplicate-panel");
+        const details = panel.querySelector("details");
+        if (details) details.open = true;
+        panel.scrollIntoView({ block: "start", behavior: "smooth" });
+      }
       highlightedIds = new Set(finding.featureIds);
       document.querySelectorAll(".finding-card").forEach((card) => card.classList.remove("selected"));
       article.classList.add("selected");
@@ -843,6 +874,7 @@ function formatDistance(meters: number): string {
 }
 
 function categoryLabel(category: InspectionFinding["category"]): string {
+  if (category === "dxf-duplicates") return t("duplicate.title");
   return ({
     "remote-cluster": t("finding.category.remote-cluster"),
     "extent-inflation": t("finding.category.extent-inflation"),
@@ -872,6 +904,14 @@ function localizeFinding(finding: InspectionFinding, report: InspectionReport): 
       title: t("finding.ambiguous.title"),
       detail: t("finding.ambiguous.detail", { share: formatPercent(share, 1) }),
     };
+  }
+
+  if (finding.category === "dxf-duplicates" && report.dataset.dxfDuplicates) {
+    const check = report.dataset.dxfDuplicates;
+    const counts = duplicateCounts(check);
+    return { title: t("duplicate.title"), detail: check.error ? t(`duplicate.error.${check.error}`) : t("duplicate.summary", {
+      total: formatNumber(check.entities.length), same: formatNumber(counts.sameLayer), cross: formatNumber(counts.crossLayer),
+    }) };
   }
 
   if (finding.category === "remote-cluster") {

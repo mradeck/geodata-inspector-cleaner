@@ -9,7 +9,7 @@ Bounds-Berechnungen, Exporte und GIS-/CAD-Weiterverarbeitung unbrauchbar macht.
 
 ## Projektstatus
 
-**Version 2607.03.0 – Release mit aktivem Cleaner.** Der
+**Version 2607.03.2 – Release mit aktivem Cleaner.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -88,7 +88,7 @@ Markdown-Renderers.
 ## Versionsanzeige und kompakte Störbereichsvorschau
 
 Die kanonische Version steht nun wie beim Pointcloud Manager direkt neben dem
-App-Titel, beispielsweise `v2607.03.0`. Browser-Tab und untere Statuszeile zeigen
+App-Titel, beispielsweise `v2607.03.2`. Browser-Tab und untere Statuszeile zeigen
 denselben Stand. Die Anzeige wird zentral aus `package.json` bezogen und nicht
 als unabhängiger Versionswert gepflegt.
 
@@ -150,6 +150,73 @@ jede CRS-Änderung eine bereits manuell bestätigte Hauptbereichswahl zurück. D
 korrekte grüne Bereich muss danach erneut auf der Karte geprüft und bestätigt
 werden. So kann keine Cleaner-Freigabe unbemerkt unter einer geänderten
 CRS-Annahme weiterverwendet werden.
+
+## DXF-Duplikate automatisch prüfen und gezielt entfernen
+
+Nach jedem DXF-Import erscheint **DXF-Duplikatcheck & Löschliste** oberhalb der
+Vorschauen sowie als eigener Befund rechts. Die Prüfung unterscheidet:
+
+- **Gleicher Layer:** vollständige identische Entitäten auf demselben Layer.
+- **Layerübergreifend:** zusätzliche identische Entitäten auf verschiedenen
+  Layern, jeweils bezogen auf einen Vertreter pro Layer.
+
+Verglichen werden ursprüngliche DXF-Daten einschließlich Z-Koordinaten,
+Eigenschaften und vollständiger POLYLINE-/VERTEX-/SEQEND-Sequenzen. Einfügungen
+mit Attributen werden ebenfalls als zusammenhängendes Objekt behandelt.
+Entitätshandles werden aus dem Vergleich ausgeschlossen; interne Owner-Handles
+werden innerhalb des Objekts vereinheitlicht. Beim layerübergreifenden Vergleich
+entfällt zusätzlich die Layerzuordnung. Unterschiedliche Layerdarstellungen und
+fachliche Bedeutungen sind vor einer Löschung zu prüfen.
+
+Es gibt keine Koordinatentoleranz: Schon kleinste Unterschiede bleiben erhalten.
+Auch andere Reihenfolgen, umgekehrte Linienrichtungen oder unterschiedlich
+formatierte Zahlen werden vorsichtig als verschieden behandelt. Die Prüfung
+nutzt keine vereinfachte Vorschaugeometrie. Texte am gleichen Ankerpunkt mit
+unterschiedlichem Inhalt sind deshalb keine identischen Duplikate.
+
+1. **Löschliste** über die Zeile „0 zum Löschen ausgewählt“ öffnen.
+2. Die Tabelle nach gleichen oder unterschiedlichen Layern filtern. Sie zeigt
+   DXF-Typ, Kennung/Handle, Layer A und B sowie den ersten Definitionspunkt XYZ.
+   Eigennamen werden nicht erfunden; die Layerbezeichnung dient zur Einordnung.
+3. Einzelne **B löschen**-Checkboxen aktivieren oder **Gleicher Layer: alle B
+   auswählen** beziehungsweise **Layerübergreifend: alle B auswählen** nutzen.
+   A ist das zuerst gefundene Vergleichsobjekt, keine fachlich bevorzugte Version.
+   Mindestens ein Exemplar jeder Gruppe bleibt erhalten. Für eine vollständige
+   Bereinigung beide Kategorien auswählen; weitere Kopien eines anderen Layers
+   können zusätzlich in „Gleicher Layer“ stehen.
+4. Die Bilanz „zum Löschen ausgewählt / bleiben erhalten“ prüfen. **Löschliste
+   leeren** setzt alle Entscheidungen zurück. Ein neuer Dateiimport startet
+   ebenfalls ohne ausgewählte Löschungen; Sprachwechsel behalten die Auswahl.
+5. **Nur ausgewählte Duplikate entfernen · DXF speichern** erzeugt eine neue
+   `*-deduplicated.dxf` und ein `*-deduplication-report.json`. Der Bericht enthält
+   Handles, Layer, Typen und angewendete Löschungen. Falls der Browser einen
+   zweiten Download blockiert, lässt sich die aktuelle Auswahl jederzeit über
+   **Löschliste als JSON speichern** separat dokumentieren. Auch der allgemeine
+   Prüfbericht enthält die Duplikatbefunde und die geplante Auswahl.
+
+Dieser **eigene Export** entfernt nur ausgewählte Duplikate aus der gesamten
+Original-DXF. Er benötigt keine Hauptbereichsbestätigung und übernimmt übrige
+Entitäten, Layer-/Blockdefinitionen, Texte, Koordinaten, DXF-Version, Kommentare
+und Zeilenenden unverändert. Ein Kontrollimport prüft die Objektzahl und den
+exakten Inhalt jeder verbliebenen Entität. Die Originaldatei bleibt erhalten.
+
+Die Hauptbereichs-, Layer-/Typfilter, CRS-Vorgabe und DXF-Zielversion des
+bestehenden **normalisierten Cleaners** gelten hier nicht. Um beide Verfahren
+zu kombinieren, zuerst die Duplikate entfernen und speichern. Die bereinigte DXF
+wird automatisch zum aktuellen Arbeitsstand. Objektzahl, Layerübersicht,
+Karten, Befunde, Prüfbericht und Cleaner verwenden sofort die verbleibenden
+Objekte. Ein erneuter Dateiimport ist nicht nötig. Die Löschliste und frühere
+Hauptbereichsbestätigung werden zurückgesetzt; vor einer weiteren räumlichen
+Bereinigung den Hauptbereich erneut bestätigen. Die Originaldatei auf dem
+Datenträger bleibt unverändert.
+
+**Grenzen:** ASCII-/UTF-8-DXF, vollständige Entitäten in `ENTITIES`;
+Blockdefinitionen werden nicht intern dedupliziert. Unvollständige Strukturen
+oder unsicher dekodierte Zeichen sperren diesen Export. Objekte mit extern
+referenzierten oder mehrdeutigen Handles bleiben sichtbar, sind aber zur
+Löschung gesperrt, damit Referenzen nicht beschädigt werden. Der Kontrollimport
+ersetzt keine vollständige Prüfung aller CAD-spezifischen Dateieigenschaften.
+Die gesamte Duplikatprüfung findet lokal statt und benötigt keine neue Bibliothek.
 
 ## Störbereich entfernen und bereinigte Datei speichern
 
@@ -291,7 +358,7 @@ npm run build
 
 ## Versionierung
 
-Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.03.0`:
+Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.03.2`:
 
 - `JJMM`: Jahr und Monat,
 - `RR`: zweistellige Releasefolge innerhalb des Monats,
@@ -301,8 +368,8 @@ Eine bewusst eröffnete größere Release-Linie erhöht `RR` und setzt `P` auf `
 Jede abgeschlossene lokale Feature-Runde und jeder Bugfix erhöht anschließend
 `P`, sodass der aktive Stand direkt im lokalen Dev-Server erkennbar ist. Wegen
 der SemVer-Regeln ohne führende Nullen steht in `package.json` und
-`package-lock.json` technisch `2607.3.0`. Die App, Dokumentation und exportierten
-Prüfberichte verwenden `2607.03.0`.
+`package-lock.json` technisch `2607.3.2`. Die App, Dokumentation und exportierten
+Prüfberichte verwenden `2607.03.2`.
 
 ## Leitprinzipien
 
@@ -334,6 +401,8 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2607.03.2` | 19. September 2026 | Duplikatbereinigung aktualisiert den aktiven Datensatz und alle Objektzahlen, Layer, Karten und Befunde automatisch; weitere Bereinigung ohne erneuten Import. |
+| `2607.03.1` | 19. September 2026 | Automatischer DXF-Duplikatcheck, getrennte Treffer für gleiche und unterschiedliche Layer, optionale Löschliste mit Handles und eigenem strukturerhaltenden Export samt Protokoll. |
 | `2607.03.0` | 13. Juli 2026 | Neue Release-Linie mit viewportgerechter Startansicht und Theme-Rastern, manuellem CRS-/EPSG-Analysefeld samt sicherer Neuanalyse sowie kompakter Störbereichs-Summary, scrollbar stabilisierten Befunden und bereinigter rechter Seitenleiste; konsolidiert 2607.02.1 bis 2607.02.3. |
 | `2607.02.3` | 13. Juli 2026 | Geschlossene Störbereichsvorschau auf die reine Kopfzeile reduziert, rechte Befundliste als eigener Scrollbereich stabilisiert und Roadmap-Kachel aus der Seitenleiste entfernt. |
 | `2607.02.2` | 13. Juli 2026 | Manuell pflegbares, zweisprachiges CRS-/EPSG-Analysefeld mit `EPSG:25832` als Standard, normalisierten Eingabeformen, automatischer Neuanalyse und sicherem Zurücksetzen früherer Cleaner-Bestätigungen. |

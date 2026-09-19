@@ -47,6 +47,7 @@ export interface GeoDataset {
   declaredCrs: string | null;
   warnings: ImportWarning[];
   layerMetadata?: GeoLayerMetadata[];
+  dxfDuplicates?: import("./duplicates/dxfDuplicates").DxfDuplicateCheck;
 }
 
 export interface Bounds2D {
@@ -81,7 +82,7 @@ export type FindingRecommendation = "keep" | "review" | "remove" | "set-crs";
 
 export interface InspectionFinding {
   id: string;
-  category: "remote-cluster" | "extent-inflation" | "z-zero" | "crs" | "import-loss" | "ambiguous-primary";
+  category: "remote-cluster" | "extent-inflation" | "z-zero" | "crs" | "import-loss" | "ambiguous-primary" | "dxf-duplicates";
   severity: FindingSeverity;
   title: string;
   detail: string;
