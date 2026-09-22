@@ -17,7 +17,7 @@
           <span class="brand-copy">
             <span class="brand-title-line">
               <strong>Geodata Inspector</strong>
-              <span id="header-version" class="brand-version">v2607.03.2</span>
+              <span id="header-version" class="brand-version">v2607.03.3</span>
             </span>
             <small>& Cleaner</small>
           </span>
@@ -268,11 +268,50 @@
         </aside>
       </main>
 
-      <footer class="statusbar">
+      <footer class="app-footer">
+        <nav class="related-apps" aria-label="Weitere Apps" data-i18n-aria-label="footer.apps">
+          <strong data-i18n="footer.apps">Weitere Apps</strong>
+          <a href="https://geoid-forge.netlify.app/" target="_blank" rel="noopener noreferrer">Geoid Forge <span aria-hidden="true">↗</span></a>
+          <a href="https://dxf-coordinate-forge.netlify.app/" target="_blank" rel="noopener noreferrer">DXF Coordinate Forge <span aria-hidden="true">↗</span></a>
+          <a href="https://www.pointcloud-manager.com" target="_blank" rel="noopener noreferrer">PointCloud Manager <span aria-hidden="true">↗</span></a>
+          <a href="https://mradeck.github.io/gps-utm-coordinate-converter/" target="_blank" rel="noopener noreferrer">GPS / UTM Converter <span aria-hidden="true">↗</span></a>
+        </nav>
+        <div class="footer-meta">
+          <span><span data-i18n="footer.author">Ein Werkzeug von Michael Radeck</span> · © <span id="footer-year"></span></span>
+          <nav class="footer-links" aria-label="Hilfe und rechtliche Hinweise" data-i18n-aria-label="footer.linksAria">
+            <button id="footer-support" type="button" data-i18n="support.title">Hilfe / Bugreport / Kontakt</button>
+            <button id="footer-licenses" type="button" data-i18n="footer.licenses">Lizenzen / Copyright</button>
+            <a href="https://www.multikopterschule.de/Kontakt-Impressum/IMPRESSUM/" target="_blank" rel="noopener noreferrer" data-i18n="footer.imprint">Impressum</a>
+            <a href="https://ko-fi.com/mradeck/tip" target="_blank" rel="noopener noreferrer" aria-label="Michael Radeck auf Ko-fi unterstützen" data-i18n-aria-label="footer.kofiAria"><span aria-hidden="true">☕</span> Ko-fi</a>
+          </nav>
+        </div>
+        <div class="statusbar">
         <span id="status"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></span>
-        <span data-i18n="version.label">Version 2607.03.2</span>
+        <span data-i18n="version.label">Version 2607.03.3</span>
+        </div>
       </footer>
     </div>
+
+    <dialog id="support-dialog" class="support-dialog about-panel" aria-labelledby="support-title" aria-describedby="support-privacy">
+      <header class="about-header">
+        <div>
+          <p class="eyebrow">Geodata Inspector &amp; Cleaner</p>
+          <h2 id="support-title" data-i18n="support.title">Hilfe / Bugreport / Kontakt</h2>
+        </div>
+        <form method="dialog"><button class="button about-close-icon" type="submit" autofocus aria-label="Kontaktfenster schließen" data-i18n-aria-label="support.closeAria">×</button></form>
+      </header>
+      <div class="about-body">
+        <p data-i18n="support.intro">Fragen zur Bedienung, einen Fehler gefunden oder eine Idee für die App?</p>
+        <div class="support-actions">
+          <a id="footer-help" class="button" href="./help.html?lang=de" target="_blank" rel="noopener" data-i18n="support.help">Anwenderhilfe öffnen</a>
+          <a id="support-bugreport" class="button" href="mailto:michael.radeck@email.de" data-i18n="support.bugreport">Bugreport per E-Mail</a>
+          <a id="support-contact" class="button" href="mailto:michael.radeck@email.de" data-i18n="support.contact">Kontakt per E-Mail</a>
+        </div>
+        <p class="support-address">michael.radeck@email.de</p>
+        <p data-i18n="support.bugHint">Für einen Bugreport helfen die Schritte zum Fehler, die erwartete und tatsächliche Reaktion sowie Browser und Betriebssystem. Die App-Version steht bereits im E-Mail-Betreff.</p>
+        <p id="support-privacy" data-i18n="support.privacy">Öffnet dein E-Mail-Programm. Die App versendet nichts selbst und hängt keine DXF-/GeoJSON-Dateien, Koordinaten oder Prüfberichte automatisch an. Bitte sensible Projektdaten vor dem freiwilligen Teilen entfernen.</p>
+      </div>
+    </dialog>
 
     <div id="about-dialog" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="about-title" hidden>
       <section class="about-panel">

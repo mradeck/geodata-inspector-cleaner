@@ -36,6 +36,7 @@ import { demoDataset } from "./sample/demoDataset";
 import { OsmClusterMap } from "./map/osmClusterMap";
 import { getTheme, initTheme, onThemeChange, toggleTheme } from "./theme";
 import { APP_VERSION } from "./version";
+import { initAppFooter } from "./appFooter";
 
 const elements = {
   headerVersion: byId<HTMLElement>("header-version"),
@@ -118,6 +119,7 @@ let analysisCrsUpdateTimer: number | null = null;
 
 initTheme();
 initI18n();
+initAppFooter(openCopyrightDialog);
 syncAppIdentity();
 elements.dxfAcadVersion.value = getDxfAcadVersion();
 syncLanguageControl();
@@ -1118,8 +1120,10 @@ function closeAboutDialog(): void {
 }
 
 function openCopyrightDialog(): void {
+  previousCopyrightFocus = document.activeElement instanceof HTMLElement && !elements.aboutMenu.contains(document.activeElement)
+    ? document.activeElement
+    : elements.aboutMenu.querySelector<HTMLElement>("summary");
   elements.aboutMenu.open = false;
-  previousCopyrightFocus = elements.aboutMenu.querySelector<HTMLElement>("summary");
   elements.copyrightDialog.hidden = false;
   elements.closeCopyright.focus();
   setStatus(t("status.copyrightOpened"), "ok");

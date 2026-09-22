@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2607.03.2`
-- **npm-kompatible Version:** `2607.3.2`
+- **Aktuelle Release-Version:** `2607.03.3`
+- **npm-kompatible Version:** `2607.3.3`
 - **Repository:** privates GitHub-Repository `mradeck/geodata-inspector-cleaner`
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md`
@@ -42,9 +42,9 @@ Arbeit lösen keinen Versionssprung aus. Beim Monatswechsel beginnt `RR` wieder
 mit `01`.
 
 SemVer verbietet führende Nullen in numerischen Segmenten. Deshalb verwenden
-`package.json` und `package-lock.json` für `2607.03.2` die npm-kompatible Form
-`2607.3.2`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
-Berichte und Dokumentation verwenden die kanonische Form `2607.03.2`.
+`package.json` und `package-lock.json` für `2607.03.3` die npm-kompatible Form
+`2607.3.3`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
+Berichte und Dokumentation verwenden die kanonische Form `2607.03.3`.
 
 ## Versionierungs-, Dokumentations- und Push-Regel
 
@@ -127,6 +127,10 @@ Merksätze:
   `docs/COPYRIGHT-LICENSES.md`. Diese Datei ist die einzige redaktionelle Quelle;
   der Dialog darf keine abweichende zweite Lizenzliste pflegen. Externe Demo-
   Links müssen Funktionslimits und Upgrade-/Upsell-Hinweise transparent benennen.
+- Die kompakte Fußzeile teilt den vorhandenen Copyright-Dialog. Hilfe, Bugreport
+  und Kontakt verwenden ein natives Dialogfenster und lokale `mailto:`-Links
+  ohne automatische Datei-/Koordinatenanhänge. Externe Apps, Impressum und Ko-fi
+  sind reine Links ohne Embed, Prefetch oder zusätzliche Laufzeitbibliothek.
 - Hell-/Dunkelwahl wird ausschließlich lokal unter `gic.theme` gespeichert.
   Neue Oberflächen müssen in beiden Themes auf Kontrast und Lesbarkeit geprüft
   werden; Hauptansicht und Hilfeseite verwenden dieselbe Theme-Schicht.
@@ -178,7 +182,7 @@ Merksätze:
 - Den privaten HBF-Test optional mit `DXF_DUPLICATE_FIXTURE=/absoluter/pfad.dxf`
   aktivieren. Die Datei nicht in das Repository kopieren. Erwartung: 1285 Objekte,
   647 gleiche-Layer- und 30 zusätzliche Cross-Layer-Duplikate, 608 verbleibend.
-- Diese Runde führt die bestehende Release-Linie als `2607.03.2` fort; eine neue
+- Diese Runde führt die bestehende Release-Linie als `2607.03.3` fort; eine neue
   Monats-/RR-Linie wurde nicht beauftragt.
 
 ## Standardbefehle
@@ -196,6 +200,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2607.03.3` | 2026-09-22 | Weitere Apps, Hilfe/Bugreport/Kontakt, bestehende Lizenzübersicht, Impressum und Ko-fi in kompakter DE-/EN-Fußzeile. |
 | `2607.03.2` | 2026-09-19 | Bereinigte DXF nach Duplikat-Export automatisch als Arbeitsstand übernehmen; Objektzahlen, Layer, Karten und Befunde neu berechnen. |
 | `2607.03.1` | 2026-09-19 | Automatischer DXF-Duplikatcheck mit optionaler Löschliste, getrennten Layer-Kategorien, strukturerhaltendem Export und Kontrollimport. |
 | `2607.03.0` | 2026-07-13 | Neue Release-Linie mit viewportgerechter Startansicht, Theme-Rastern, manuellem CRS-/EPSG-Analysefeld und verdichteter Ergebnis-GUI; konsolidiert 2607.02.1 bis 2607.02.3. |

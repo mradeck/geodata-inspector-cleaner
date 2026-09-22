@@ -9,7 +9,7 @@ Bounds-Berechnungen, Exporte und GIS-/CAD-Weiterverarbeitung unbrauchbar macht.
 
 ## Projektstatus
 
-**Version 2607.03.2 – Release mit aktivem Cleaner.** Der
+**Version 2607.03.3 – Release mit aktivem Cleaner.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -85,10 +85,26 @@ App-Dialog. Die Datei bleibt damit die gemeinsame Quelle für Release-Stand,
 Bibliothekslizenzen, OpenStreetMap-Pflichten und die Sicherheitsgrenze des
 Markdown-Renderers.
 
+Am unteren Rand findest du **Weitere Apps**: Geoid Forge, DXF Coordinate Forge,
+[PointCloud Manager](https://www.pointcloud-manager.com) und GPS / UTM Converter.
+Die kompakte Fußzeile bleibt im App-Viewport sichtbar und verlinkt außerdem
+**Impressum**, **Ko-fi** und **Lizenzen / Copyright**. Der Lizenzlink öffnet dieselbe
+gepflegte Übersicht wie das Über-Menü; keine zweite Lizenzliste.
+
+**Hilfe / Bugreport / Kontakt** öffnet ein Fenster mit der Anwenderhilfe sowie
+E-Mail-Links an **michael.radeck@email.de**. Der Bugreport bereitet einen Betreff
+mit App-Version und eine Vorlage für Reproduktionsschritte, erwartetes/tatsächliches
+Verhalten sowie Browser/Betriebssystem vor. Ein eingerichtetes E-Mail-Programm ist
+erforderlich. Die App versendet nichts selbst und hängt keine Quelldateien,
+Koordinaten oder Prüfberichte automatisch an. Sensible Projektdaten bitte vor
+dem freiwilligen Teilen entfernen. Externe Apps, Impressum und Ko-fi werden erst
+beim Anklicken geöffnet; es gibt weder eingebettete Spenden-Widgets noch neue Tracker.
+Beschriftungen, Hilfe-Link und E-Mail-Vorlage folgen der DE-/EN-Sprachwahl.
+
 ## Versionsanzeige und kompakte Störbereichsvorschau
 
 Die kanonische Version steht nun wie beim Pointcloud Manager direkt neben dem
-App-Titel, beispielsweise `v2607.03.2`. Browser-Tab und untere Statuszeile zeigen
+App-Titel, beispielsweise `v2607.03.3`. Browser-Tab und untere Statuszeile zeigen
 denselben Stand. Die Anzeige wird zentral aus `package.json` bezogen und nicht
 als unabhängiger Versionswert gepflegt.
 
@@ -358,7 +374,7 @@ npm run build
 
 ## Versionierung
 
-Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.03.2`:
+Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.03.3`:
 
 - `JJMM`: Jahr und Monat,
 - `RR`: zweistellige Releasefolge innerhalb des Monats,
@@ -368,8 +384,8 @@ Eine bewusst eröffnete größere Release-Linie erhöht `RR` und setzt `P` auf `
 Jede abgeschlossene lokale Feature-Runde und jeder Bugfix erhöht anschließend
 `P`, sodass der aktive Stand direkt im lokalen Dev-Server erkennbar ist. Wegen
 der SemVer-Regeln ohne führende Nullen steht in `package.json` und
-`package-lock.json` technisch `2607.3.2`. Die App, Dokumentation und exportierten
-Prüfberichte verwenden `2607.03.2`.
+`package-lock.json` technisch `2607.3.3`. Die App, Dokumentation und exportierten
+Prüfberichte verwenden `2607.03.3`.
 
 ## Leitprinzipien
 
@@ -401,6 +417,7 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2607.03.3` | 22. September 2026 | Kompakte Fußzeile mit weiteren Apps, Hilfe-/Bugreport-/Kontaktfenster, bestehender Lizenzübersicht, Impressum und Ko-fi; DE/EN und beide Themes. |
 | `2607.03.2` | 19. September 2026 | Duplikatbereinigung aktualisiert den aktiven Datensatz und alle Objektzahlen, Layer, Karten und Befunde automatisch; weitere Bereinigung ohne erneuten Import. |
 | `2607.03.1` | 19. September 2026 | Automatischer DXF-Duplikatcheck, getrennte Treffer für gleiche und unterschiedliche Layer, optionale Löschliste mit Handles und eigenem strukturerhaltenden Export samt Protokoll. |
 | `2607.03.0` | 13. Juli 2026 | Neue Release-Linie mit viewportgerechter Startansicht und Theme-Rastern, manuellem CRS-/EPSG-Analysefeld samt sicherer Neuanalyse sowie kompakter Störbereichs-Summary, scrollbar stabilisierten Befunden und bereinigter rechter Seitenleiste; konsolidiert 2607.02.1 bis 2607.02.3. |

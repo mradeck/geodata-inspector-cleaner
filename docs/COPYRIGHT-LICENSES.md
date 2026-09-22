@@ -1,8 +1,8 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2607.03.2
+**Release:** 2607.03.3
 
-**Prüfstand:** 19. September 2026
+**Prüfstand:** 22. September 2026
 
 **Repository:** privat
 
@@ -11,8 +11,10 @@ Build-Komponenten und externe Kartendienste. Sie ersetzt keine individuelle
 Rechtsberatung. Vor jedem beauftragten Git-Push wird sie gegen `package.json`,
 `package-lock.json` und die externen Nutzungsbedingungen geprüft.
 
-Duplikatcheck `2607.03.2`: keine neuen oder geänderten Bibliotheken bzw.
-externen Dienste. Lockfile-Lizenzen erneut geprüft; Repository weiterhin privat.
+Fußzeile `2607.03.3`: keine neuen oder geänderten Bibliotheken. Weitere Apps,
+Impressum und Ko-fi sind reine externe Links, keine eingebetteten Dienste oder
+Tracker. Hilfe/Bugreport/Kontakt verwendet lokale `mailto:`-Links ohne
+automatische Datei-/Koordinatenanhänge. Lockfile-Lizenzen geprüft; Repository weiterhin privat.
 Der Sicherheitscheck meldet vier bestehende Befunde in Entwicklungsabhängigkeiten
 (@vitest/mocker, vitest, nanoid, postcss); keine neuen Laufzeitabhängigkeiten.
 
@@ -90,7 +92,7 @@ DXF-, GeoJSON- oder andere Benutzerinhalte werden nicht als Markdown/HTML an
 `marked` übergeben. Sollte später fremdes Markdown unterstützt werden, ist vor
 der Aktivierung eine Sanitizing-Schicht verpflichtend.
 
-## Release-Prüfung 2607.03.2
+## Release-Prüfung 2607.03.3
 
 - direkte Abhängigkeiten gegen `package.json` und Lockfile abgeglichen,
 - vollständigen npm-Lizenzscan geprüft,

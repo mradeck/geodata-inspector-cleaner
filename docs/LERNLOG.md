@@ -4,6 +4,34 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## 22. September 2026 – Subversion 2607.03.3
+
+Die Fußzeile bietet weitere Apps (Geoid Forge, DXF Coordinate Forge,
+PointCloud Manager und GPS / UTM Converter), Hilfe/Bugreport/Kontakt,
+Lizenzen/Copyright, Impressum und Ko-fi. Die App-Hülle bleibt viewportgebunden;
+eine automatische Footer-Zeile ersetzt die feste 32-px-Statuszeile. Lange
+Analyse-Inhalte scrollen weiterhin innerhalb ihrer Panels.
+
+Der Kontaktbereich verwendet ein natives `dialog` für Tastaturfokus und Escape.
+Hilfe-Link, Beschriftungen und E-Mail-Vorlage folgen der zentralen DE-/EN-Wahl.
+Der Bugreport enthält nur feste Vorlagenfelder und die zentrale App-Version;
+Dateinamen, Geometrien und Berichte werden nicht automatisch übernommen.
+`mailto:` öffnet das E-Mail-Programm, die Anwendung selbst versendet nichts.
+Der Lizenzlink nutzt den vorhandenen Dialog und dieselbe Markdown-Quelle.
+Externe Links sind reine Verweise, keine eingebetteten Dienste oder Tracker.
+
+Keine neuen Abhängigkeiten. Lockfile-Lizenzen gegen die vorhandene Übersicht
+geprüft: keine GPL-/AGPL-/Non-Commercial- oder unklaren Einträge. Der npm-Audit
+meldet unverändert vier Entwicklungsbefunde (2 moderat, 2 hoch); Aktualisierungen
+dieser Werkzeuge sind nicht Teil des Footer-Auftrags. Die bestehende Release-Linie
+wird als 2607.03.3 fortgeführt, das Repository bleibt privat.
+
+Verifikation: 78 Tests bestanden, ein optionaler privater Fixture-Test ohne
+Umgebungsvariable übersprungen; Typprüfung, Produktionsbuild und Diff-Check
+bestanden. `npm audit --omit=dev`: keine Befunde. Browserprüfung für DE/EN,
+Hell/Dunkel, E-Mail-URLs, Kontakt- und Lizenzdialog sowie Footer innerhalb des
+720-px-Viewports. Es wurde keine Test-E-Mail versendet.
+
 ## 19. September 2026 – Subversion 2607.03.2
 
 Fehler mit der HBF-Datei reproduziert: Der Duplikat-Export meldete 638 verbleibende
