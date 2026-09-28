@@ -201,3 +201,46 @@ Löschung betroffener Handles. Die Auswahl ist zunächst leer; die Befunde werde
 nicht zu räumlichen Löschvorschlägen addiert. Ein eigener Export entfernt nur
 explizit ausgewählte Entitätsbereiche und verifiziert die unveränderten
 verbleibenden Inhalte.
+
+## Schraffurumrisse (2609.3.3)
+
+Die Randdaten werden nach der [Autodesk-DXF-Referenz](https://help.autodesk.com/cloudhelp/2024/ENU/AutoCAD-DXF/files/GUID-DC5215D6-E73F-4DFF-8BE9-01CA9610FAEE.htm)
+gelesen. Gruppen 91/92/93 und die jeweiligen Polyline-/Edge-Daten bestimmen die
+Ränder; Musterlinien, Ursprung und Saatpunkte sind keine Umrisspunkte. Jeder
+Rand einschließlich Innenringen wird als geschlossene LWPOLYLINE geschrieben.
+Linien und Kreisbögen bleiben exakt (Bulge); Ellipsen und NURBS werden mit einer
+Abtasttoleranz von 0,001 Zeichnungseinheiten segmentiert und gekennzeichnet.
+Für Splines wird jeder Knotenspannbereich adaptiv an Viertel-, Mittel- und
+Dreiviertelpunkten geprüft; dies ist keine formale globale Fehlergarantie.
+Offene oder ungültige Ränder führen zum Auslassen der gesamten betroffenen
+Schraffur, damit kein unvollständiger Satz mit fehlenden Innenringen entsteht.
+
+OCS-Ebene, Elevation, ursprünglicher Layer und Model-/Paper-Space-Owner bleiben
+an den neuen Polylinien erhalten. Vorhandene Entitäten werden nicht verändert;
+lediglich neue Entitäten und bei vorhandenem Header der nächste HANDSEED werden
+geschrieben. Der Kontrollimport vergleicht den exakten Quelltext aller alten
+Entitäten und die Geometrie aller neuen. Erneute Erzeugung derselben geordneten
+Umrissgeometrien ist gesperrt. Blockdefinitionen werden nicht aufgelöst.
+
+## IDBUFFER-Verweise bei Duplikatbereinigung (2609.3.4)
+
+Autodesk beschreibt [IDBUFFER](https://help.autodesk.com/cloudhelp/2026/CSY/AutoCAD-DXF/files/GUID-7A243F2B-72D8-4C48-A29A-3F251B86D03F.htm) als reine Objektverweisliste. Nur Mitglieds-Tags 330 nach
+AcDbIdBuffer innerhalb der OBJECTS-Sektion dürfen mit dem gewählten Duplikat
+entfernt werden. Owner, Reactor-Gruppen, unbekannte Unterklassen und andere
+Referenztypen bleiben geschützt. Alle übrigen Tags werden unverändert erhalten;
+Reimport prüft verbliebene Entitäten und das Fehlen der entfernten Listenverweise.
+Die Anzahl entfernter IDBUFFER-Einträge wird im Exportprotokoll dokumentiert.
+
+## Gemeinsamer Exportplan (2609.3.7)
+
+Die Prüfung verändert keine Quelldaten. Auswahl und Ausführung sind getrennt.
+Löschbare Duplikate sind standardmäßig ausgewählt; räumliche Auswahl entspricht
+alle Feature-IDs der Nicht-Hauptbereiche (ab 2609.3.8, ausdrücklicher Nutzerwunsch). Jeder Bereich kann per Checkbox abgewählt werden.
+HATCH-Umrisse sind bei möglichen neuen Umrissen standardmäßig aktiv.
+
+DXF: Auswahl über sourceEntityId auf vollständige originale Entitäten abbilden,
+Duplikat-/Bereichs-/Layerentfernungen vereinigen, geschützte oder teilweise
+gewählte Verbundobjekte sichtbar erhalten. Erst danach neue Umrisse für die
+verbleibenden Schraffuren erzeugen. Originalversion bleibt erhalten, keine
+Normalisierung von Vorschaugeometrien. Exportbilanz vorab, Prüfbericht optional.
+GeoJSON verwendet dieselbe Bereichsauswahl und bestehenden Layer-/Typfilter.

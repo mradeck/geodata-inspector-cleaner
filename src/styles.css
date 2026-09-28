@@ -339,3 +339,14 @@ input[type="range"] { width: 100%; accent-color: var(--green); margin: 15px 0 6p
 .duplicate-table-wrap input { accent-color: var(--green); width: 18px; height: 18px; }
 .duplicate-selected { background: var(--green-soft); }
 .duplicate-panel :focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+
+.save-file-dialog { max-width: min(560px, calc(100vw - 48px)); padding: 24px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--text); }
+.save-file-dialog::backdrop { background: rgba(0, 0, 0, .45); }
+.save-file-dialog p { line-height: 1.5; }
+.save-file-dialog .button { margin: 8px 8px 0 0; }
+.save-file-name { overflow-wrap: anywhere; font-weight: 600; }
+
+.plan-cluster { display: flex; gap: 8px; align-items: center; margin: 8px 0; font-size: 12px; }
+.plan-areas { max-height: 100px; overflow-y: auto; }
+.plan-operation { border-top: 1px solid var(--line); padding-top: 8px; }
+.plan-cluster input { flex-shrink: 0; }

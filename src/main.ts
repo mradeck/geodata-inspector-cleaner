@@ -1,3 +1,7 @@
+import { parseDxf } from "./io/parseDxf";
+import { createPlannedDxf, defaultAreaRemovalIds } from "./io/exportPlan";
+import { saveTextFile } from "./io/saveFile";
+import { HatchPanel } from "./hatches/renderHatchPanel";
 import { DuplicatePanel } from "./duplicates/renderDuplicatePanel";
 import { duplicateCounts } from "./duplicates/dxfDuplicates";
 import "./styles.css";
@@ -100,10 +104,17 @@ const elements = {
   themeIcon: byId<HTMLElement>("theme-icon"),
 };
 
-const duplicatePanel = new DuplicatePanel(byId<HTMLElement>("duplicate-panel"), downloadText, applyDuplicateCleanup);
+const duplicatePanel = new DuplicatePanel(byId<HTMLElement>("duplicate-panel"), () => { if (currentReport) renderCleaner(currentReport); });
+
+const hatchPanel = new HatchPanel(byId<HTMLElement>("hatch-panel"), () => { if (currentReport) renderCleaner(currentReport); });
 
 let currentDataset: GeoDataset | null = null;
 let currentReport: InspectionReport | null = null;
+let planDataset: GeoDataset | null = null;
+let selectedRemovalIds = new Set<string>();
+let preparedDxf: ReturnType<typeof createPlannedDxf> | null = null;
+let lastExportAudit: unknown = null;
+
 let highlightedIds = new Set<string>();
 let preferredPrimaryFeatureId: string | null = null;
 let osmClusterMap: OsmClusterMap | null = null;
@@ -205,6 +216,7 @@ elements.dropZone.addEventListener("drop", (event) => {
 
 elements.loadDemo.addEventListener("click", () => {
   currentDataset = demoDataset;
+  planDataset = null; lastExportAudit = null;
   syncAnalysisCrsFromDataset(currentDataset);
   resetObjectFilter();
   highlightedIds.clear();
@@ -309,6 +321,9 @@ elements.downloadReport.addEventListener("click", () => {
     })),
     recommendedRemovalIds: [...currentReport.recommendedRemovalIds],
     duplicates: duplicatePanel.report(),
+    hatchOutlines: hatchPanel.report(),
+    lastExportAudit,
+    selectedRemovalIds: [...selectedRemovalIds],
     objectFilter: {
       selectedFeatureCount: countSelected(currentReport.dataset.features, featureFilterSelection),
       totalFeatureCount: currentReport.dataset.features.length,
@@ -333,26 +348,26 @@ elements.downloadReport.addEventListener("click", () => {
 elements.downloadCleaned.addEventListener("click", () => exportCurrentSelection());
 elements.downloadGeoJsonAsDxf.addEventListener("click", () => exportCurrentSelection("dxf", true));
 
-function exportCurrentSelection(outputFormat?: "dxf" | "geojson", allowUnchangedOutput = false): void {
+async function exportCurrentSelection(outputFormat?: "dxf" | "geojson", allowUnchangedOutput = false): Promise<void> {
   if (!currentDataset || !currentReport) return;
   try {
+    if (currentDataset.dxfDuplicates) {
+      if (!preparedDxf) return;
+      const output = preparedDxf;
+      if (!await downloadText(output.fileName, output.content, "application/dxf;charset=utf-8")) return;
+      lastExportAudit = { application: "geodata-inspector-cleaner", version: APP_VERSION, ...output.audit };
+      applyDuplicateCleanup(parseDxf(output.content, output.fileName), t("plan.saved", { count: output.keptCount }));
+      return;
+    }
+    const ids = new Set(currentDataset.features.filter((f) => !selectedRemovalIds.has(f.id)).map((f) => f.id));
     const cleaned = createCleanedExport(currentDataset, currentReport, {
-      featureFilterSelection,
-      outputFormat,
-      allowUnchangedOutput,
-      acadVersion: selectedDxfAcadVersion(),
-      coordinateSystemLabel: currentReport.analysisCrs ?? currentDataset.declaredCrs,
+      featureFilterSelection, outputFormat, allowUnchangedOutput: true, selectionIds: ids,
+      acadVersion: selectedDxfAcadVersion(), coordinateSystemLabel: currentReport.analysisCrs ?? currentDataset.declaredCrs,
     });
-    downloadText(cleaned.fileName, cleaned.content, cleaned.mimeType);
-    elements.cleanerSummary.textContent = t("cleaner.validated", {
-      kept: formatNumber(cleaned.keptFeatureCount),
-      removed: formatNumber(cleaned.removedFeatureCount),
-    });
+    if (!await downloadText(cleaned.fileName, cleaned.content, cleaned.mimeType)) return;
+    elements.cleanerSummary.textContent = t("cleaner.validated", { kept: formatNumber(cleaned.keptFeatureCount), removed: formatNumber(cleaned.removedFeatureCount) });
     setStatus(t("status.cleanedSaved", { file: cleaned.fileName }), "ok");
-  } catch (error) {
-    const message = error instanceof CleanerError ? t(`cleaner.error.${error.code}`) : t("cleaner.error.unknown");
-    setStatus(message, "error");
-  }
+  } catch { setStatus(t("plan.failed"), "error"); }
 }
 
 function selectedDxfAcadVersion(): DxfAcadVersion {
@@ -384,6 +399,7 @@ async function loadFile(file: File): Promise<void> {
   setStatus(t("status.reading", { file: file.name }), "working");
   try {
     currentDataset = await readDataset(file);
+    lastExportAudit = null;
     syncAnalysisCrsFromDataset(currentDataset);
     resetObjectFilter();
     highlightedIds.clear();
@@ -475,6 +491,7 @@ function renderDashboard(report: InspectionReport): void {
     </dl>`;
 
   duplicatePanel.render(report.dataset);
+  hatchPanel.render(report.dataset);
   renderFindings(report);
   renderObjectFilter(report.dataset);
   renderCleaner(report);
@@ -516,12 +533,7 @@ function renderObjectFilter(dataset: GeoDataset): void {
     kept: formatNumber(kept),
     total: formatNumber(total),
   });
-  const primary = currentReport?.clusters.find((cluster) => cluster.isPrimary);
-  const confirmed = currentReport?.primarySelection === "manual";
-  elements.objectFilterConfirmation.classList.toggle("confirmed", confirmed);
-  elements.objectFilterConfirmationText.textContent = t(confirmed ? "filter.confirmed" : "filter.confirmHint");
-  elements.filterConfirmPrimary.hidden = confirmed;
-  elements.filterConfirmPrimary.disabled = !primary;
+  elements.objectFilterConfirmation.hidden = true;
   elements.objectFilterTable.replaceChildren();
 
   const header = document.createElement("div");
@@ -626,41 +638,63 @@ function formatLayerMetadata(summary: LayerObjectSummary): string {
 }
 
 function renderCleaner(report: InspectionReport): void {
-  const primary = report.clusters.find((cluster) => cluster.isPrimary);
-  const primaryIds = new Set(primary?.featureIds ?? []);
-  const kept = filterFeatures(report.dataset.features, featureFilterSelection)
-    .filter((feature) => primaryIds.has(feature.id)).length;
-  const spatialRemoved = report.dataset.features.length - (primary?.featureCount ?? 0);
-  const objectFiltered = Math.max(0, (primary?.featureCount ?? 0) - kept);
-  const removed = Math.max(0, report.dataset.features.length - kept);
-  const canExport = report.primarySelection === "manual" && Boolean(primary) && kept > 0;
-  const isGeoJson = report.dataset.format === "geojson";
-  elements.downloadCleaned.textContent = t(report.dataset.format === "dxf" ? "cleaner.downloadDxf" : "cleaner.downloadGeoJson");
-  elements.downloadCleaned.disabled = !canExport || removed === 0;
-  elements.downloadGeoJsonAsDxf.hidden = !isGeoJson;
-  elements.downloadGeoJsonAsDxf.disabled = !canExport;
-  elements.cleanerConversionNote.hidden = !isGeoJson;
-
-  if (!primary) {
-    elements.cleanerSummary.textContent = t("cleaner.noPrimary");
-  } else if (kept === 0) {
-    elements.cleanerSummary.textContent = t("cleaner.nothingSelected");
-  } else if (report.primarySelection !== "manual") {
-    elements.cleanerSummary.textContent = t("cleaner.confirm", {
-      kept: formatNumber(kept),
-      removed: formatNumber(removed),
-    });
-  } else if (removed === 0) {
-    elements.cleanerSummary.textContent = t(isGeoJson ? "cleaner.conversionOnly" : "cleaner.nothingToRemove", {
-      kept: formatNumber(kept),
-    });
+  if (planDataset !== report.dataset) {
+    planDataset = report.dataset;
+    selectedRemovalIds = defaultAreaRemovalIds(report.clusters);
+  }
+  const controls = byId<HTMLElement>("export-plan-controls"); controls.replaceChildren();
+  const areaHelp = document.createElement("small"); areaHelp.textContent = t("plan.areas"); controls.append(areaHelp);
+  const areas = document.createElement("div"); areas.className = "plan-areas"; controls.append(areas);
+  for (const cluster of report.clusters) {
+    const label = document.createElement("label"); label.className = "plan-cluster";
+    const input = document.createElement("input"); input.type = "checkbox";
+    input.checked = cluster.featureIds.every((id) => selectedRemovalIds.has(id));
+    input.indeterminate = !input.checked && cluster.featureIds.some((id) => selectedRemovalIds.has(id));
+    label.append(input, document.createTextNode(t(cluster.isPrimary ? "plan.removeCluster" : "plan.removeOutside", { index: report.clusters.indexOf(cluster) + 1, count: cluster.featureCount })));
+    input.addEventListener("change", () => {
+      for (const id of cluster.featureIds) { if (input.checked) selectedRemovalIds.add(id); else selectedRemovalIds.delete(id); }
+      renderCleaner(report);
+    }); areas.append(label);
+  }
+  const chosen = filterFeatures(report.dataset.features, featureFilterSelection).filter((f) => !selectedRemovalIds.has(f.id));
+  const retainedIds = new Set(chosen.map((f) => f.id));
+  const removed = new Set(report.dataset.features.filter((f) => !retainedIds.has(f.id)).map((f) => f.id));
+  const isDxf = Boolean(report.dataset.dxfDuplicates);
+  elements.dxfAcadVersion.closest('label')!.hidden = isDxf;
+  elements.downloadGeoJsonAsDxf.hidden = report.dataset.format !== "geojson";
+  elements.downloadGeoJsonAsDxf.disabled = !chosen.length;
+  elements.cleanerConversionNote.hidden = report.dataset.format !== "geojson";
+  preparedDxf = null;
+  if (isDxf) {
+    try {
+      preparedDxf = createPlannedDxf(report.dataset, { duplicateIds: duplicatePanel.selection(), removedFeatureIds: removed, hatchOutlines: hatchPanel.active() });
+      const a = preparedDxf.audit;
+      elements.cleanerSummary.textContent = t("plan.summary", { removed: preparedDxf.removedCount, duplicates: a.selectedDuplicateCount, outlines: a.createdOutlines.length, kept: preparedDxf.keptCount });
+      const protectedCount = a.protectedObjectsRetained.length + a.partialObjectsRetained.length;
+      if (protectedCount) elements.cleanerSummary.textContent += " " + t("plan.protected", { count: protectedCount });
+      if (a.skippedHatches.length) elements.cleanerSummary.textContent += " " + t("hatch.skipped", { count: a.skippedHatches.length });
+    } catch { elements.cleanerSummary.textContent = t("plan.failed"); }
+    const duplicates = duplicatePanel.stats();
+    const selected = duplicatePanel.selection().size;
+    const addChoice = (text: string, checked: boolean, disabled: boolean, change: (value: boolean) => void, mixed = false) => {
+      const label = document.createElement("label"); label.className = "plan-cluster plan-operation";
+      const input = document.createElement("input"); input.type = "checkbox";
+      input.checked = checked; input.disabled = disabled; input.indeterminate = mixed;
+      label.append(input, document.createTextNode(text));
+      input.addEventListener("change", () => change(input.checked)); controls.append(label);
+    };
+    addChoice(t("plan.duplicatesRow", { detected: duplicates.detected, removed: selected }),
+      selected > 0 && selected === duplicates.eligible, !duplicates.eligible,
+      (enabled) => duplicatePanel.selectAll(enabled), selected > 0 && selected < duplicates.eligible);
+    const hatches = hatchPanel.stats();
+    addChoice(t("plan.hatchesRow", { detected: hatches.detected, created: preparedDxf?.audit.createdOutlines.length ?? 0 }),
+      hatchPanel.active(), !hatches.available, (enabled) => hatchPanel.setActive(enabled));
+    elements.downloadCleaned.textContent = t(hatchPanel.active() ? "plan.exportHatches" : "plan.exportDxf");
+    elements.downloadCleaned.disabled = !preparedDxf || !preparedDxf.keptCount;
   } else {
-    elements.cleanerSummary.textContent = t("cleaner.ready", {
-      kept: formatNumber(kept),
-      removed: formatNumber(removed),
-      spatial: formatNumber(spatialRemoved),
-      filtered: formatNumber(objectFiltered),
-    });
+    elements.cleanerSummary.textContent = t("plan.geoSummary", { kept: chosen.length, removed: removed.size });
+    elements.downloadCleaned.textContent = t(report.dataset.format === "dxf" ? "plan.exportDxf" : "cleaner.downloadGeoJson");
+    elements.downloadCleaned.disabled = !chosen.length;
   }
 }
 
@@ -756,7 +790,7 @@ function renderMapCandidates(mapReport: ClusterMapReport, report: InspectionRepo
       actions.append(show);
     }
 
-    if (candidate.status === "mappable" && (!cluster.isPrimary || report.primarySelection !== "manual")) {
+    if (candidate.status === "mappable" && !cluster.isPrimary) {
       const choose = document.createElement("button");
       choose.type = "button";
       choose.className = "button choose-primary";
@@ -1167,13 +1201,8 @@ function baseName(fileName: string): string {
   return fileName.replace(/^.*[\\/]/, "").replace(/\.[^.]+$/, "");
 }
 
-function downloadText(fileName: string, content: string, mimeType: string): void {
-  const url = URL.createObjectURL(new Blob([content], { type: mimeType }));
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = fileName;
-  anchor.click();
-  URL.revokeObjectURL(url);
+function downloadText(fileName: string, content: string, mimeType: string): Promise<boolean> {
+  return saveTextFile(fileName, content, mimeType);
 }
 
 function escapeHtml(value: string): string {

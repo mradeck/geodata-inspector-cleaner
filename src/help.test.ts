@@ -5,7 +5,7 @@ describe("README-basierte Hilfe", () => {
   it("enthält die zentralen Bedien- und Exportabschnitte", () => {
     expect(readme).toContain("## Schnellstart");
     expect(readme).toContain("DXF-Zielformat");
-    expect(readme).toContain("Störbereich entfernen und bereinigte Datei speichern");
+    expect(readme).toContain("Ein gemeinsamer Export für alle Prüfungen");
   });
 
   it("enthält die veröffentlichte Anwendung und kein typisches UTF-8-Mojibake", () => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { inspectDataset } from "../analysis/inspectDataset";
 import { selectionKey, type FeatureFilterSelection } from "../analysis/layerFilter";
 import type { GeoDataset } from "../model";
-import { CleanerError, createCleanedExport } from "./exportCleaned";
+import { CleanerError, createCleanedExport, omitCoveredHatchPreviews } from "./exportCleaned";
 import { parseDxf } from "./parseDxf";
 import { parseGeoJson } from "./parseGeoJson";
 
@@ -148,5 +148,22 @@ describe("bereinigter Export", () => {
     }
     expect(ac1032.content.replaceAll("AC1032", "AC1015")).toBe(ac1015.content);
     expect(parseDxf(ac1032.content, ac1032.fileName).features).toHaveLength(2);
+  });
+});
+
+describe('covered hatch previews in normalized DXF output', () => {
+  it('requires every ring, same layer, same Z, and a selected closed polyline; leaves other duplicates alone', () => {
+    const outline = dataset('dxf').features[1]!;
+    const inner = outline.points.map((p) => ({ ...p, x: p.x + 1 }));
+    const hatch = { ...outline, id: 'hatch', sourceType: 'HATCH', hatchBoundaryPoints: [outline.points, inner] };
+    const hole = { ...outline, id: 'inner', points: inner };
+    expect(omitCoveredHatchPreviews([hatch, outline])).toHaveLength(2);
+    expect(omitCoveredHatchPreviews([hatch, outline, hole])).toEqual([outline, hole]);
+    expect(omitCoveredHatchPreviews([hatch, { ...outline, layer: 'other' }, hole])).toHaveLength(3);
+    expect(omitCoveredHatchPreviews([hatch, { ...outline, kind: 'polyline' }, hole])).toHaveLength(3);
+    expect(omitCoveredHatchPreviews([hatch, { ...outline, points: outline.points.map((p) => ({...p,z:p.z+0.000001})) }, hole])).toHaveLength(3);
+    expect(omitCoveredHatchPreviews([hatch])).toEqual([hatch]);
+    expect(omitCoveredHatchPreviews([outline, {...outline,id:'copy'}])).toHaveLength(2);
+    expect(omitCoveredHatchPreviews([{...hatch,hatchBoundaryPoints:undefined},outline,hole])).toHaveLength(3);
   });
 });

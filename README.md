@@ -9,7 +9,7 @@ Bounds-Berechnungen, Exporte und GIS-/CAD-Weiterverarbeitung unbrauchbar macht.
 
 ## Projektstatus
 
-**Version 2607.03.3 – Release mit aktivem Cleaner.** Der
+**Version 2609.3.8 – Release mit aktivem Cleaner.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -26,7 +26,7 @@ aktuelle Stand demonstriert bereits:
 - OpenStreetMap-Plausibilitätsansicht für georeferenzierte Cluster,
 - DXF-/GeoJSON-Geometrieüberlagerung auf OSM mit Haupt-/Störbereichsgrenzen,
 - explizite Hauptbereichswahl aus dem Kartenkontext,
-- kontrollierten DXF-/GeoJSON-Cleaning-Export nach manueller Bestätigung,
+- einen gemeinsamen DXF-/GeoJSON-Export mit prüfbarer Vorauswahl,
 - Layer- und Objekttypfilter mit DXF-Farbe, Linientyp, Linienstärke und
   Layerstatus,
 - GeoJSON-zu-DXF-Konvertierung mit beibehaltener Layerstruktur,
@@ -104,7 +104,7 @@ Beschriftungen, Hilfe-Link und E-Mail-Vorlage folgen der DE-/EN-Sprachwahl.
 ## Versionsanzeige und kompakte Störbereichsvorschau
 
 Die kanonische Version steht nun wie beim Pointcloud Manager direkt neben dem
-App-Titel, beispielsweise `v2607.03.3`. Browser-Tab und untere Statuszeile zeigen
+App-Titel, beispielsweise `v2609.3.8`. Browser-Tab und untere Statuszeile zeigen
 denselben Stand. Die Anzeige wird zentral aus `package.json` bezogen und nicht
 als unabhängiger Versionswert gepflegt.
 
@@ -167,190 +167,87 @@ korrekte grüne Bereich muss danach erneut auf der Karte geprüft und bestätigt
 werden. So kann keine Cleaner-Freigabe unbemerkt unter einer geänderten
 CRS-Annahme weiterverwendet werden.
 
-## DXF-Duplikate automatisch prüfen und gezielt entfernen
+## Ein gemeinsamer Export für alle Prüfungen
 
-Nach jedem DXF-Import erscheint **DXF-Duplikatcheck & Löschliste** oberhalb der
-Vorschauen sowie als eigener Befund rechts. Die Prüfung unterscheidet:
+1. DXF oder GeoJSON laden. Die Quelldatei bleibt unverändert.
+2. Vorschau und vorausgewählte Änderungen prüfen:
+   - löschbare DXF-Duplikate sind in der Löschliste bereits ausgewählt,
+   - alle erkannten Außenbereiche sind rechts unten angehakt,
+   - Layer-/Typfilter wählen Einzelpunkte zunächst ab,
+   - bei geeigneten Schraffuren ist **Schraffur-Umrisse beim gemeinsamen Export
+     erzeugen** bereits aktiv.
+3. Auswahl bei Bedarf ändern. Duplikate lassen sich einzeln oder gesammelt
+   abwählen. Die Bereichsliste rechts unten erlaubt auch das Beibehalten eines
+   vorgeschlagenen Löschbereichs. Der Hauptbereich bleibt zunächst erhalten. Karten und Bereichsnummern dienen der Kontrolle.
+4. Rechts unten stehen eigene Schalter mit den erkannten Duplikaten und der
+   Löschanzahl sowie erkannten Schraffuren und der Anzahl neuer Umrisse. Beide
+   sind bei verfügbaren Aktionen vorausgewählt und mit den Detailansichten
+   synchronisiert. Die gemeinsame Bilanz zeigt: entfernte Objekte, ausgewählte
+   Duplikate, neue Umrisse und endgültige DXF-Objektzahl. Der Button nennt bei
+   aktivierter Erzeugung ausdrücklich **DXF exportieren · mit Schraffur-Umrissen**.
+5. Einmal exportieren und den Speicherort wählen. Es gibt keine separaten
+   DXF-Downloads für Duplikate oder Schraffuren und keine zusätzliche
+   Hauptbereichsbestätigung. Der erfolgreiche DXF-Export wird zum neuen
+   Arbeitsstand; beim Abbrechen bleibt die Auswahl erhalten.
 
-- **Gleicher Layer:** vollständige identische Entitäten auf demselben Layer.
-- **Layerübergreifend:** zusätzliche identische Entitäten auf verschiedenen
-  Layern, jeweils bezogen auf einen Vertreter pro Layer.
+Die Quellobjekte sind bis zum Export unverändert. Deshalb zeigt das Inventar
+weiterhin die geladenen Zahlen; die Exportbilanz zeigt das geplante Ergebnis.
+Der Kopfbutton **Prüfbericht** speichert auf Wunsch die Auswahl und nach dem
+Export das angewendete Änderungsprotokoll. Kein zweiter automatischer Download.
 
-Verglichen werden ursprüngliche DXF-Daten einschließlich Z-Koordinaten,
-Eigenschaften und vollständiger POLYLINE-/VERTEX-/SEQEND-Sequenzen. Einfügungen
-mit Attributen werden ebenfalls als zusammenhängendes Objekt behandelt.
-Entitätshandles werden aus dem Vergleich ausgeschlossen; interne Owner-Handles
-werden innerhalb des Objekts vereinheitlicht. Beim layerübergreifenden Vergleich
-entfällt zusätzlich die Layerzuordnung. Unterschiedliche Layerdarstellungen und
-fachliche Bedeutungen sind vor einer Löschung zu prüfen.
+### DXF-Struktur und Duplikate
 
-Es gibt keine Koordinatentoleranz: Schon kleinste Unterschiede bleiben erhalten.
-Auch andere Reihenfolgen, umgekehrte Linienrichtungen oder unterschiedlich
-formatierte Zahlen werden vorsichtig als verschieden behandelt. Die Prüfung
-nutzt keine vereinfachte Vorschaugeometrie. Texte am gleichen Ankerpunkt mit
-unterschiedlichem Inhalt sind deshalb keine identischen Duplikate.
+Der gemeinsame DXF-Export erhält Originalentitäten, Layer, Blöcke, Schraffuren,
+Eigenschaften, Koordinaten, Dateiversion und übrige CAD-Struktur. Er entfernt
+gewählte Entitäten, bereinigt zugehörige IDBUFFER-Mitgliedsverweise und fügt
+optional neue Umrisse hinzu. Abschließend wird die Ausgabe kontrolliert.
+Die Versionswahl gilt deshalb nur für GeoJSON→DXF; vorhandene DXFs behalten
+bewusst ihre Originalversion. Es gibt keine Reprojektion.
 
-1. **Löschliste** über die Zeile „0 zum Löschen ausgewählt“ öffnen.
-2. Die Tabelle nach gleichen oder unterschiedlichen Layern filtern. Sie zeigt
-   DXF-Typ, Kennung/Handle, Layer A und B sowie den ersten Definitionspunkt XYZ.
-   Eigennamen werden nicht erfunden; die Layerbezeichnung dient zur Einordnung.
-3. Einzelne **B löschen**-Checkboxen aktivieren oder **Gleicher Layer: alle B
-   auswählen** beziehungsweise **Layerübergreifend: alle B auswählen** nutzen.
-   A ist das zuerst gefundene Vergleichsobjekt, keine fachlich bevorzugte Version.
-   Mindestens ein Exemplar jeder Gruppe bleibt erhalten. Für eine vollständige
-   Bereinigung beide Kategorien auswählen; weitere Kopien eines anderen Layers
-   können zusätzlich in „Gleicher Layer“ stehen.
-4. Die Bilanz „zum Löschen ausgewählt / bleiben erhalten“ prüfen. **Löschliste
-   leeren** setzt alle Entscheidungen zurück. Ein neuer Dateiimport startet
-   ebenfalls ohne ausgewählte Löschungen; Sprachwechsel behalten die Auswahl.
-5. **Nur ausgewählte Duplikate entfernen · DXF speichern** erzeugt eine neue
-   `*-deduplicated.dxf` und ein `*-deduplication-report.json`. Der Bericht enthält
-   Handles, Layer, Typen und angewendete Löschungen. Falls der Browser einen
-   zweiten Download blockiert, lässt sich die aktuelle Auswahl jederzeit über
-   **Löschliste als JSON speichern** separat dokumentieren. Auch der allgemeine
-   Prüfbericht enthält die Duplikatbefunde und die geplante Auswahl.
+Duplikate werden anhand originaler Tags verglichen, einschließlich Z und
+Eigenschaften; Handles dienen der Identifikation. Gleicher-Layer- und zusätzliche
+layerübergreifende Kopien werden getrennt angezeigt. Layerübergreifende Treffer
+können fachlich unterschiedliche Bedeutungen haben und lassen sich abwählen.
 
-Dieser **eigene Export** entfernt nur ausgewählte Duplikate aus der gesamten
-Original-DXF. Er benötigt keine Hauptbereichsbestätigung und übernimmt übrige
-Entitäten, Layer-/Blockdefinitionen, Texte, Koordinaten, DXF-Version, Kommentare
-und Zeilenenden unverändert. Ein Kontrollimport prüft die Objektzahl und den
-exakten Inhalt jeder verbliebenen Entität. Die Originaldatei bleibt erhalten.
+Unbekannte Referenzen sperren weiterhin die Löschung. Nur teilweise ausgewählte
+zusammengesetzte Objekte (z. B. INSERT mit Attributen) bleiben als Ganzes erhalten.
+Die Bilanz weist solche Ausnahmen vor dem Export aus; der Prüfbericht nennt die
+Kennungen. Nicht geometrisch auswertbare Inhalte bleiben erhalten. Mehrdeutige
+oder ungültige DXF-Strukturen sperren den gemeinsamen Export.
 
-Die Hauptbereichs-, Layer-/Typfilter, CRS-Vorgabe und DXF-Zielversion des
-bestehenden **normalisierten Cleaners** gelten hier nicht. Um beide Verfahren
-zu kombinieren, zuerst die Duplikate entfernen und speichern. Die bereinigte DXF
-wird automatisch zum aktuellen Arbeitsstand. Objektzahl, Layerübersicht,
-Karten, Befunde, Prüfbericht und Cleaner verwenden sofort die verbleibenden
-Objekte. Ein erneuter Dateiimport ist nicht nötig. Die Löschliste und frühere
-Hauptbereichsbestätigung werden zurückgesetzt; vor einer weiteren räumlichen
-Bereinigung den Hauptbereich erneut bestätigen. Die Originaldatei auf dem
-Datenträger bleibt unverändert.
+### Schraffurumrisse
 
-**Grenzen:** ASCII-/UTF-8-DXF, vollständige Entitäten in `ENTITIES`;
-Blockdefinitionen werden nicht intern dedupliziert. Unvollständige Strukturen
-oder unsicher dekodierte Zeichen sperren diesen Export. Objekte mit extern
-referenzierten oder mehrdeutigen Handles bleiben sichtbar, sind aber zur
-Löschung gesperrt, damit Referenzen nicht beschädigt werden. Der Kontrollimport
-ersetzt keine vollständige Prüfung aller CAD-spezifischen Dateieigenschaften.
-Die gesamte Duplikatprüfung findet lokal statt und benötigt keine neue Bibliothek.
+Die Erzeugung gilt ausschließlich für Schraffuren, die nach den gewählten
+Löschungen noch vorhanden sind. Alle Außen-/Innenringe werden als geschlossene
+LWPOLYLINE auf dem Original-Layer erzeugt. Schraffuren bleiben erhalten. Bei
+abgeschalteter Option werden keine zusätzlichen Polylinien erzeugt.
+Identische bereits vorhandene/geplante Umrisse werden nicht erneut angelegt.
+Linien und Kreisbögen bleiben exakt; Ellipsen und Splines werden mit einer
+Abtasttoleranz von 0,001 Zeichnungseinheiten angenähert und gekennzeichnet.
+Unvollständige oder offene Ränder werden mit Grund ausgelassen; die Schraffur
+bleibt vollständig erhalten. Nur ENTITIES ab R14, keine Blockdefinitionen.
 
-## Störbereich entfernen und bereinigte Datei speichern
+Beispieldatei: Zwei Schraffur-Duplikate sind vorausgewählt. Nach Entfernen bleiben
+32 Schraffuren; dazu entstehen 33 unterschiedliche Umrisse einschließlich
+Innenring. Der echte Pointcloud-Manager-Importer liest daraus 33 unterschiedliche
+Shapes. Kein normalisierender Zweitexport erzeugt zusätzliche Kopien.
+Vier referenzierte Layout-/Schriftfeldobjekte dieser Datei bleiben geschützt.
 
-Der Cleaner arbeitet absichtlich in zwei getrennten Schritten: Die App schlägt
-zunächst einen Hauptbereich vor, entfernt aber noch nichts. Erst die ausdrückliche
-Bestätigung durch den Anwender schaltet den Export frei.
+### Speicherort und Abbruch
 
-1. DXF oder GeoJSON laden beziehungsweise das Beispiel öffnen.
-2. Den grünen Projektbereich, seinen blauen Bounds-Rahmen und den roten
-   Störbereich in den Vorschauen und auf der OSM-Karte prüfen.
-3. Im Kartenabschnitt beim korrekten Cluster auf **Hauptbereich bestätigen**
-   klicken. Bei einem CRS-gestützten Vorschlag ist dieser Schritt ebenfalls
-   zwingend; die CRS-Heuristik allein darf keine Geometrie löschen.
-4. Unterhalb der Karten in der **Objekt- und Layerübersicht** festlegen, welche
-   Kombinationen aus Layer und Geometrietyp erhalten bleiben. Einzelpunkte sind
-   wie im Pointcloud-Manager zunächst abgewählt.
-5. Im Abschnitt **04 · Cleaner** die Bilanz „behalten / entfernen“ prüfen.
-6. **Bereinigte DXF speichern** beziehungsweise **Bereinigtes GeoJSON
-   speichern** wählen.
-7. Die erzeugte Datei in CAD/GIS öffnen und dort insbesondere **Zoom all**, die
-   Lage, die Layer und die Geometrieanzahl kontrollieren.
+In unterstützten Browsern öffnet der Export direkt die native Speichern-unter-
+Auswahl. Pro Datei wird neu gefragt; keine gespeicherten Dateihandles. Abbruch
+verändert weder Quelldatei noch Arbeitsstand. Fehler öffnen einen Dialog mit
+erneutem Versuch. Bietet der Browser keine native Auswahl an, erklärt die App
+diese Einschränkung und bietet einen ausdrücklich beschrifteten normalen
+Download als Ersatz an; dessen Ziel bestimmt der Browser.
 
-Die App benennt die neue Datei beispielsweise
-`bestandsplan-cleaned.dxf`. Die ursprüngliche Datei bleibt byteweise
-unangetastet und kann jederzeit erneut analysiert werden.
+### GeoJSON
 
-### 1. Projekt- und Störbereich im Kartenkontext prüfen
-
-
-### 2. Hauptbereich bestätigen und Export freigeben
-
-
-### Was die bereinigte DXF technisch enthält
-
-Der DXF-Export übernimmt die in `pointcloud-manager` bewährte Exportstrategie
-und passt sie an das formatneutrale Feature-Modell dieser App an. Es wird keine
-potenziell beschädigte Teilkopie der Quell-DXF geschrieben, sondern eine neue,
-normalisierte ASCII-DXF erzeugt:
-
-- Maßeinheit Meter über `$INSUNITS = 6` für deklarierte projizierte CRS;
-  geografische oder nicht deklarierte GeoJSON-Koordinatensysteme werden beim
-  DXF-Export sicherheitshalber als einheitenlos markiert,
-- neu berechnete `$EXTMIN`- und `$EXTMAX`-Werte des bestätigten Hauptbereichs,
-- CRS-Hinweis als DXF-Kommentar, sofern ein CRS in der Datei deklariert oder im
-  Analysefeld vorgegeben ist,
-- nachvollziehbares Cleaning-Protokoll mit Quelldatei, Anzahl der behaltenen und
-  entfernten Features sowie den bestätigten Bounds,
-- bereinigte, CAD-taugliche Layernamen,
-- ACI-Farbe und True-Color je Layer,
-- Punkte als `POINT`, offene Linien als `POLYLINE` und geschlossene Flächen als
-  geschlossene `POLYLINE`,
-- ausschließlich Features des manuell bestätigten Hauptclusters.
-
-### DXF-Version und CAD-Kompatibilität auswählen
-
-Im Cleaner gilt die DXF-Versionsauswahl sowohl für bereinigte DXF-Dateien als
-auch für GeoJSON→DXF-Konvertierungen:
-
-- **AutoCAD 2000 (`AC1015`)** ist der Default. Dieses Profil ist für strenge
-  AutoCAD-OEM-Programme ausgelegt und entspricht der im Pointcloud-Manager
-  getesteten Variante, die beispielsweise in DATAFLOR GREENXPERT nicht nur
-  geöffnet, sondern auch weiterkopiert werden kann.
-- **AutoCAD 2018 (`AC1032`)** richtet sich an moderne AutoCAD-Workflows und
-  kennzeichnet die Datei ausdrücklich als aktuelleres Format mit offiziellem
-  TrueColor-Support.
-
-Die Wahl wird lokal im Browser gespeichert. Beide Profile verwenden dasselbe
-vollständige, vom Pointcloud-Manager übernommene DXF-Gerüst: fortlaufende
-Handles, Subclass-Marker, alle erwarteten Standardsymboltabellen,
-`*Model_Space`/`*Paper_Space`, `BLOCKS`, PlotStyle-Sentinel und das
-Named-Object-`DICTIONARY` in `OBJECTS`. Es wird also nicht lediglich der
-`$ACADVER`-Text ausgetauscht. Nach dem Export durchläuft jede Variante den
-internen Kontrollimport.
-
-### GeoJSON als DXF exportieren
-
-Nach einem GeoJSON-Import bietet der Cleaner zusätzlich **Als DXF exportieren**
-an. Hauptbereichs- und Layer-/Typentscheidung gelten genauso wie beim normalen
-Cleaning-Export. Werden Objekte entfernt, heißt die Ausgabe `*-cleaned.dxf`;
-bei einer reinen Formatkonvertierung `*-converted.dxf`.
-
-Die Konvertierung übernimmt die Koordinaten unverändert und führt keine
-stillschweigende Reprojektion durch. Ein projiziertes CRS wie `EPSG:25832` wird
-als metrische DXF ausgegeben. `EPSG:4326`, CRS84 oder ein fehlendes CRS führen zu
-einer einheitenlosen DXF mit entsprechendem Kommentar. Vor der Weitergabe ist
-die Lage deshalb im Ziel-CAD zu prüfen.
-
-Danach liest die App den erzeugten Text mit dem eigenen Importer erneut ein. Der
-Download wird nur angeboten, wenn Feature-Anzahl, genau ein räumlicher Cluster
-und die Bounds des bestätigten Bereichs übereinstimmen. Das reale Referenzpaar
-ist als Regressionstest abgedeckt: Aus der unbereinigten Datei mit 200 Features
-entsteht der bestätigte 99-Feature-Projektbereich mit denselben Bounds wie in der
-bereitgestellten, bereits gefilterten Kontroll-Datei.
-
-### Bewusste Grenzen des normalisierten Exports
-
-Der Export ist geometrisch und für robuste CAD-Bounds optimiert, aber kein
-verlustfreier DXF-Roundtrip. Der Importer hat komplexe CAD-Entitäten bereits für
-Analyse und Vorschau vereinheitlicht. Dadurch gelten insbesondere:
-
-- `TEXT`, `MTEXT`, Blockattribute und vergleichbare Beschriftungselemente werden
-  derzeit nur über ihren analysierten Ankerpunkt als `POINT` ausgegeben.
-- Kreise, Bögen, Ellipsen und Splines werden entsprechend der beim Import
-  gemeldeten Näherung als Polylinien exportiert.
-- Blockstruktur, Layout-/Paper-Space-Inhalte, Linientypdetails, Hatch-Muster,
-  XData, Handles und sonstige nicht in das interne Feature-Modell übernommene
-  CAD-Semantik werden nicht rekonstruiert.
-- Übersprungene oder angenäherte Entitäten stehen als Importwarnungen in der
-  Oberfläche und im Prüfbericht. Diese Warnungen sind vor dem Export fachlich zu
-  bewerten.
-
-Für den konkreten Anwendungsfall „entfernten Plankopf beseitigen, damit Zoom all
-wieder den Projektbereich zeigt“ ist die Normalisierung ein Sicherheitsgewinn:
-veraltete globale Extents und Referenzen auf entfernte Entity-Strukturen werden
-nicht in die neue Datei mitgeschleppt. Wenn ein Projekt jedoch vollständig
-editierbare Texte, Blöcke oder native Kurven benötigt, muss die Ausgabe zusätzlich
-in den vorgesehenen CAD-Anwendungen geprüft oder später um einen
-entitätserhaltenden Exportpfad erweitert werden.
+Bereichs- und Layer-/Typauswahl werden beim gemeinsamen GeoJSON-Export angewendet.
+Alternativ ist die Umwandlung nach DXF mit AC1015 oder AC1032 möglich. Koordinaten
+bleiben unverändert. Die normalisierte GeoJSON→DXF-Konvertierung repräsentiert
+keine komplexen CAD-Objektstrukturen; der direkte DXF-Pfad erhält diese hingegen.
 
 ## Schnellstart
 
@@ -374,18 +271,11 @@ npm run build
 
 ## Versionierung
 
-Die sichtbare Release-Version verwendet `JJMM.RR.P`, aktuell `2607.03.3`:
-
-- `JJMM`: Jahr und Monat,
-- `RR`: zweistellige Releasefolge innerhalb des Monats,
-- `P`: Subversion/Hotfix.
-
-Eine bewusst eröffnete größere Release-Linie erhöht `RR` und setzt `P` auf `0`.
-Jede abgeschlossene lokale Feature-Runde und jeder Bugfix erhöht anschließend
-`P`, sodass der aktive Stand direkt im lokalen Dev-Server erkennbar ist. Wegen
-der SemVer-Regeln ohne führende Nullen steht in `package.json` und
-`package-lock.json` technisch `2607.3.3`. Die App, Dokumentation und exportierten
-Prüfberichte verwenden `2607.03.3`.
+Aktuell **2609.3.8**, Bugfix auf Basis der September-Version 2609.3.3. Das Schema
+lautet `JJMM.R.P`: Jahr/Monat, Release-Linie, Subversion. Derselbe Wert steht in
+`package.json`, `package-lock.json`, `displayVersion`, App und Prüfberichten.
+Bei neuen Runden wird auch der aktuelle Monat geprüft. Frühere Einträge mit
+Juli-Präfix bleiben in der Historie als damals veröffentlichte Stände erhalten.
 
 ## Leitprinzipien
 
@@ -417,6 +307,13 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2609.3.8` | 2026-09-28 | Außenbereiche automatisch ausgewählt; eigene synchronisierte Export-Schalter mit Duplikat- und Schraffurzahlen. |
+| `2609.3.7` | 28. September 2026 | Gemeinsamer Exportplan: Duplikate/Bereiche vorausgewählt, Umrisse aktivierbar; ein DXF-Export mit Originalstruktur und direkter Speicherortwahl. |
+| `2609.3.6` | 28. September 2026 | Speicherortabfrage je Export; Abbruch und Schreibfehler behandelt, expliziter Download-Ersatz bei fehlender Browserunterstützung. |
+| `2609.3.5` | 28. September 2026 | Doppelte Konturen beim nachgeschalteten Cleaner-Export verhindert; mit tatsächlichem Pointcloud-Manager-Importer geprüft. |
+| `2609.3.4` | 28. September 2026 | Schraffur-Duplikate trotz IDBUFFER-Mitgliedslisten direkt löschbar; zugehörige Listenverweise kontrolliert entfernen und protokollieren. |
+| `2609.3.3` | 28. September 2026 | Versionsmonat korrigiert; geschlossene Schraffurumrisse auf Original-Layern einschließlich Innenringen, Kurvenunterstützung und strukturerhaltendem DXF-Export. |
+
 | `2607.03.3` | 22. September 2026 | Kompakte Fußzeile mit weiteren Apps, Hilfe-/Bugreport-/Kontaktfenster, bestehender Lizenzübersicht, Impressum und Ko-fi; DE/EN und beide Themes. |
 | `2607.03.2` | 19. September 2026 | Duplikatbereinigung aktualisiert den aktiven Datensatz und alle Objektzahlen, Layer, Karten und Befunde automatisch; weitere Bereinigung ohne erneuten Import. |
 | `2607.03.1` | 19. September 2026 | Automatischer DXF-Duplikatcheck, getrennte Treffer für gleiche und unterschiedliche Layer, optionale Löschliste mit Handles und eigenem strukturerhaltenden Export samt Protokoll. |

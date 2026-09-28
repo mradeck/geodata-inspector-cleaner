@@ -23,6 +23,7 @@ export interface DxfDuplicateCheck {
   entities: DxfSourceEntity[];
   candidates: DxfDuplicateCandidate[];
   error: "structure" | "encoding" | null;
+  removableReferences: DxfTag[];
 }
 
 /** Handles are identity, not content. Internal owner references are canonicalized,
@@ -38,7 +39,7 @@ function signature(entity: DxfSourceEntity, ignoreLayer: boolean): string {
 }
 
 export function inspectDxfDuplicates(source: string): DxfDuplicateCheck {
-  const result: DxfDuplicateCheck = { source, entities: [], candidates: [], error: null };
+  const result: DxfDuplicateCheck = { source, entities: [], candidates: [], error: null, removableReferences: [] };
   if (source.includes("\ufffd")) return { ...result, error: "encoding" };
   const lines = [...source.matchAll(/[^\r\n]*(?:\r\n|\n|\r|$)/g)].filter((m) => m[0].length);
   if (lines.length % 2) return { ...result, error: "structure" };
@@ -100,7 +101,22 @@ export function inspectDxfDuplicates(source: string): DxfDuplicateCheck {
       ownerByHandle.set(handle, entity);
     }
   }
-  for (const tag of tags) {
+  // Only IDBUFFER member pointers are a documented, safely editable list.
+  // Owners, reactors, unknown subclasses and all other objects stay protected.
+  let section = ""; let objectType = ""; let subclass = ""; let depth = 0;
+  for (let i = 0; i < tags.length; i++) {
+    const tag = tags[i]!;
+    if (tag.code === 0) {
+      objectType = tag.value.trim(); subclass = ""; depth = 0;
+      if (objectType === "SECTION") section = tags[i + 1]?.value.trim() ?? "";
+      if (objectType === "ENDSEC") section = "";
+    }
+    if (tag.code === 102) { if (tag.value.trim().startsWith("{")) depth++; else if (tag.value.trim() === "}") depth--; }
+    if (tag.code === 100 && depth === 0) subclass = tag.value.trim();
+    if (section === "OBJECTS" && objectType === "IDBUFFER" && subclass === "AcDbIdBuffer" && depth === 0 && tag.code === 330) {
+      result.removableReferences.push(tag);
+      continue;
+    }
     if ((tag.code >= 320 && tag.code <= 369) || tag.code === 390 || tag.code === 480 || tag.code === 481 || tag.code === 1005) {
       const target = ownerByHandle.get(tag.value.trim().toUpperCase());
       if (target && (tag.start < target.start || tag.start >= target.end)) target.protected = true;
@@ -148,17 +164,27 @@ export function createDuplicateExport(check: DxfDuplicateCheck, selected: Readon
     const candidate = candidates.get(id);
     if (!candidate || candidate.blocked) throw new Error("invalid-selection");
   }
+  const output = createEntityRemovalExport(check, selected);
+  return { ...output, removed: output.removed.map((e) => ({ ...e, kind: candidates.get(e.id)!.kind })) };
+}
+
+/** Shared source-preserving removal for the combined export. */
+export function createEntityRemovalExport(check: DxfDuplicateCheck, selected: ReadonlySet<string>) {
+  if (check.error || [...selected].some((id) => !check.entities.some((e) => e.id === id && !e.protected))) throw new Error("invalid-selection");
   const kept = check.entities.filter((e) => !selected.has(e.id));
   const removed = check.entities.filter((e) => selected.has(e.id));
+  const removedHandles = new Set(removed.flatMap((e) => e.tags.filter((t) => t.code === 5).map((t) => t.value.trim().toUpperCase())));
+  const removedReferences = check.removableReferences.filter((t) => removedHandles.has(t.value.trim().toUpperCase()));
+  const ranges = [...removed, ...removedReferences].sort((a, b) => a.start - b.start);
   const pieces: string[] = [];
   let cursor = 0;
-  for (const entity of removed) { pieces.push(check.source.slice(cursor, entity.start)); cursor = entity.end; }
+  for (const range of ranges) { pieces.push(check.source.slice(cursor, range.start)); cursor = range.end; }
   pieces.push(check.source.slice(cursor));
   const content = pieces.join("");
   const reparsed = inspectDxfDuplicates(content);
   if (reparsed.error || reparsed.entities.length !== kept.length || reparsed.entities.some((e, i) =>
     content.slice(e.start, e.end) !== check.source.slice(kept[i]!.start, kept[i]!.end))) throw new Error("validation");
-  return { content, keptCount: kept.length, removedCount: removed.length,
-    removed: removed.map((e) => ({ id: e.id, handle: e.handle, layer: e.layer, type: e.type,
-      kind: candidates.get(e.id)!.kind })) };
+  if (reparsed.removableReferences.some((t) => removedHandles.has(t.value.trim().toUpperCase()))) throw new Error("validation");
+  return { content, removedReferenceCount: removedReferences.length, keptCount: kept.length, removedCount: removed.length,
+    removed: removed.map((e) => ({ id: e.id, handle: e.handle, layer: e.layer, type: e.type })) };
 }

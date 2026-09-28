@@ -1,8 +1,7 @@
-import { parseDxf } from "../io/parseDxf";
 import { formatNumber, t } from "../i18n";
 import type { GeoDataset } from "../model";
 import { APP_VERSION } from "../version";
-import { createDuplicateExport, duplicateCounts, type DxfDuplicateCandidate, type DxfDuplicateCheck, type DxfSourceEntity } from "./dxfDuplicates";
+import { duplicateCounts, type DxfDuplicateCandidate, type DxfDuplicateCheck, type DxfSourceEntity } from "./dxfDuplicates";
 
 const PAGE_SIZE = 50;
 
@@ -16,8 +15,14 @@ export class DuplicatePanel {
   private expanded = false;
   private message = "";
 
-  constructor(private readonly root: HTMLElement, private readonly download: (name: string, content: string, mime: string) => void,
-    private readonly applyDataset: (dataset: GeoDataset, status: string) => void) {}
+  constructor(private readonly root: HTMLElement, private readonly changed: () => void) {}
+  selection(): ReadonlySet<string> { return new Set(this.selected); }
+
+  stats() { return { detected: this.check?.candidates.length ?? 0, eligible: this.check?.candidates.filter((c) => !c.blocked).length ?? 0 }; }
+  selectAll(enabled: boolean): void {
+    this.selected = new Set(enabled ? this.check?.candidates.filter((c) => !c.blocked).map((c) => c.entityId) ?? [] : []);
+    this.refresh();
+  }
 
   report() {
     if (!this.check || !this.dataset) return null;
@@ -40,7 +45,7 @@ export class DuplicatePanel {
     if (dataset !== this.dataset) {
       this.dataset = dataset; this.check = dataset.dxfDuplicates;
       this.candidatesById = new Map(this.check?.candidates.map((c) => [c.entityId, c]) ?? []);
-      this.selected.clear(); this.page = 0; this.filter = "all"; this.expanded = false; this.message = "";
+      this.selected = new Set(this.check?.candidates.filter((c) => !c.blocked).map((c) => c.entityId) ?? []); this.page = 0; this.filter = "all"; this.expanded = false; this.message = "";
     }
     this.root.hidden = !this.check;
     this.root.replaceChildren();
@@ -111,11 +116,7 @@ export class DuplicatePanel {
       paragraph(t("duplicate.page", { page: this.page + 1, pages, count: formatNumber(candidates.length) })),
       button(t("duplicate.next"), () => { this.page++; this.refresh(); }, this.page >= pages - 1));
     details.append(pagination);
-    details.append(paragraph(t("duplicate.exportNote")));
-    const downloads = document.createElement("div"); downloads.className = "duplicate-actions";
-    downloads.append(button(t("duplicate.download"), () => this.export(), !this.selected.size),
-      button(t("duplicate.report"), () => this.download(`${baseName(dataset.fileName)}-duplicate-list.json`, JSON.stringify(this.report(), null, 2), "application/json;charset=utf-8")));
-    details.append(downloads);
+    details.append(paragraph(t("plan.pending")));
     const status = paragraph(this.message); status.setAttribute("role", "status"); this.root.append(details, status);
   }
 
@@ -125,23 +126,8 @@ export class DuplicatePanel {
     while (this.selected.has(keeperId) && byId.has(keeperId)) keeperId = byId.get(keeperId)!.keeperId;
     return keeperId;
   }
-  private refresh() { if (this.dataset) this.render(this.dataset); }
-  private export() {
-    try {
-      const output = createDuplicateExport(this.check!, this.selected);
-      const name = `${baseName(this.dataset!.fileName)}-deduplicated.dxf`;
-      const cleanedDataset = parseDxf(output.content, name);
-      this.download(name, output.content, "application/dxf;charset=utf-8");
-      this.download(`${baseName(this.dataset!.fileName)}-deduplication-report.json`, JSON.stringify({
-        ...this.report(), applied: true, outputFile: name, keptCount: output.keptCount,
-        removedCount: output.removedCount, removed: output.removed, validation: "reimport-and-exact-retained-entity-comparison",
-      }, null, 2), "application/json;charset=utf-8");
-      const status = t("duplicate.saved", { removed: formatNumber(output.removedCount), kept: formatNumber(output.keptCount) });
-      this.applyDataset(cleanedDataset, status);
-      this.message = status;
-    } catch { this.message = t("duplicate.failed"); }
-    this.refresh();
-  }
+  private refresh() { if (this.dataset) this.render(this.dataset); this.changed(); }
+
 }
 function paragraph(text: string) { const p = document.createElement("p"); p.textContent = text; return p; }
 function button(text: string, action: () => void, disabled = false) {

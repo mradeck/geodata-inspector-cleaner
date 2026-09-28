@@ -28,6 +28,7 @@ export interface CleanedExport {
   removedFeatureCount: number;
   spatialRemovedFeatureCount: number;
   filterRemovedFeatureCount: number;
+  coveredHatchFeatureCount: number;
   validatedBounds: Bounds2D;
   outputFormat: SourceFormat;
 }
@@ -40,12 +41,14 @@ interface CleaningAudit {
   outputBounds: Bounds2D;
   spatialRemovedFeatureCount: number;
   filterRemovedFeatureCount: number;
+  coveredHatchFeatureCount: number;
   filterRemovedByLayerAndType: string[];
   sourceFormat: SourceFormat;
   outputFormat: SourceFormat;
 }
 
 export interface CleanedExportOptions {
+  selectionIds?: ReadonlySet<string>;
   featureFilterSelection?: FeatureFilterSelection;
   outputFormat?: SourceFormat;
   /** Erlaubt eine reine Formatkonvertierung, auch wenn kein Feature entfernt wird. */
@@ -66,22 +69,24 @@ export function createCleanedExport(
   report: InspectionReport,
   options: CleanedExportOptions = {},
 ): CleanedExport {
-  if (report.primarySelection !== "manual") throw new CleanerError("primary-not-confirmed");
+  if (!options.selectionIds && report.primarySelection !== "manual") throw new CleanerError("primary-not-confirmed");
   const primary = report.clusters.find((cluster) => cluster.isPrimary);
   if (!primary) throw new CleanerError("no-primary");
-  const keepIds = new Set(primary.featureIds);
+  const keepIds = options.selectionIds ?? new Set(primary.featureIds);
   const primaryFeatures = dataset.features.filter((feature) => keepIds.has(feature.id));
-  const keptFeatures = options.featureFilterSelection
+  const selectedFeatures = options.featureFilterSelection
     ? filterFeatures(primaryFeatures, options.featureFilterSelection)
     : primaryFeatures;
+  const outputFormat = options.outputFormat ?? dataset.format;
+  const keptFeatures = outputFormat === "dxf" ? omitCoveredHatchPreviews(selectedFeatures) : selectedFeatures;
+  const coveredHatchFeatureCount = selectedFeatures.length - keptFeatures.length;
   if (keptFeatures.length === 0) throw new CleanerError("nothing-kept");
   const spatialRemovedFeatureCount = dataset.features.length - primaryFeatures.length;
-  const filterRemovedFeatures = primaryFeatures.filter((feature) => !keptFeatures.includes(feature));
+  const filterRemovedFeatures = primaryFeatures.filter((feature) => !selectedFeatures.includes(feature));
   const filterRemovedFeatureCount = filterRemovedFeatures.length;
   const removedFeatureCount = dataset.features.length - keptFeatures.length;
   if (removedFeatureCount === 0 && !options.allowUnchangedOutput) throw new CleanerError("nothing-to-remove");
   const outputBounds = bounds2D(keptFeatures);
-  const outputFormat = options.outputFormat ?? dataset.format;
   const coordinateSystemLabel = options.coordinateSystemLabel ?? dataset.declaredCrs;
 
   const extension = outputFormat === "dxf" ? "dxf" : "geojson";
@@ -95,6 +100,7 @@ export function createCleanedExport(
     outputBounds,
     spatialRemovedFeatureCount,
     filterRemovedFeatureCount,
+    coveredHatchFeatureCount,
     filterRemovedByLayerAndType: summarizeFilteredFeatures(filterRemovedFeatures),
     sourceFormat: dataset.format,
     outputFormat,
@@ -112,7 +118,7 @@ export function createCleanedExport(
   const reparsed = outputFormat === "dxf"
     ? parseDxf(content, outputName)
     : parseGeoJson(content, outputName);
-  validateReimport(reparsed, keptFeatures.length, outputBounds);
+  validateReimport(reparsed, keptFeatures.length, outputBounds, Boolean(options.selectionIds));
 
   return {
     content,
@@ -122,6 +128,7 @@ export function createCleanedExport(
     removedFeatureCount,
     spatialRemovedFeatureCount,
     filterRemovedFeatureCount,
+    coveredHatchFeatureCount,
     validatedBounds: outputBounds,
     outputFormat,
   };
@@ -146,6 +153,7 @@ export function exportFeaturesAsDxf(
       `Cleaner removed features: ${audit.removedFeatureCount}`,
       `Cleaner spatially removed features: ${audit.spatialRemovedFeatureCount}`,
       `Cleaner object-filter removed features: ${audit.filterRemovedFeatureCount}`,
+      `Cleaner hatch previews covered by selected outlines: ${audit.coveredHatchFeatureCount}`,
       `Cleaner confirmed main bounds: ${formatBounds(audit.primaryBounds)}`,
       `Cleaner output bounds: ${formatBounds(audit.outputBounds)}`,
       `Cleaner format conversion: ${audit.sourceFormat} -> ${audit.outputFormat}`,
@@ -173,6 +181,7 @@ function exportFeaturesAsGeoJson(features: GeoFeature[], declaredCrs: string | n
       outputBounds: audit.outputBounds,
       spatialRemovedFeatureCount: audit.spatialRemovedFeatureCount,
       filterRemovedFeatureCount: audit.filterRemovedFeatureCount,
+      coveredHatchFeatureCount: audit.coveredHatchFeatureCount,
       filterRemovedByLayerAndType: audit.filterRemovedByLayerAndType,
       sourceFormat: audit.sourceFormat,
       outputFormat: audit.outputFormat,
@@ -204,10 +213,10 @@ function featureGeometry(feature: GeoFeature): Record<string, unknown> {
   return { type: "LineString", coordinates };
 }
 
-function validateReimport(dataset: GeoDataset, expectedFeatureCount: number, expectedBounds: Bounds2D): void {
+function validateReimport(dataset: GeoDataset, expectedFeatureCount: number, expectedBounds: Bounds2D, allowMultipleClusters = false): void {
   if (dataset.features.length !== expectedFeatureCount) throw new CleanerError("validation-count");
   const report = inspectDataset(dataset);
-  if (report.clusters.length !== 1) throw new CleanerError("validation-clusters");
+  if (!allowMultipleClusters && report.clusters.length !== 1) throw new CleanerError("validation-clusters");
   if (!report.fullBounds || !sameBounds(report.fullBounds, expectedBounds)) throw new CleanerError("validation-bounds");
 }
 
@@ -259,4 +268,13 @@ function formatBounds(bounds: Bounds2D): string {
 function inferGeoJsonDxfUnits(declaredCrs: string | null): number {
   if (!declaredCrs) return 0;
   return /(?:4326|CRS\s*:?\s*84)/i.test(declaredCrs) ? 0 : 6;
+}
+
+/** Only suppress HATCH previews if every ring is already covered by a selected
+ * closed polyline on the same layer. Never deduplicate unrelated CAD entities.
+ * Comparison is exact and ordered; no spatial tolerance or rounded coordinates. */
+export function omitCoveredHatchPreviews(features: GeoFeature[]): GeoFeature[] {
+  const key = (layer: string, points: Position3[]) => JSON.stringify([layer, dedupeClosing(points).map((p) => [p.x, p.y, p.z])]);
+  const outlines = new Set(features.filter((f) => f.kind === "polygon" && ["LWPOLYLINE", "POLYLINE"].includes(f.sourceType)).map((f) => key(f.layer, f.points)));
+  return features.filter((f) => !(f.sourceType === "HATCH" && f.hatchBoundaryPoints?.length && f.hatchBoundaryPoints.every((ring) => outlines.has(key(f.layer, ring)))));
 }

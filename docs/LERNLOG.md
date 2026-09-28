@@ -4,6 +4,149 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## 28. September 2026 – Sichtbare Exportauswahl 2609.3.8
+
+- Nur empfohlene Löschbereiche vorauszuwählen entsprach nicht dem Nutzerwunsch: jetzt sind alle erkannten Nicht-Hauptbereiche angehakt, auch bei unklarer Empfehlung.
+- Exportübersicht enthält synchronisierte Checkboxen mit erkannten/ausgewählten Duplikaten und erkannten Schraffuren/tatsächlich geplanten neuen Umrissen.
+- Bereichsliste scrollt separat, damit die beiden Aktionsschalter sichtbar bleiben. Referenzschutz bleibt erhalten und wird in der Bilanz ausgewiesen.
+- Keine neuen Abhängigkeiten oder Lizenzänderungen.
+- Push-Prüfung: 105 Tests einschließlich beider lokalen DXF-Referenzen und Produktionsbuild erfolgreich; Repository privat. Vier bestehende Audit-Befunde betreffen Entwicklungsabhängigkeiten, keine Produktionsabhängigkeiten.
+
+## 28. September 2026 – Gemeinsamer Exportplan 2609.3.7
+
+Nutzerwunsch: Auswahl/Prüfung von Ausführung trennen, weniger Klicks. Duplikat-
+und HATCH-Panels exportieren keine Dateien mehr. Löschbare Duplikate werden
+vorausgewählt, empfohlene Löschbereiche ebenfalls; geeignete Schraffurumrisse
+sind aktiv. Bereichscheckboxen und Layer-/Typfilter bleiben änderbar. Keine
+Hauptbereichsbestätigung als zusätzliche Exportfreigabe. Bei mehrdeutiger
+Bereichsanalyse werden nicht pauschal alle Nicht-Hauptbereiche gelöscht.
+
+Der zentrale DXF-Plan wird vorab aus der unveränderten Quelle erstellt und
+bilanziert: Entfernen (mit IDBUFFER-Bereinigung), anschließend Umrisse aus
+verbliebenen HATCHs, Kontrollimport. sourceEntityId ordnet Vorschaugeometrien
+auch bei fehlenden Handles und INSERT-Attributen der vollständigen Entität zu.
+Referenzierte/partiell gewählte Verbundobjekte bleiben mit sichtbarem Hinweis
+bestehen. Kein normalisierter Zweitexport; Originalversion und übrige CAD-
+Strukturen bleiben erhalten. GeoJSON nutzt weiterhin die normalisierte
+Konvertierung mit expliziter Featureauswahl, ohne Hauptbereichs-Sperre.
+
+Der Button nennt aktive Umrisse. Ein Klick öffnet direkt die native Zielwahl;
+keine zusätzliche vorgeschaltete Bestätigung bei unterstützter API. Abbruch
+übernimmt nichts. Prüfbericht optional über den Kopfbutton, kein automatischer
+zweiter Download. Erfolgreiche DXF-Ausgabe wird neu analysiert und übernommen.
+
+Private Beispieldatei: zwei Duplikate entfernt, 32 HATCHs behalten, 33 eindeutige
+LWPOLYLINEs erzeugt. Vier referenzierte Layout-/Schriftfeldobjekte bleiben
+sichtbar bilanziert erhalten. Echter Pointcloud-Manager-DXFReader: 33 Shapes,
+33 eindeutig. ezdxf: 0 Fehler, unverändert vier bereits vorhandene IDBUFFER-
+Owner-Hinweise. Keine Bibliotheks- oder Lizenzänderung.
+
+104 Tests inklusive privater HBF-/HATCH-Fixtures, Build und Diff-Check bestanden.
+Browser: automatische Duplikatwahl, Umrissschalter mit sofortigem Button-/
+Bilanzwechsel, Bereichsauswahl, DE/EN und Hell/Dunkel geprüft. Betriebssystem-
+Speicherfenster nicht automatisiert bedient. Repository privat; Versions- und
+Lizenzcheck konsistent, Audit unverändert vier Entwicklungsbefunde (2 moderat,
+2 hoch).
+
+## 28. September 2026 – Speicherortwahl 2609.3.6
+
+Bisher setzte downloadText nur einen Blob-Link; der Host/Browser wählte seinen
+Download-Ordner. Jetzt zentraler modaler Speicherdialog mit frischer Nutzeraktion
+für showSaveFilePicker (auch nach langen Exportberechnungen). Kein persistiertes
+Handle; pro Datei neue Zielwahl. Fehlende API wird erklärt, normaler Download
+nur über ausdrücklich beschrifteten Ersatzbutton. Schreibfehler bleiben im
+Dialog; kein automatischer Fallback. Datensatzübernahme erst nach erfolgreichem
+Speichern/ausdrücklich ausgelöstem Download, nicht bei Abbruch. JSON-Protokolle
+werden separat angeboten. Tests für Zielwahl, Abbruch und fehlerhaften Schreibpfad.
+Keine Bibliotheks- oder Lizenzänderung.
+
+98 Tests einschließlich privater DXF-Regressionsfälle und Build bestanden.
+Dialog sowie Abbruch in Hell/Dunkel im Browser geprüft; native Dateiauswahl
+und Schreibpfad durch isolierte Tests mit simuliertem Dateihandle abgedeckt.
+Der Betriebssystem-Speicherdialog wurde nicht automatisiert bedient.
+Versions-/Lizenz-/Diff-Check bestanden, Repository privat. Audit unverändert
+vier Entwicklungsbefunde (2 moderat, 2 hoch).
+
+## 28. September 2026 – Bugfix 2609.3.5
+
+Die zuvor angenommene Erklärung für den Pointcloud-Manager war unvollständig:
+Sein tatsächlicher DXFReader ignoriert HATCH. Die zusätzliche lokale Datei
+plfanzflaechen01_schraffuren-umrisse-cleaned.dxf belegt den Fehler im normalen
+Cleaner: HATCH-Vorschauen werden ebenso wie erzeugte Umrisse als POLYLINE
+exportiert. Damit entstehen aus 34 HATCHs und 33 Umrissen 67 Polylinien.
+
+Korrektur: Der Import hält alle HATCH-Ränder für den Abgleich bereit. Im
+normalisierten DXF-Export entfallen nur HATCH-Vorschauen, deren sämtliche Ränder
+exakt und in gleicher Reihenfolge durch ausgewählte geschlossene Polylinien auf
+demselben Layer abgedeckt sind (inklusive Z). Keine Toleranz, keine pauschale
+Polylinien-Deduplizierung. Nicht gewählte, offene oder abweichende Ränder reichen
+nicht. Die separate Bilanz steht im Ergebnis und in DXF-Kommentaren.
+
+Mit dem unveränderten DXFReader.ts aus dem lokalen Pointcloud-Manager getestet:
+Original 0 Shapes; Umrisse 33/33 eindeutig; bisheriger Cleaner 67/33 eindeutig;
+korrigierter Cleaner 33/33 eindeutig. 95 Tests inklusive beider privater Fixtures
+und Build bestanden. Keine neue Abhängigkeit oder Lizenzänderung. Repository
+privat; Audit unverändert vier Entwicklungsbefunde (2 moderat, 2 hoch).
+
+## 28. September 2026 – Bugfix 2609.3.4
+
+Die zwei echten HATCH-Kopien E7A2 und E7AB der privaten Pflanzflächen-Datei
+waren wegen IDBUFFER-Mitgliedsverweisen gesperrt. Dieselben Verweise stehen
+auch im strukturerhaltenden Umriss-Export; bloßes Neuimportieren dieser Datei
+entfernt sie nicht. Der normalisierte Cleaner rekonstruiert Geometrien und
+verwirft solche Objektlisten, was eine abweichende Duplikatbilanz erklären kann.
+Schraffuren und zusätzliche Umrisse sind unterschiedliche Objekttypen.
+
+Die Bereinigung entfernt jetzt mit ausgewählten Duplikaten ausschließlich ihre
+Mitgliedsverweise in AcDbIdBuffer innerhalb OBJECTS. Owner, Reactor-Gruppen,
+unbekannte Unterklassen und andere Referenzen bleiben gesperrt. Übrige
+Entitäten bleiben bytegleich; entfernte Listenverweise werden kontrolliert und
+im Exportprotokoll gezählt. Kein pauschales Entfernen von CAD-Spezialobjekten.
+
+93 Tests einschließlich privater HATCH-/HBF-Regression und Build bestanden.
+Browserprüfung: Original sofort auswählbar, 38 → 36 native Objekte, zwei
+Duplikate entfernt, Arbeitsstand ohne Neuimport aktualisiert. Version 2609.3.4
+in Paket, Lockfile und UI konsistent. Keine Bibliotheksänderung; Lizenzen
+unverändert, Repository privat. Audit weiterhin vier Entwicklungsbefunde
+(2 moderat, 2 hoch), keine neuen Laufzeitabhängigkeiten.
+
+## 28. September 2026 – Version 2609.3.3
+
+Der Nutzer korrigiert den bislang festgehaltenen Juli-Präfix ausdrücklich auf
+2609.3.3. Die Version wird identisch angezeigt und in package/lock geführt;
+Versionsregeln prüfen künftig den aktuellen Monat statt die alte Linie blind
+fortzuführen. Diese Runde enthält zugleich die Schraffur-Umrissfunktion.
+
+HATCH-Ränder aus Gruppe 91/92 werden separat von Ursprung, Saatpunkten und
+Schraffurmuster gelesen. Jeder Innen-/Außenring wird geschlossen auf dem Quelllayer
+ausgegeben. Native Kreisbögen werden als Bulge erhalten; Ellipsen und rationale
+Splines werden gekennzeichnet segmentiert. Clockwise-DXF-Bogenwinkel werden als
+Komplementärwinkel behandelt. OCS und Elevation bleiben erhalten. Der Export
+hängt nur neue Entitäten an und aktualisiert den HANDSEED, ohne Originalentitäten
+oder DATAflor-spezifische Objektstrukturen neu zu schreiben.
+
+Die HATCH-Vorschau verwendet jetzt Randpunkte statt Ursprung und Saatpunkten,
+damit keine künstlichen Ferncluster entstehen. LWPOLYLINE-Vorschauen berücksichtigen
+Bulge und OCS. Nach Export aktualisiert derselbe Workflow wie bei Duplikaten den
+Datensatz und sämtliche Ansichten. Keine neuen Bibliotheken oder Dienste.
+
+Validierung mit der privaten Beispieldatei: 34 HATCHs, 35 Ränder, davon zwei
+identisch. 33 neue LWPOLYLINEs decken alle Ränder ab. Modell-/Pflanzflächen-Layer:
+34 → 67; Analyse einschließlich Layout/Schriftfeld: 63 → 96. Die native
+Entitätszählung fasst INSERT-Attribute zusammen und steigt von 38 auf 71.
+Keine Schraffur ausgelassen. Erneuter Export ist gesperrt, weil alle Ränder
+abgedeckt sind. Unabhängiger ezdxf-Vergleich: sämtliche Randkoordinaten identisch,
+alle neuen Polylinien geschlossen, Original-Layer erhalten. Audit: keine Fehler;
+dieselben vier IDBUFFER-Owner-Reparaturhinweise in Quelle und Ausgabe. Diese
+bereits vorhandenen CAD-Spezialobjekte bleiben in der exportierten Datei erhalten.
+
+87 Tests einschließlich HATCH- und bisheriger privater HBF-Regression bestanden;
+Build, Versions-/Lizenzcheck und Diff-Check bestanden. Browser: DE/EN, Hell/Dunkel,
+Export, unmittelbare Zählungsaktualisierung und Wiederholungssperre geprüft.
+Repository weiterhin privat; keine neuen Abhängigkeiten. npm audit unverändert:
+vier Entwicklungsbefunde (2 moderat, 2 hoch), keine Produktionsbefunde.
+Ein tatsächlicher Import in DATAflor AutoCAD OEM wurde nicht durchgeführt.
+
 ## 22. September 2026 – Subversion 2607.03.3
 
 Die Fußzeile bietet weitere Apps (Geoid Forge, DXF Coordinate Forge,

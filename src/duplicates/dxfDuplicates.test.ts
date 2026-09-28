@@ -77,6 +77,24 @@ describe("exact DXF duplicate check and source-preserving export", () => {
     expect(() => createDuplicateExport(check, new Set(["entity-2"]))).toThrow();
   });
 
+  it("removes only IDBUFFER member pointers with selected duplicates, preserving owner and unrelated members", () => {
+    const tail = "0\nSECTION\n2\nOBJECTS\n0\nIDBUFFER\n5\nF0\n330\nFF\n100\nAcDbIdBuffer\n330\nB0\n330\nA0\n330\nB0\n0\nENDSEC\n";
+    const check = inspectDxfDuplicates(file(line("A0") + line("B0"), tail));
+    expect(check.candidates[0]?.blocked).toBe(false);
+    const out = createDuplicateExport(check, new Set(["entity-2"]));
+    expect(out.removedReferenceCount).toBe(2);
+    expect(out.content).toBe(file(line("A0"), tail.replaceAll("330\nB0\n", "")));
+  });
+  it.each([
+    "0\nIDBUFFER\n330\nB0\n100\nAcDbIdBuffer\n",
+    "0\nIDBUFFER\n100\nAcDbIdBuffer\n102\n{ACAD_REACTORS\n330\nB0\n102\n}\n",
+    "0\nXRECORD\n100\nAcDbIdBuffer\n330\nB0\n",
+    "0\nIDBUFFER\n100\nAcDbIdBuffer\n100\nCustomSubclass\n330\nB0\n",
+  ])("keeps owners, reactors and unknown pointer contexts protected", (object) => {
+    const check = inspectDxfDuplicates(file(line("A0") + line("B0"), `0\nSECTION\n2\nOBJECTS\n${object}0\nENDSEC\n`));
+    expect(check.candidates[0]?.blocked).toBe(true);
+  });
+
   it("blocks duplicate handle identities and referenced child handles", () => {
     const check = inspectDxfDuplicates(file(poly("A0") + poly("B0"), "0\nSECTION\n2\nOBJECTS\n0\nXRECORD\n340\nB01\n0\nENDSEC\n"));
     expect(check.candidates[0]?.blocked).toBe(true);

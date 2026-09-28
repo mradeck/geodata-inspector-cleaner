@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2607.03.3`
-- **npm-kompatible Version:** `2607.3.3`
+- **Aktuelle Release-Version:** `2609.3.8`
+- **npm-kompatible Version:** `2609.3.8`
 - **Repository:** privates GitHub-Repository `mradeck/geodata-inspector-cleaner`
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md`
@@ -19,32 +19,17 @@ Bereinigung räumlicher Auffälligkeiten in DXF- und GeoJSON-Dateien.
 
 ## Versionsschema und Subversionen
 
-Die sichtbare Release-Version folgt `JJMM.RR.P`:
+Die sichtbare und npm-kompatible Version folgt `JJMM.R.P`, ohne führende Null
+im Release-Segment. `JJMM` ist das aktuelle Jahr/Monat; `R` bezeichnet die
+Release-Linie und `P` die Subversion. Bei jeder abgeschlossenen Feature-/Bugfix-
+Runde `P` erhöhen und den Kalendermonat ausdrücklich prüfen. Eine anderslautende
+konkrete Versionsvorgabe des Nutzers hat Vorrang. Kein starrer alter Monatspräfix.
 
-- `JJMM`: zweistelliges Jahr und Monat, beispielsweise `2607` für Juli 2026.
-- `RR`: zweistellig hochgezählte Hauptrelease-Nummer innerhalb des Monats,
-  beginnend mit `01`.
-- `P`: Subversion/Patchnummer, beginnend mit `0`.
-
-Beispiele:
-
-- `2607.01.0`: erster Hauptrelease im Juli 2026.
-- `2607.01.1`: erster Hotfix beziehungsweise kleine Subversion dieses Releases.
-- `2607.02.0`: nächster Funktionsrelease im selben Monat.
-- `2608.01.0`: erster Funktionsrelease im Folgemonat.
-
-`RR` bezeichnet eine bewusst eröffnete größere Release-Linie innerhalb des
-Monats und setzt `P` auf `0`. Innerhalb dieser Linie wird `P` nach jeder
-abgeschlossenen lokalen Feature-Runde und nach jedem abgeschlossenen Bugfix um
-eins erhöht. Mehrere zusammengehörige Änderungen in einem Nutzerauftrag zählen
-als eine Runde. Reine Analyse ohne Dateiänderung und noch nicht abgeschlossene
-Arbeit lösen keinen Versionssprung aus. Beim Monatswechsel beginnt `RR` wieder
-mit `01`.
-
-SemVer verbietet führende Nullen in numerischen Segmenten. Deshalb verwenden
-`package.json` und `package-lock.json` für `2607.03.3` die npm-kompatible Form
-`2607.3.3`. Das zusätzliche Feld `displayVersion`, die sichtbare App-Anzeige,
-Berichte und Dokumentation verwenden die kanonische Form `2607.03.3`.
+Für die Runde vom 28. September 2026 ist die vom Nutzer ausdrücklich gewünschte
+Ausgangsversion **2609.3.3** vorgegeben; der anschließende Bugfix hat **2609.3.4**. Sie korrigiert zugleich den veralteten Juli-
+Präfix und enthält die Schraffur-Umrissfunktion. `displayVersion`, package/lock,
+HTML-Fallbacks und Dokumentation müssen übereinstimmen. Historische Versionen
+bleiben als tatsächlich veröffentlichte Stände dokumentiert.
 
 ## Versionierungs-, Dokumentations- und Push-Regel
 
@@ -172,18 +157,51 @@ Merksätze:
 - `src/duplicates/dxfDuplicates.ts` vergleicht originale Tags, niemals die
   approximierten `GeoFeature.points`. Klassische Polylinien und INSERT-Attribute
   bleiben zusammenhängende Sequenzen; Handle-Referenzen werden konservativ geprüft.
-- Der Duplikat-Export ist ein eigener, strukturerhaltender Workflow. Die Auswahl
-  startet leer. Nach erfolgreichem Export wird die bereinigte DXF als aktiver
+- Der DXF-Export ist ein gemeinsamer, strukturerhaltender Workflow. Die Auswahl
+  startet gemäß Nutzerwunsch mit allen löschbaren Duplikaten. Nach erfolgreichem Export wird die bereinigte DXF als aktiver
   Datensatz neu analysiert; alle Ansichten und der nachfolgende Cleaner müssen
   diesen Stand nutzen. Alte Feature-IDs, Löschliste und Hauptbereichsbestätigung
   verwerfen, gültige CRS-Vorgabe beibehalten.
-- Der Export darf nur bekannte, nicht referenzierte Kandidaten entfernen und
+- Der Export darf nur bekannte, nicht gesperrte Kandidaten entfernen und
   muss den exakten Inhalt aller übrigen Entitäten beim Kontrollimport vergleichen.
 - Den privaten HBF-Test optional mit `DXF_DUPLICATE_FIXTURE=/absoluter/pfad.dxf`
   aktivieren. Die Datei nicht in das Repository kopieren. Erwartung: 1285 Objekte,
   647 gleiche-Layer- und 30 zusätzliche Cross-Layer-Duplikate, 608 verbleibend.
-- Diese Runde führt die bestehende Release-Linie als `2607.03.3` fort; eine neue
-  Monats-/RR-Linie wurde nicht beauftragt.
+- Die Version 2609.3.3 wurde für die September-Runde ausdrücklich vorgegeben.
+
+IDBUFFER-Mitgliedsverweise (330 nach AcDbIdBuffer in OBJECTS) sind gezielt
+entfernbar und im Exportbericht zu zählen. Owner-/Reactor- und unbekannte
+Referenzen bleiben gesperrt. Übrige Entitäten bytegleich prüfen.
+
+## Schraffurumrisse
+
+- `src/hatches` erzeugt geschlossene LWPOLYLINE-Ränder aus HATCH-Boundary-Daten.
+  Ursprung und Saatpunkte sind keine Randgeometrie. Schraffuren bleiben erhalten.
+- OCS, Elevation, Layer und Owner erhalten; neue eindeutige Handles vergeben.
+- Alle Innenringe übernehmen. Bei ungültigem Teilrand gesamte Schraffur auslassen
+  und den Grund im UI/Protokoll nennen. Ellipsen-/Spline-Näherungen kennzeichnen.
+- Ausgabe reimportieren und direkt als aktuellen Arbeitsstand übernehmen.
+- Private Beispieldatei nur lokal über `HATCH_FIXTURE` testen; nicht einchecken.
+
+Der normalisierte DXF-Cleaner unterdrückt eine HATCH-Vorschau nur, wenn alle
+Ränder exakt durch ausgewählte geschlossene Polylinien desselben Layers
+abgedeckt sind. Keine allgemeine Geometriededuplizierung. Eigene Bilanz und
+Regression mit Original → Umrisse → Cleaner → Pointcloud-Manager prüfen.
+
+Speichern zentral über saveTextFile: pro Datei frische Nutzeraktion, keine
+persistierten Handles. Export-Callbacks abwarten; bei Abbruch keine
+Datensatzübernahme. Protokolle separat anbieten.
+
+## Gemeinsamer Export ab 2609.3.7
+
+Nutzerwunsch hat Vorrang vor früherer Leer-/Bestätigungsvorgabe: löschbare
+Duplikate und alle Nicht-Hauptbereiche vorauswählen; geeignete Umrisse aktiv.
+Panels verändern nur Auswahl. Ausschließlich rechts unten exportieren.
+DXF aus Originalquelle filtern, dann Umrisse aus verbliebenen HATCHs erzeugen.
+Kein normalisierter Zweitexport. Geschützte/partielle Verbundobjekte behalten
+und vorab bilanzieren. Quellzuordnung über sourceEntityId, nicht Vorschau-ID.
+Prüfbericht optional, keine automatische zweite Datei. Nativen Speicherdialog
+direkt öffnen; Vorschau-Exportplan steht bereits vor dem Klick bereit.
 
 ## Standardbefehle
 
@@ -200,6 +218,13 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2609.3.8` | 2026-09-28 | Außenbereiche automatisch ausgewählt; eigene synchronisierte Export-Schalter mit Duplikat- und Schraffurzahlen. |
+| `2609.3.7` | 2026-09-28 | Gemeinsamer DXF-Exportplan, automatische Vorauswahl, keine einzelnen Aktionsdownloads. |
+| `2609.3.6` | 2026-09-28 | Speicherortwahl pro Datei, kein stiller Download-Fallback. |
+| `2609.3.5` | 2026-09-28 | Normalisierter Cleaner exportiert vollständig durch ausgewählte Polylinien abgedeckte HATCH-Vorschauen nicht doppelt. |
+| `2609.3.4` | 2026-09-28 | IDBUFFER-Mitgliedslisten beim Duplikatlöschen gezielt bereinigen; Schraffurkopien direkt auswählbar. |
+| `2609.3.3` | 2026-09-28 | Monatspräfix gemäß Nutzer korrigiert; geschlossene Schraffurumrisse auf Quelllayern mit Innenringen, nativen Kreisbögen, gekennzeichneten Kurvennäherungen und aktualisiertem Arbeitsstand. |
+
 | `2607.03.3` | 2026-09-22 | Weitere Apps, Hilfe/Bugreport/Kontakt, bestehende Lizenzübersicht, Impressum und Ko-fi in kompakter DE-/EN-Fußzeile. |
 | `2607.03.2` | 2026-09-19 | Bereinigte DXF nach Duplikat-Export automatisch als Arbeitsstand übernehmen; Objektzahlen, Layer, Karten und Befunde neu berechnen. |
 | `2607.03.1` | 2026-09-19 | Automatischer DXF-Duplikatcheck mit optionaler Löschliste, getrennten Layer-Kategorien, strukturerhaltendem Export und Kontrollimport. |

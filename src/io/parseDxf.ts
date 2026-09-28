@@ -1,3 +1,4 @@
+import { readHatchGeometry, sampleVertices, toWorld, type Vertex } from "../hatches/hatchBoundaries";
 import { inspectDxfDuplicates } from "../duplicates/dxfDuplicates";
 import type { GeoDataset, GeoFeature, GeoLayerMetadata, GeometryKind, ImportWarning, Position3 } from "../model";
 
@@ -26,6 +27,8 @@ export function parseDxf(text: string, fileName: string): GeoDataset {
   const entityRange = findEntitiesRange(groups);
   if (!entityRange) throw new Error("Die DXF-Datei enthält keine ENTITIES-Sektion.");
 
+  const duplicateCheck = inspectDxfDuplicates(text);
+  let sourceIndex = 0;
   let index = entityRange.start;
   while (index < entityRange.end) {
     const marker = groups[index];
@@ -34,12 +37,18 @@ export function parseDxf(text: string, fileName: string): GeoDataset {
       continue;
     }
     const type = marker.value.toUpperCase();
+    const firstFeature = state.features.length;
+    const sourceEntity = duplicateCheck.entities[sourceIndex];
     if (type === "POLYLINE") {
       index = parseClassicPolyline(groups, index, entityRange.end, state);
+      for (const feature of state.features.slice(firstFeature)) feature.sourceEntityId = sourceEntity?.id;
+      sourceIndex++;
       continue;
     }
     const next = findNextMarker(groups, index + 1, entityRange.end);
     if (!STRUCTURAL_MARKERS.has(type)) parseEntity(type, groups.slice(index + 1, next), state);
+    for (const feature of state.features.slice(firstFeature)) feature.sourceEntityId = (type === "ATTRIB" ? duplicateCheck.entities[sourceIndex - 1]?.id : sourceEntity?.id);
+    if (!["ATTRIB", "SEQEND"].includes(type)) sourceIndex++;
     index = next;
   }
 
@@ -57,7 +66,7 @@ export function parseDxf(text: string, fileName: string): GeoDataset {
   return {
     fileName,
     format: "dxf",
-    dxfDuplicates: inspectDxfDuplicates(text),
+    dxfDuplicates: duplicateCheck,
     features: state.features,
     declaredCrs: findDeclaredCrs(groups),
     warnings,
@@ -180,6 +189,7 @@ function parseClassicPolyline(groups: DxfGroup[], start: number, end: number, st
   if (points.length > 0) {
     const closed = (flags & 1) === 1;
     pushFeature(state, "POLYLINE", layer, closed && points.length >= 3 ? "polygon" : points.length === 2 ? "line" : "polyline", dedupeClosing(points));
+    state.features.at(-1)!.sourceHandle = valueForCode(header, 5)?.trim().toUpperCase();
   } else {
     increment(state.skipped, "POLYLINE");
   }
@@ -191,6 +201,7 @@ function parseEntity(type: string, entries: DxfGroup[], state: ParseState): void
   let points: Position3[] = [];
   let kind: GeometryKind = "anchor";
   let approximation: string | undefined;
+  let hatchBoundaryPoints: Position3[][] | undefined;
 
   switch (type) {
     case "POINT":
@@ -202,12 +213,34 @@ function parseEntity(type: string, entries: DxfGroup[], state: ParseState): void
       kind = "line";
       break;
     case "LWPOLYLINE": {
-      points = sequentialPoints(entries);
+      const vertices: Vertex[] = [];
+      for (const entry of entries) {
+        if (entry.code === 1001) break;
+        if (entry.code === 10) vertices.push({ x: number(entry.value), y: NaN, bulge: 0 });
+        else if (entry.code === 20 && vertices.length) vertices.at(-1)!.y = number(entry.value);
+        else if (entry.code === 42 && vertices.length) vertices.at(-1)!.bulge = number(entry.value);
+      }
       const closed = ((integerForCode(entries, 70) ?? 0) & 1) === 1;
+      const normal: [number, number, number] = [numberForCode(entries, 210) ?? 0, numberForCode(entries, 220) ?? 0, numberForCode(entries, 230) ?? 1];
+      points = sampleVertices(vertices, closed).map((p) => toWorld(p, numberForCode(entries, 38) ?? 0, normal))
+        .filter((p) => [p.x, p.y, p.z].every(Number.isFinite));
       kind = closed && points.length >= 3 ? "polygon" : points.length === 2 ? "line" : "polyline";
       points = dedupeClosing(points);
-      if (entries.some((entry) => entry.code === 42 && number(entry.value) !== 0)) {
-        approximation = "Bulge-Bögen werden in der Vorschau als gerade Segmente dargestellt.";
+      if (vertices.some((v) => v.bulge !== 0)) approximation = "Bulge-Bögen werden für Vorschau und normalisierten Export segmentiert.";
+      break;
+    }
+    case "HATCH": {
+      try {
+        const hatch = readHatchGeometry(entries);
+        // One preview feature per source HATCH; inner rings are generated separately by the outline tool.
+        hatchBoundaryPoints = hatch.boundaries.map((boundary) => sampleVertices(boundary.vertices, true).map((p) => toWorld(p, hatch.elevation, hatch.normal)));
+        points = hatchBoundaryPoints[0]!;
+        kind = "polygon";
+        approximation = "HATCH-Vorschau zeigt den ersten Rand. Alle Ränder einschließlich Innenringen bleiben im strukturerhaltenden Umriss-Export erhalten.";
+      } catch {
+        points = sequentialPoints(entries);
+        kind = "polyline";
+        approximation = "HATCH-Rand unvollständig; nur verfügbare Definitionspunkte für die Vorschau.";
       }
       break;
     }
@@ -241,7 +274,6 @@ function parseEntity(type: string, entries: DxfGroup[], state: ParseState): void
       kind = points.length >= 3 ? "polygon" : "polyline";
       break;
     case "SPLINE":
-    case "HATCH":
     case "DIMENSION":
     case "LEADER":
     case "MLEADER":
@@ -267,7 +299,8 @@ function parseEntity(type: string, entries: DxfGroup[], state: ParseState): void
     return;
   }
   if (approximation) increment(state.approximated, type);
-  pushFeature(state, type, layer, kind, points, approximation);
+  pushFeature(state, type, layer, kind, points, approximation, hatchBoundaryPoints);
+  state.features.at(-1)!.sourceHandle = valueForCode(entries, 5)?.trim().toUpperCase();
 }
 
 function pushFeature(
@@ -277,6 +310,7 @@ function pushFeature(
   kind: GeometryKind,
   points: Position3[],
   approximation?: string,
+  hatchBoundaryPoints?: Position3[][],
 ): void {
   state.features.push({
     id: `dxf-${state.nextId++}`,
@@ -285,6 +319,7 @@ function pushFeature(
     points,
     sourceType,
     approximation,
+    ...(hatchBoundaryPoints ? { hatchBoundaryPoints } : {}),
   });
 }
 

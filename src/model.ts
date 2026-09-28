@@ -14,8 +14,12 @@ export interface GeoFeature {
   kind: GeometryKind;
   points: Position3[];
   sourceType: string;
+  sourceHandle?: string;
+  sourceEntityId?: string;
   properties?: Record<string, unknown>;
   approximation?: string;
+  /** Complete sampled HATCH rings, used to avoid exporting an already represented outline twice. */
+  hatchBoundaryPoints?: Position3[][];
 }
 
 export interface ImportWarning {
