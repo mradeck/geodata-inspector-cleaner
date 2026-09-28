@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2609.3.8`
-- **npm-kompatible Version:** `2609.3.8`
+- **Aktuelle Release-Version:** `2609.3.10`
+- **npm-kompatible Version:** `2609.3.10`
 - **Repository:** privates GitHub-Repository `mradeck/geodata-inspector-cleaner`
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md`
@@ -170,8 +170,8 @@ Merksätze:
 - Die Version 2609.3.3 wurde für die September-Runde ausdrücklich vorgegeben.
 
 IDBUFFER-Mitgliedsverweise (330 nach AcDbIdBuffer in OBJECTS) sind gezielt
-entfernbar und im Exportbericht zu zählen. Owner-/Reactor- und unbekannte
-Referenzen bleiben gesperrt. Übrige Entitäten bytegleich prüfen.
+entfernbar und im Exportbericht zu zählen. Eigene Erweiterungsdaten und bekannte Verwaltungsverweise können ab 2609.3.9
+über removalDependencies bereinigt werden; unbekannte externe Referenzen bleiben gesperrt. Übrige Entitäten bytegleich prüfen.
 
 ## Schraffurumrisse
 
@@ -218,6 +218,8 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2609.3.10` | 2026-09-28 | Schlanker Standardexport: native Geometrie und benötigte Ressourcen; vollständig abgedeckte Schraffuren durch Umrisse ersetzen. |
+| `2609.3.9` | 2026-09-28 | Außenbereiche mit Layout-/Plankopfobjekten einschließlich zugehöriger Verwaltungsverweise korrekt löschen; Export und erneuten Import geprüft. |
 | `2609.3.8` | 2026-09-28 | Außenbereiche automatisch ausgewählt; eigene synchronisierte Export-Schalter mit Duplikat- und Schraffurzahlen. |
 | `2609.3.7` | 2026-09-28 | Gemeinsamer DXF-Exportplan, automatische Vorauswahl, keine einzelnen Aktionsdownloads. |
 | `2609.3.6` | 2026-09-28 | Speicherortwahl pro Datei, kein stiller Download-Fallback. |
@@ -249,3 +251,26 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 - DWG-Strategie: `docs/ADR-001-DWG-STRATEGY.md`
 - Lernlog: `docs/LERNLOG.md`
 - Copyright und Lizenzen: `docs/COPYRIGHT-LICENSES.md`
+
+## Löschung von Layout-/Plankopfobjekten ab 2609.3.9
+
+Ausgewählte CAD-Objekte werden mit ihren eigenen Erweiterungsdaten entfernt.
+Bekannte Verwaltungsverweise (Blockreferenzlisten, Zeichenreihenfolge, aktives
+Ansichtsfenster, Feldlisten und benannter Blockhierarchieindex) werden gezielt
+bereinigt. Unbekannte eingehende Verweise und uneindeutige Kennungen bleiben
+gesperrt. Die Exportbilanz unterscheidet CAD-Objekte von Vorschauobjekten:
+ein Plankopf mit 25 Attributen zählt als ein CAD-Objekt und 26 Vorschauobjekte.
+Nach erfolgreichem Export zeigt die Oberfläche den neuen Arbeitsstand; null
+weitere Löschungen oder Umrisse sind dann das erwartete Ergebnis.
+
+## Schlanker Standardexport ab 2609.3.10
+
+Expliziter Nutzerwunsch überschreibt den bisherigen strukturerhaltenden
+Standard: main ruft createPlannedDxf mit compact:true auf. Zuerst Auswahl
+anwenden, dann vollständige Umrisse erzeugen, anschließend compactDxf aus
+nativen Tags schreiben. Keine Vorschaukoordinaten für bestehende Geometrie.
+Vollständig durch echte vorhandene Polylinien abgedeckte HATCHs ersetzen;
+Doppel-HATCHs allein sind kein Abdeckungsnachweis. Benötigte Blockdefinitionen
+rekursiv erhalten; unbekannte Geometrietypen mit Typangabe sperren. Keine
+OBJECTS-/Anwendungsdaten der Quelle mitkopieren. Der ältere strukturerhaltende
+Pfad bleibt intern für Regressionen verfügbar, ist kein zweiter UI-Export.

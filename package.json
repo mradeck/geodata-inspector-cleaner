@@ -1,7 +1,7 @@
 {
   "name": "geodata-inspector-cleaner",
-  "version": "2609.3.8",
-  "displayVersion": "2609.3.8",
+  "version": "2609.3.10",
+  "displayVersion": "2609.3.10",
   "description": "Local-first SPA for inspecting and cleaning spatial outliers in DXF and GeoJSON files.",
   "type": "module",
   "private": true,

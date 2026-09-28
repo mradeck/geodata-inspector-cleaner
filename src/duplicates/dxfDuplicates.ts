@@ -1,3 +1,4 @@
+import { removalDependencies } from "./removalDependencies";
 /** Exact source comparison, deliberately independent of the approximated preview geometry. */
 export interface DxfSourceEntity {
   id: string;
@@ -170,21 +171,25 @@ export function createDuplicateExport(check: DxfDuplicateCheck, selected: Readon
 
 /** Shared source-preserving removal for the combined export. */
 export function createEntityRemovalExport(check: DxfDuplicateCheck, selected: ReadonlySet<string>) {
-  if (check.error || [...selected].some((id) => !check.entities.some((e) => e.id === id && !e.protected))) throw new Error("invalid-selection");
+  if (check.error || [...selected].some((id) => !check.entities.some((e) => e.id === id))) throw new Error("invalid-selection");
   const kept = check.entities.filter((e) => !selected.has(e.id));
   const removed = check.entities.filter((e) => selected.has(e.id));
+  const dependencies = removed.filter(e => e.protected).map(e => removalDependencies(check, e));
+  if (dependencies.some(d => !d)) throw new Error("invalid-selection");
+  const metadataEdits = dependencies.flatMap(d => d!.edits);
   const removedHandles = new Set(removed.flatMap((e) => e.tags.filter((t) => t.code === 5).map((t) => t.value.trim().toUpperCase())));
+  for (const dependency of dependencies) for (const handle of dependency!.handles) removedHandles.add(handle);
   const removedReferences = check.removableReferences.filter((t) => removedHandles.has(t.value.trim().toUpperCase()));
-  const ranges = [...removed, ...removedReferences].sort((a, b) => a.start - b.start);
+  const ranges: { start: number; end: number; replacement?: string }[] = [...removed, ...removedReferences, ...metadataEdits].sort((a, b) => a.start - b.start || b.end - a.end);
   const pieces: string[] = [];
   let cursor = 0;
-  for (const range of ranges) { pieces.push(check.source.slice(cursor, range.start)); cursor = range.end; }
+  for (const range of ranges) { if (range.end <= cursor) continue; if (range.start < cursor) throw new Error("overlapping-edits"); pieces.push(check.source.slice(cursor, range.start), range.replacement ?? ""); cursor = range.end; }
   pieces.push(check.source.slice(cursor));
   const content = pieces.join("");
   const reparsed = inspectDxfDuplicates(content);
   if (reparsed.error || reparsed.entities.length !== kept.length || reparsed.entities.some((e, i) =>
     content.slice(e.start, e.end) !== check.source.slice(kept[i]!.start, kept[i]!.end))) throw new Error("validation");
   if (reparsed.removableReferences.some((t) => removedHandles.has(t.value.trim().toUpperCase()))) throw new Error("validation");
-  return { content, removedReferenceCount: removedReferences.length, keptCount: kept.length, removedCount: removed.length,
+  return { content, removedOwnedObjectCount: dependencies.reduce((sum, d) => sum + d!.objectCount, 0), repairedReferenceCount: metadataEdits.length, removedReferenceCount: removedReferences.length, keptCount: kept.length, removedCount: removed.length,
     removed: removed.map((e) => ({ id: e.id, handle: e.handle, layer: e.layer, type: e.type })) };
 }

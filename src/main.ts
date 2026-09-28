@@ -667,13 +667,14 @@ function renderCleaner(report: InspectionReport): void {
   preparedDxf = null;
   if (isDxf) {
     try {
-      preparedDxf = createPlannedDxf(report.dataset, { duplicateIds: duplicatePanel.selection(), removedFeatureIds: removed, hatchOutlines: hatchPanel.active() });
+      preparedDxf = createPlannedDxf(report.dataset, { duplicateIds: duplicatePanel.selection(), removedFeatureIds: removed, hatchOutlines: hatchPanel.active(), compact: true });
       const a = preparedDxf.audit;
-      elements.cleanerSummary.textContent = t("plan.summary", { removed: preparedDxf.removedCount, duplicates: a.selectedDuplicateCount, outlines: a.createdOutlines.length, kept: preparedDxf.keptCount });
+      elements.cleanerSummary.textContent = t("plan.summary", { removed: preparedDxf.removedCount, features: a.removedFeatureCount, duplicates: a.selectedDuplicateCount, outlines: a.createdOutlines.length, kept: preparedDxf.keptCount });
+      if (a.replacedHatchCount) elements.cleanerSummary.textContent += " " + t("plan.replacedHatches", { count: a.replacedHatchCount });
       const protectedCount = a.protectedObjectsRetained.length + a.partialObjectsRetained.length;
       if (protectedCount) elements.cleanerSummary.textContent += " " + t("plan.protected", { count: protectedCount });
       if (a.skippedHatches.length) elements.cleanerSummary.textContent += " " + t("hatch.skipped", { count: a.skippedHatches.length });
-    } catch { elements.cleanerSummary.textContent = t("plan.failed"); }
+    } catch (error) { elements.cleanerSummary.textContent = error instanceof Error && error.message.startsWith("compact-unsupported:") ? t("plan.unsupported", { types: error.message.split(":")[1]! }) : t("plan.failed"); }
     const duplicates = duplicatePanel.stats();
     const selected = duplicatePanel.selection().size;
     const addChoice = (text: string, checked: boolean, disabled: boolean, change: (value: boolean) => void, mixed = false) => {

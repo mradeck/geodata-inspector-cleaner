@@ -9,7 +9,7 @@ Bounds-Berechnungen, Exporte und GIS-/CAD-Weiterverarbeitung unbrauchbar macht.
 
 ## Projektstatus
 
-**Version 2609.3.8 – Release mit aktivem Cleaner.** Der
+**Version 2609.3.10 – Release mit aktivem Cleaner.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -104,7 +104,7 @@ Beschriftungen, Hilfe-Link und E-Mail-Vorlage folgen der DE-/EN-Sprachwahl.
 ## Versionsanzeige und kompakte Störbereichsvorschau
 
 Die kanonische Version steht nun wie beim Pointcloud Manager direkt neben dem
-App-Titel, beispielsweise `v2609.3.8`. Browser-Tab und untere Statuszeile zeigen
+App-Titel, beispielsweise `v2609.3.10`. Browser-Tab und untere Statuszeile zeigen
 denselben Stand. Die Anzeige wird zentral aus `package.json` bezogen und nicht
 als unabhängiger Versionswert gepflegt.
 
@@ -184,7 +184,7 @@ CRS-Annahme weiterverwendet werden.
    sind bei verfügbaren Aktionen vorausgewählt und mit den Detailansichten
    synchronisiert. Die gemeinsame Bilanz zeigt: entfernte Objekte, ausgewählte
    Duplikate, neue Umrisse und endgültige DXF-Objektzahl. Der Button nennt bei
-   aktivierter Erzeugung ausdrücklich **DXF exportieren · mit Schraffur-Umrissen**.
+   aktivierter Erzeugung ausdrücklich **Schlanke DXF · mit Schraffur-Umrissen**.
 5. Einmal exportieren und den Speicherort wählen. Es gibt keine separaten
    DXF-Downloads für Duplikate oder Schraffuren und keine zusätzliche
    Hauptbereichsbestätigung. Der erfolgreiche DXF-Export wird zum neuen
@@ -197,29 +197,31 @@ Export das angewendete Änderungsprotokoll. Kein zweiter automatischer Download.
 
 ### DXF-Struktur und Duplikate
 
-Der gemeinsame DXF-Export erhält Originalentitäten, Layer, Blöcke, Schraffuren,
-Eigenschaften, Koordinaten, Dateiversion und übrige CAD-Struktur. Er entfernt
-gewählte Entitäten, bereinigt zugehörige IDBUFFER-Mitgliedsverweise und fügt
-optional neue Umrisse hinzu. Abschließend wird die Ausgabe kontrolliert.
-Die Versionswahl gilt deshalb nur für GeoJSON→DXF; vorhandene DXFs behalten
-bewusst ihre Originalversion. Es gibt keine Reprojektion.
+Der gemeinsame DXF-Export erzeugt eine schlanke AutoCAD-2018-DXF aus nativen
+Geometriedaten. Er enthält nur ausgewählte Geometrien, benötigte Layer,
+Linienarten, Textstile und tatsächlich verwendete Blockdefinitionen. Ungenutzte
+CAD-Verwaltungsdaten, Erweiterungswörterbücher, Anwendungsdaten und Vorschaubilder
+entfallen. Koordinaten, Z, Kreisbögen, Polylinienbreiten und Extrusionsrichtungen
+werden nicht aus der vereinfachten Vorschau rekonstruiert. Keine Reprojektion.
+Die Versionswahl gilt weiterhin für die separate GeoJSON→DXF-Konvertierung.
 
 Duplikate werden anhand originaler Tags verglichen, einschließlich Z und
 Eigenschaften; Handles dienen der Identifikation. Gleicher-Layer- und zusätzliche
 layerübergreifende Kopien werden getrennt angezeigt. Layerübergreifende Treffer
 können fachlich unterschiedliche Bedeutungen haben und lassen sich abwählen.
 
-Unbekannte Referenzen sperren weiterhin die Löschung. Nur teilweise ausgewählte
-zusammengesetzte Objekte (z. B. INSERT mit Attributen) bleiben als Ganzes erhalten.
-Die Bilanz weist solche Ausnahmen vor dem Export aus; der Prüfbericht nennt die
-Kennungen. Nicht geometrisch auswertbare Inhalte bleiben erhalten. Mehrdeutige
-oder ungültige DXF-Strukturen sperren den gemeinsamen Export.
+Nur teilweise ausgewählte Verbundobjekte (INSERT mit Attributen) bleiben als
+Ganzes erhalten und werden in der Bilanz genannt. Nicht unterstützte ausgewählte
+Geometrien sperren den kompakten Export mit Angabe des Objekttyps, statt still
+zu verschwinden. Unterstützt sind unter anderem native Linien, Kreise, Bögen,
+Ellipsen, Splines, Polylinien, Flächen, Texte sowie INSERTs mit benötigten Blöcken.
 
 ### Schraffurumrisse
 
 Die Erzeugung gilt ausschließlich für Schraffuren, die nach den gewählten
 Löschungen noch vorhanden sind. Alle Außen-/Innenringe werden als geschlossene
-LWPOLYLINE auf dem Original-Layer erzeugt. Schraffuren bleiben erhalten. Bei
+LWPOLYLINE auf dem Original-Layer erzeugt. Vollständig durch Umrisse abgedeckte
+Schraffuren werden im Export ersetzt. Bei
 abgeschalteter Option werden keine zusätzlichen Polylinien erzeugt.
 Identische bereits vorhandene/geplante Umrisse werden nicht erneut angelegt.
 Linien und Kreisbögen bleiben exakt; Ellipsen und Splines werden mit einer
@@ -228,10 +230,10 @@ Unvollständige oder offene Ränder werden mit Grund ausgelassen; die Schraffur
 bleibt vollständig erhalten. Nur ENTITIES ab R14, keine Blockdefinitionen.
 
 Beispieldatei: Zwei Schraffur-Duplikate sind vorausgewählt. Nach Entfernen bleiben
-32 Schraffuren; dazu entstehen 33 unterschiedliche Umrisse einschließlich
-Innenring. Der echte Pointcloud-Manager-Importer liest daraus 33 unterschiedliche
+32 Schraffuren, die durch 33 unterschiedliche Umrisse einschließlich
+Innenring ersetzt werden (rund 12 kB). Der echte Pointcloud-Manager-Importer liest daraus 33 unterschiedliche
 Shapes. Kein normalisierender Zweitexport erzeugt zusätzliche Kopien.
-Vier referenzierte Layout-/Schriftfeldobjekte dieser Datei bleiben geschützt.
+Der ausgewählte Außenbereich einschließlich Layout-/Schriftfeldobjekten entfällt.
 
 ### Speicherort und Abbruch
 
@@ -271,7 +273,7 @@ npm run build
 
 ## Versionierung
 
-Aktuell **2609.3.8**, Bugfix auf Basis der September-Version 2609.3.3. Das Schema
+Aktuell **2609.3.10**, Bugfix auf Basis der September-Version 2609.3.3. Das Schema
 lautet `JJMM.R.P`: Jahr/Monat, Release-Linie, Subversion. Derselbe Wert steht in
 `package.json`, `package-lock.json`, `displayVersion`, App und Prüfberichten.
 Bei neuen Runden wird auch der aktuelle Monat geprüft. Frühere Einträge mit
@@ -307,6 +309,8 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2609.3.10` | 2026-09-28 | Schlanker Standardexport: native Geometrie und benötigte Ressourcen; vollständig abgedeckte Schraffuren durch Umrisse ersetzen. |
+| `2609.3.9` | 2026-09-28 | Außenbereiche mit Layout-/Plankopfobjekten einschließlich zugehöriger Verwaltungsverweise korrekt löschen; Export und erneuten Import geprüft. |
 | `2609.3.8` | 2026-09-28 | Außenbereiche automatisch ausgewählt; eigene synchronisierte Export-Schalter mit Duplikat- und Schraffurzahlen. |
 | `2609.3.7` | 28. September 2026 | Gemeinsamer Exportplan: Duplikate/Bereiche vorausgewählt, Umrisse aktivierbar; ein DXF-Export mit Originalstruktur und direkter Speicherortwahl. |
 | `2609.3.6` | 28. September 2026 | Speicherortabfrage je Export; Abbruch und Schreibfehler behandelt, expliziter Download-Ersatz bei fehlender Browserunterstützung. |
@@ -342,3 +346,14 @@ Noch nicht festgelegt. Das Repository bleibt bis zur Lizenz- und
 DWG-Strategieentscheidung privat. Insbesondere eine mögliche Verwendung von GNU
 LibreDWG würde wegen GPLv3+ die Lizenzarchitektur beeinflussen und darf nicht
 beiläufig als Abhängigkeit aufgenommen werden.
+
+## Löschung von Layout-/Plankopfobjekten ab 2609.3.9
+
+Ausgewählte CAD-Objekte werden mit ihren eigenen Erweiterungsdaten entfernt.
+Bekannte Verwaltungsverweise (Blockreferenzlisten, Zeichenreihenfolge, aktives
+Ansichtsfenster, Feldlisten und benannter Blockhierarchieindex) werden gezielt
+bereinigt. Unbekannte eingehende Verweise und uneindeutige Kennungen bleiben
+gesperrt. Die Exportbilanz unterscheidet CAD-Objekte von Vorschauobjekten:
+ein Plankopf mit 25 Attributen zählt als ein CAD-Objekt und 26 Vorschauobjekte.
+Nach erfolgreichem Export zeigt die Oberfläche den neuen Arbeitsstand; null
+weitere Löschungen oder Umrisse sind dann das erwartete Ergebnis.

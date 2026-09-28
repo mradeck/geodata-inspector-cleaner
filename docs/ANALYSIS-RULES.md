@@ -244,3 +244,7 @@ gewählte Verbundobjekte sichtbar erhalten. Erst danach neue Umrisse für die
 verbleibenden Schraffuren erzeugen. Originalversion bleibt erhalten, keine
 Normalisierung von Vorschaugeometrien. Exportbilanz vorab, Prüfbericht optional.
 GeoJSON verwendet dieselbe Bereichsauswahl und bestehenden Layer-/Typfilter.
+
+Ab 2609.3.9: Bekannte Verwaltungsverweise und eigene Erweiterungsobjekte verhindern die Bereichslöschung nicht mehr. Unbekannte eingehende Verweise bleiben gesperrt. Regression prüft nach dem Export erneut die räumlichen Cluster.
+
+Ab 2609.3.10 ist der UI-Standard ein neues kompaktes Geometriedokument. Native Koordinaten erhalten, benötigte Ressourcen kopieren, vollständig abgedeckte Schraffuren ersetzen. Alte CAD-Verwaltungsreferenzen verhindern die Entfernung im neuen Dokument nicht.

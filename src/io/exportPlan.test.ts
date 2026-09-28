@@ -1,3 +1,4 @@
+import { analyzeDataset } from "../analysis/analyzeDataset";
 import { describe, expect, it } from "vitest";
 import { readFileSync, writeFileSync } from "node:fs";
 import { parseDxf } from "./parseDxf";
@@ -44,8 +45,12 @@ describe('combined export plan',()=>{
 });
 it.skipIf(!process.env.HATCH_FIXTURE)('exports the private sample with all default choices in a single step',()=>{
  const d=parseDxf(readFileSync(process.env.HATCH_FIXTURE!,'utf8'),'sample.dxf');
+ const outside=defaultAreaRemovalIds(analyzeDataset(d, {}, {analysisCrs:"EPSG:25832"}).clusters);
  const keep=new Set(filterFeatures(d.features,buildDefaultSelection(summarizeLayers(d))).map(f=>f.id));
- const out=createPlannedDxf(d,{duplicateIds:new Set(d.dxfDuplicates!.candidates.filter(c=>!c.blocked).map(c=>c.entityId)), removedFeatureIds:new Set(d.features.filter(f=>!keep.has(f.id)).map(f=>f.id)),hatchOutlines:true});
+ const out=createPlannedDxf(d,{duplicateIds:new Set(d.dxfDuplicates!.candidates.filter(c=>!c.blocked).map(c=>c.entityId)), removedFeatureIds:new Set(d.features.filter(f=>outside.has(f.id)||!keep.has(f.id)).map(f=>f.id)),hatchOutlines:true});
+ expect(out.audit.protectedObjectsRetained).toEqual([]); expect(out.audit.partialObjectsRetained).toEqual([]);
+ expect(out.removedCount).toBe(6); expect(out.keptCount).toBe(65);
+ expect(analyzeDataset(parseDxf(out.content,"reimport.dxf")).clusters).toHaveLength(1);
  expect(out.audit.createdOutlines).toHaveLength(33);expect(out.audit.selectedDuplicateCount).toBe(2);
  const result=inspectDxfDuplicates(out.content);expect(result.candidates).toHaveLength(0);
  expect(result.entities.filter(e=>e.type==='HATCH')).toHaveLength(32);
@@ -56,4 +61,17 @@ it.skipIf(!process.env.HATCH_FIXTURE)('exports the private sample with all defau
 it('preselects outside areas even without a removal recommendation, retaining the primary area', () => {
  expect([...defaultAreaRemovalIds([{isPrimary:true,featureIds:['main']},{isPrimary:false,featureIds:['outside','other']}])]).toEqual(['outside','other']);
  expect([...defaultAreaRemovalIds([{isPrimary:true,featureIds:['only']}])]).toEqual([]);
+});
+
+it.skipIf(!process.env.EXPORTED_HATCH_FIXTURE)('removes the surviving remote area from the actual 3.8 export and remains stable on reimport', () => {
+ const d=parseDxf(readFileSync(process.env.EXPORTED_HATCH_FIXTURE!,'utf8'),'export-v3.8.dxf');
+ const report=analyzeDataset(d, {}, {analysisCrs:'EPSG:25832'});
+ expect(report.clusters.map(c=>c.featureCount).sort((a,b)=>a-b)).toEqual([29,65]);
+ const out=createPlannedDxf(d,{...empty,removedFeatureIds:defaultAreaRemovalIds(report.clusters),hatchOutlines:true});
+ expect(out.removedCount).toBe(4); expect(out.keptCount).toBe(65);
+ expect(out.audit.protectedObjectsRetained).toEqual([]);expect(out.audit.createdOutlines).toHaveLength(0);
+ const loaded=parseDxf(out.content,'fixed.dxf');
+ expect(analyzeDataset(loaded).clusters).toHaveLength(1);expect(loaded.features).toHaveLength(65);
+ expect(createPlannedDxf(loaded,{...empty,hatchOutlines:true}).content).toBe(out.content);
+ if(process.env.REPAIRED_TEST_OUTPUT)writeFileSync(process.env.REPAIRED_TEST_OUTPUT,out.content);
 });

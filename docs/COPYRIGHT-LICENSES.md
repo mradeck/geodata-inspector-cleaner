@@ -1,6 +1,6 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2609.3.8
+**Release:** 2609.3.10
 
 **Prüfstand:** 28. September 2026
 
@@ -11,7 +11,7 @@ Build-Komponenten und externe Kartendienste. Sie ersetzt keine individuelle
 Rechtsberatung. Vor jedem beauftragten Git-Push wird sie gegen `package.json`,
 `package-lock.json` und die externen Nutzungsbedingungen geprüft.
 
-Schraffurumrisse und Versionskorrektur `2609.3.8`: keine neuen oder geänderten Bibliotheken bzw.
+Schraffurumrisse und Versionskorrektur `2609.3.10`: keine neuen oder geänderten Bibliotheken bzw.
 externen Dienste. Lockfile-Lizenzen erneut geprüft; Repository weiterhin privat.
 
 Fußzeile `2607.03.3`: keine neuen oder geänderten Bibliotheken. Weitere Apps,
@@ -95,7 +95,7 @@ DXF-, GeoJSON- oder andere Benutzerinhalte werden nicht als Markdown/HTML an
 `marked` übergeben. Sollte später fremdes Markdown unterstützt werden, ist vor
 der Aktivierung eine Sanitizing-Schicht verpflichtend.
 
-## Release-Prüfung 2609.3.8
+## Release-Prüfung 2609.3.10
 
 - direkte Abhängigkeiten gegen `package.json` und Lockfile abgeglichen,
 - vollständigen npm-Lizenzscan geprüft,

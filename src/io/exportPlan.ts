@@ -1,3 +1,5 @@
+import { compactDxf } from "./compactDxf";
+import { removalDependencies } from "../duplicates/removalDependencies";
 import { createEntityRemovalExport, inspectDxfDuplicates } from "../duplicates/dxfDuplicates";
 import { createHatchOutlineExport, inspectHatchOutlines } from "../hatches/hatchOutlines";
 import type { GeoDataset, SpatialCluster } from "../model";
@@ -6,6 +8,7 @@ export interface ExportPlan {
   duplicateIds: ReadonlySet<string>;
   removedFeatureIds: ReadonlySet<string>;
   hatchOutlines: boolean;
+  compact?: boolean;
 }
 
 /** All choices apply to the unchanged source. Remove first, then generate boundaries
@@ -26,10 +29,15 @@ export function createPlannedDxf(dataset: GeoDataset, plan: ExportPlan) {
     if (!requested.length) continue;
     // INSERT + attributes / POLYLINE + vertices must stay atomic.
     if (requested.length !== features.length) { partial.push(entity.handle ?? entity.id); continue; }
-    if (entity.protected) { blocked.push(entity.handle ?? entity.id); continue; }
+    if (!plan.compact && entity.protected && !removalDependencies(source, entity)) { blocked.push(entity.handle ?? entity.id); continue; }
     selected.add(entity.id);
   }
-  const removal = createEntityRemovalExport(source, selected);
+  const removal = plan.compact ? (() => {
+    let content=source.source;
+    const removed=source.entities.filter(e=>selected.has(e.id));
+    for(const e of [...removed].reverse())content=content.slice(0,e.start)+content.slice(e.end);
+    return {content,removed:removed.map(e=>({id:e.id,handle:e.handle,layer:e.layer,type:e.type})),removedCount:removed.length,keptCount:source.entities.length-removed.length,removedReferenceCount:0,removedOwnedObjectCount:0,repairedReferenceCount:0};
+  })() : createEntityRemovalExport(source, selected);
   let content = removal.content;
   const remaining = inspectDxfDuplicates(content);
   const check = inspectHatchOutlines(remaining);
@@ -38,15 +46,20 @@ export function createPlannedDxf(dataset: GeoDataset, plan: ExportPlan) {
   if (plan.hatchOutlines && check.outlines.some((o) => !o.exists)) {
     const result = createHatchOutlineExport(remaining); content = result.content; created = result.created;
   }
+  const compact = plan.compact ? compactDxf(content) : null;
+  if(compact)content=compact.content;
   const final = inspectDxfDuplicates(content);
-  if (final.error || final.entities.length !== removal.keptCount + created.length) throw new Error("validation");
+  if (final.error || final.entities.length !== removal.keptCount + created.length - (compact?.removedHatches ?? 0)) throw new Error("validation");
   return {
-    content, fileName: dataset.fileName.replace(/\.dxf$/i, "") + "-export.dxf",
+    content, fileName: dataset.fileName.replace(/\.dxf$/i, "") + (plan.compact ? "-clean.dxf" : "-export.dxf"),
     keptCount: final.entities.length, removedCount: removal.removedCount,
     audit: { sourceFile: dataset.fileName, removed: removal.removed, removedIdBufferReferences: removal.removedReferenceCount,
+      removedOwnedObjectCount: removal.removedOwnedObjectCount, repairedReferenceCount: removal.repairedReferenceCount,
+      removedFeatureCount: removal.removed.reduce((sum, e) => sum + (featuresByEntity.get(e.id)?.length ?? 0), 0),
       selectedDuplicateCount: plan.duplicateIds.size, createdOutlines: created, hatchOutlinesEnabled: plan.hatchOutlines,
       skippedHatches: plan.hatchOutlines ? check.skipped : [], protectedObjectsRetained: blocked, partialObjectsRetained: partial,
-      sourceHatchesRetained: true, exportMode: "source-preserving-combined" },
+      replacedHatchCount: compact?.removedHatches ?? 0,
+      sourceHatchesRetained: !compact?.removedHatches, exportMode: plan.compact ? "compact-geometry" : "source-preserving-combined" },
   };
 }
 

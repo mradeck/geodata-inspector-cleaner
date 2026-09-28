@@ -4,6 +4,49 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## 28. September 2026 – Schlanke DXF 2609.3.10
+
+Nutzerziel ist eine minimale Shape-Datei, nicht die vollständige CAD-Struktur.
+Der Standardexport schreibt deshalb ein neues AC1032-Dokument aus nativen
+Geometrie-Tags mit nur benötigten Layern, Linienarten, Textstilen und Blöcken.
+Keine Rundung oder Rückkonvertierung der Vorschaugeometrie. Neue Handles und
+konsistente Eigentümer, keine alten Extension-Dictionaries, XData oder Proxys.
+Vollständig vorhandene Außen-/Innenumrisse ersetzen HATCHs. Nicht unterstützte
+beibehaltene Geometrie führt zu sichtbarer Sperre statt stillem Datenverlust.
+
+Private Originaldatei: 33 LWPOLYLINEs, 12.257 Byte, ein Cluster. Vollständiger
+Koordinaten-/Bulge-/Layer-/Z-/OCS-Vergleich mit den 33 Referenzumrissen identisch.
+Unabhängige ezdxf-Prüfung ohne Fehler oder Reparaturen. Keine neuen Bibliotheken.
+123 Tests und Build bestanden, Browser-Bilanz und Reimport geprüft; tatsächlicher
+Pointcloud-Manager-Importer erkennt 33 eindeutige Shapes. Audit unverändert vier
+Entwicklungsbefunde, keine Produktionsbefunde. Repository privat.
+Push-Abnahme: 123 Tests inklusive lokaler DXF-Referenzen, Build, Versions- und
+Diff-Prüfung erneut erfolgreich. Keine privaten DXF-Dateien eingecheckt.
+
+## 28. September 2026 – Außenbereich tatsächlich entfernen 2609.3.9
+
+Die 3.8-Ausgabe hatte korrekt zwei HATCH-Duplikate entfernt und 33 Umrisse
+erzeugt, behielt aber drei VIEWPORTs und einen INSERT mit 25 ATTRIBs. Der
+pauschale Referenzschutz blockierte auch normale Eigentümer-/Verwaltungsdaten.
+Die bisherigen Tests prüften Umrisse und Duplikate, nicht das Verschwinden des
+Außenbereichs; dies war eine Lücke in der Abnahme.
+
+Eigene OBJECTS-Erweiterungsdaten rekursiv anhand Owner entfernen; bekannte
+BLKREFS-, SORTENTSTABLE-, LAYOUT-, FIELDLIST- und benannte
+ASEBlockHierarchyIndexRecord-Verweise gezielt bereinigen. Shared Resources,
+Blockdefinitionen und unbekannte externe Verweise nicht pauschal löschen.
+Synthetische Regressionen prüfen Kaskade, Referenzreparatur, unveränderte
+Fremddaten, unbekannte Verweise und doppelte Handles.
+
+Beide privaten Dateien opt-in prüfen: Original → gemeinsamer Export sowie
+reale v3.8-Ausgabe → Außenbereich löschen → erneuter Import. Erwartung: nur
+noch ein Cluster, 65 Vorschau-/CAD-Objekte (32 HATCH, 33 LWPOLYLINE), keine
+weiteren Umrisse beim Folgeexport. Externe Prüfung mit ezdxf: 0 Fehler,
+unverändert vier bereits vorhandene IDBUFFER-Owner-Hinweise. Keine neuen
+Abhängigkeiten oder Lizenzen. Beispieldateien bleiben außerhalb des Repositorys.
+
+Abnahme: 116 Tests inklusive Original, tatsächlicher v3.8-Ausgabe und HBF-Datei; Build und Diff-Prüfung erfolgreich. Browser-Reimport: ein Bereich, kein Außenbereich mehr. Pointcloud-Manager-Importer: 33 Shapes, 33 eindeutig. Kein Verweis auf die 44 entfernten Entity-/Metadaten-Handles verbleibt. Audit weiterhin vier Entwicklungsbefunde, keine Produktionsbefunde; Repository privat.
+
 ## 28. September 2026 – Sichtbare Exportauswahl 2609.3.8
 
 - Nur empfohlene Löschbereiche vorauszuwählen entsprach nicht dem Nutzerwunsch: jetzt sind alle erkannten Nicht-Hauptbereiche angehakt, auch bei unklarer Empfehlung.
