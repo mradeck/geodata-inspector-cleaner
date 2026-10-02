@@ -10,3 +10,5 @@ test-results/
 test-data/dxf/real-world/
 *.dxf
 *.geojson
+/docs/images/cleaner-01-inspection.jpg
+/docs/images/cleaner-02-confirmed-export.jpg
