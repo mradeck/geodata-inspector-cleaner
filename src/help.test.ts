@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import readme from "../README.md?raw";
+import readme from "../README.de.md?raw";
 
 describe("README-basierte Hilfe", () => {
   it("enthält die zentralen Bedien- und Exportabschnitte", () => {

@@ -142,9 +142,9 @@ Gesamt-Bounds. Ein Cluster gilt für die OSM-Vorschau als kartierbar, wenn:
 3. der Mittelpunkt innerhalb des plausiblen Einsatzgebiets des CRS liegt.
 
 Eine formell mögliche Transformation ist kein Beweis für eine korrekte Lage.
-Beim private-project-Rohfixture ist der 101-Feature-Cluster minimal größer, liegt
+Bei einem Mehrclusterfall kann der größere Feature-Cluster zwar mehr Elemente enthalten, liegt
 nach EPSG:25832-Transformation aber außerhalb des plausiblen UTM-32-Gebiets.
-Der 99-Feature-Cluster liegt dagegen kartierbar im tatsächlichen Projektbereich.
+Der kleinere Cluster kann dagegen kartierbar im tatsächlichen Projektbereich liegen.
 
 Die Kartenwahl ist eine explizite Benutzerentscheidung. Erst danach dürfen die
 anderen Cluster als Entfernungskandidaten empfohlen werden.

@@ -4,11 +4,11 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2609.3.10`
-- **npm-kompatible Version:** `2609.3.10`
-- **Repository:** privates GitHub-Repository `mradeck/geodata-inspector-cleaner`
+- **Aktuelle Release-Version:** `2610.3.11`
+- **npm-kompatible Version:** `2610.3.11`
+- **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
-- **README:** `README.md`
+- **README:** `README.md` (English), `README.de.md` (Deutsch)
 - **Lernlog:** `docs/LERNLOG.md`
 - **Copyright-/Lizenzübersicht:** `docs/COPYRIGHT-LICENSES.md`
 
@@ -105,7 +105,7 @@ Merksätze:
   beibehalten, kein Prefetch/Offline-Download und Kartenprovider konfigurierbar halten.
 - Sichtbare und barrierefreie UI-Texte in beiden zentralen Sprachkatalogen
   (`src/i18n/de.ts`, `src/i18n/en.ts`) ergänzen; Katalog-Parität testen.
-- Die Anwenderhilfe rendert `README.md` über `help.html`; Bedienänderungen müssen
+- Die Anwenderhilfe rendert `README.de.md` über `help.html`; Bedienänderungen müssen
   deshalb in der README so beschrieben sein, dass sie auch innerhalb der App als
   Hilfe verständlich bleiben. Das Produktkonzept bleibt separat versioniert.
 - Das Kopfmenü `Über` rendert Copyright-/Lizenzinformationen dynamisch aus
@@ -147,10 +147,10 @@ Merksätze:
   Änderung muss Cluster-/Kartenanalyse neu ausführen und eine frühere manuelle
   Hauptbereichsbestätigung verwerfen. Exporter dürfen den Wert als CRS-Hinweis
   übernehmen, aber niemals stillschweigend Koordinaten reprojizieren.
-- Reale DXF-Referenzfixtures gelten als sensibel. Sie dürfen nur nach
-  ausdrücklicher Freigabe in ein weiterhin privates Repository gepusht werden.
-  Eine öffentliche Freigabe benötigt eine gesonderte Anonymisierungs- und
-  Rechteprüfung.
+- Echte Vermessungsdateien bleiben gemäß Nutzerentscheidung vom 2. Oktober
+  2026 ausschließlich lokal. Keine DXF-/GeoJSON-Dateien, zugehörigen Manifest-
+  oder Referenztests mit privaten Koordinaten und daraus erzeugten Screenshots
+  ins Repository aufnehmen. Synthetische Testfälle für CI verwenden.
 
 ## DXF-Duplikatprüfung
 
@@ -218,6 +218,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2610.3.11` | 2026-10-02 | MIT-Lizenz für den Quellcode; echte Vermessungsdaten einschließlich Historie aus dem Repository entfernt. |
 | `2609.3.10` | 2026-09-28 | Schlanker Standardexport: native Geometrie und benötigte Ressourcen; vollständig abgedeckte Schraffuren durch Umrisse ersetzen. |
 | `2609.3.9` | 2026-09-28 | Außenbereiche mit Layout-/Plankopfobjekten einschließlich zugehöriger Verwaltungsverweise korrekt löschen; Export und erneuten Import geprüft. |
 | `2609.3.8` | 2026-09-28 | Außenbereiche automatisch ausgewählt; eigene synchronisierte Export-Schalter mit Duplikat- und Schraffurzahlen. |

@@ -4,6 +4,17 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## 2. Oktober 2026 – Projektlizenz 2610.3.11
+
+Auf ausdrücklichen Nutzerwunsch ist der Projektquellcode unter MIT lizenziert.
+LICENSE, npm-Metadaten, README und Lizenzübersicht stimmen überein.
+Der Nutzer hat die Veröffentlichung echter Vermessungsdateien ausgeschlossen
+und ausdrücklich ihre Entfernung aus GitHub beauftragt. DXF-Dateien, Manifest,
+Referenztests mit exakten Koordinaten und Projektscreenshots werden deshalb
+auch aus der Git-Historie entfernt. Synthetische Regressionstests bleiben bestehen.
+Die MIT-Lizenz umfasst ausschließlich den verteilten Quellcode, keine privaten
+Vermessungsdaten. `.gitignore` verhindert das erneute Einchecken solcher Dateien.
+
 ## 28. September 2026 – Schlanke DXF 2609.3.10
 
 Nutzerziel ist eine minimale Shape-Datei, nicht die vollständige CAD-Struktur.

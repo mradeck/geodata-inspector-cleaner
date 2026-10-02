@@ -1,8 +1,8 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2609.3.10
+**Release:** 2610.3.11
 
-**Prüfstand:** 28. September 2026
+**Prüfstand:** 2. Oktober 2026
 
 **Repository:** privat
 
@@ -23,15 +23,18 @@ Der Sicherheitscheck meldet vier bestehende Befunde in Entwicklungsabhängigkeit
 
 ## Projektlizenz
 
-Für `geodata-inspector-cleaner` ist noch keine eigene Distributionslizenz
-festgelegt. Das Repository bleibt deshalb privat. Die Aufnahme einer
-DWG-Komponente, insbesondere einer GPL-lizenzierten Lösung wie GNU LibreDWG,
-bedarf vorab einer eigenen Lizenz- und Distributionsentscheidung.
+Der Projektquellcode von `geodata-inspector-cleaner` steht seit dem
+2. Oktober 2026 unter der [MIT-Lizenz](../LICENSE).
+Copyright © 2026 Michael Radeck. Der vollständige Lizenztext steht im
+Repository in `LICENSE`; `package.json` und das Lockfile deklarieren MIT.
+Lizenzen von Drittkomponenten und Kartendaten bleiben unverändert.
+Die Aufnahme einer DWG-Komponente, insbesondere einer GPL-lizenzierten Lösung
+wie GNU LibreDWG, bedarf vorab einer eigenen Lizenz- und Distributionsentscheidung.
 
-Die realen DXF-Referenzfixtures sind nicht als anonymisiert oder zur
-öffentlichen Weitergabe freigegeben klassifiziert. Sie sind keine
-Open-Source-Testdaten und dürfen nicht aus dem privaten Projektkontext
-veröffentlicht werden.
+Echte Vermessungsdateien und ihre Referenztests, Manifeste und Screenshots
+werden nicht verteilt und sind von der MIT-Lizenz des Quellcodes ausgenommen.
+Sie werden auf Nutzerwunsch aus dem Repository einschließlich seiner Git-Historie
+entfernt und durch `.gitignore` von künftigen Commits ausgeschlossen.
 
 ## Direkte Laufzeitabhängigkeiten
 
@@ -61,7 +64,7 @@ Relevante indirekte Laufzeitkomponenten:
 
 Der vollständige Lockfile-Scan für diesen Release fand keine GPL-, AGPL-,
 Non-Commercial- oder unbekannt lizenzierte Fremdabhängigkeit. Die Anwendung
-selbst besitzt bewusst noch keine öffentliche Lizenz.
+selbst ist unter MIT lizenziert.
 
 ## OpenStreetMap
 

@@ -1,5 +1,5 @@
 import { marked } from "marked";
-import readme from "../README.md?raw";
+import readme from "../README.de.md?raw";
 import "./styles.css";
 import "./concept.css";
 import {
