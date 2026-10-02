@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2610.3.11`
-- **npm-kompatible Version:** `2610.3.11`
+- **Aktuelle Release-Version:** `2610.3.12`
+- **npm-kompatible Version:** `2610.3.12`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
@@ -218,6 +218,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2610.3.12` | 2026-10-02 | Bereinigtes öffentliches MIT-Repository und neue Verknüpfung der bestehenden Netlify-Site. |
 | `2610.3.11` | 2026-10-02 | MIT-Lizenz für den Quellcode; echte Vermessungsdaten einschließlich Historie aus dem Repository entfernt. |
 | `2609.3.10` | 2026-09-28 | Schlanker Standardexport: native Geometrie und benötigte Ressourcen; vollständig abgedeckte Schraffuren durch Umrisse ersetzen. |
 | `2609.3.9` | 2026-09-28 | Außenbereiche mit Layout-/Plankopfobjekten einschließlich zugehöriger Verwaltungsverweise korrekt löschen; Export und erneuten Import geprüft. |

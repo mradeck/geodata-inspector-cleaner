@@ -11,7 +11,7 @@ Bounds-Berechnungen, Exporte und GIS-/CAD-Weiterverarbeitung unbrauchbar macht.
 
 ## Projektstatus
 
-**Version 2610.3.11 – MIT-Lizenz für den Quellcode, Cleaner unverändert.** Der
+**Version 2610.3.12 – MIT-Lizenz für den Quellcode, Cleaner unverändert.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -275,7 +275,7 @@ npm run build
 
 ## Versionierung
 
-Aktuell **2609.3.10**, Bugfix auf Basis der September-Version 2609.3.3. Das Schema
+Aktuell **2610.3.12**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
 lautet `JJMM.R.P`: Jahr/Monat, Release-Linie, Subversion. Derselbe Wert steht in
 `package.json`, `package-lock.json`, `displayVersion`, App und Prüfberichten.
 Bei neuen Runden wird auch der aktuelle Monat geprüft. Frühere Einträge mit
@@ -311,6 +311,8 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2610.3.12` | 2026-10-02 | Bereinigtes öffentliches MIT-Repository; bestehende Netlify-Site neu verknüpft. |
+| `2610.3.11` | 2026-10-02 | MIT-Lizenz und Ausschluss privater Vermessungsdaten. |
 | `2609.3.10` | 2026-09-28 | Schlanker Standardexport: native Geometrie und benötigte Ressourcen; vollständig abgedeckte Schraffuren durch Umrisse ersetzen. |
 | `2609.3.9` | 2026-09-28 | Außenbereiche mit Layout-/Plankopfobjekten einschließlich zugehöriger Verwaltungsverweise korrekt löschen; Export und erneuten Import geprüft. |
 | `2609.3.8` | 2026-09-28 | Außenbereiche automatisch ausgewählt; eigene synchronisierte Export-Schalter mit Duplikat- und Schraffurzahlen. |

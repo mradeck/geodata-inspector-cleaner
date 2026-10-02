@@ -1,10 +1,10 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2610.3.11
+**Release:** 2610.3.12
 
 **Prüfstand:** 2. Oktober 2026
 
-**Repository:** privat
+**Repository:** öffentlich; bereinigtes, unabhängiges Repository unter MIT
 
 Diese Übersicht dokumentiert die direkt verwendeten Bibliotheken, relevante
 Build-Komponenten und externe Kartendienste. Sie ersetzt keine individuelle

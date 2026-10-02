@@ -6,7 +6,7 @@ A local-first single-page app for inspecting and cleaning spatial outliers in DX
 
 [Open the app](https://geodata-inspector-cleaner.netlify.app/)
 
-**Version: 2610.3.11.** The source code is licensed under MIT. Real survey files, coordinate-based private regression fixtures and project screenshots are excluded from the repository and its published history.
+**Version: 2610.3.12.** The source code is licensed under MIT. Real survey files, coordinate-based private regression fixtures and project screenshots are excluded from the repository and its published history.
 
 ## Features
 

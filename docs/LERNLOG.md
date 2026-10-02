@@ -4,6 +4,15 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## 2. Oktober 2026 – Öffentlicher Stand 2610.3.12
+
+Auf Nutzerauftrag wurde ein unabhängiges öffentliches Repository unter dem
+bisherigen Namen angelegt. Es enthält ausschließlich die bereinigte Historie
+und den MIT-lizenzierten Quellcode. Das frühere Repository bleibt unter
+`geodata-inspector-cleaner-private` privat; seine sechs Issues bleiben erhalten.
+Die bestehende Netlify-Site wurde mit dem neuen Repository verbunden, ihre
+öffentliche Website-Adresse bleibt erhalten. Keine neuen Abhängigkeiten.
+
 ## 2. Oktober 2026 – Projektlizenz 2610.3.11
 
 Auf ausdrücklichen Nutzerwunsch ist der Projektquellcode unter MIT lizenziert.
