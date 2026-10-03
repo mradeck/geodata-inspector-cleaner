@@ -19,7 +19,24 @@ function records(text: string): Record[] {
 
 /** Fresh CAD document with native geometry and only its required tables/blocks.
  * No preview coordinates, extension dictionaries, application data or proxy graphics. */
-export function compactDxf(source: string) {
+export function compactDxf(source: string, options: { stripAnnotations?: boolean } = {}) {
+  let removedAnnotations = 0, removedAnnotationEntities = 0;
+  if (options.stripAnnotations) {
+    const before = inspectDxfDuplicates(source);
+    let parent = '';
+    const stripped = records(source).filter(r => {
+      if (!['ENTITIES','BLOCKS'].includes(r.section)) return true;
+      if (['TEXT','MTEXT','ATTRIB','ATTDEF'].includes(r.type)) { removedAnnotations++; return false; }
+      if (r.type === 'SEQEND') { const omit = parent === 'INSERT'; parent = ''; return !omit; }
+      if (!['VERTEX','ATTRIB'].includes(r.type)) parent = r.type;
+      if (r.type === 'INSERT') r.tags = r.tags.filter(t=>t.code!==66);
+      return true;
+    });
+    source = stripped.flatMap(r=>r.tags.flatMap(t=>[t.code,t.value])).join('\n')+'\n';
+    const after = inspectDxfDuplicates(source);
+    if (before.error || after.error) throw new Error('annotation-validation');
+    removedAnnotationEntities = before.entities.length-after.entities.length;
+  }
   const inspected=inspectDxfDuplicates(source);if(inspected.error)throw new Error('invalid-dxf');
   const polylines=inspected.entities.filter(e=>e.type==='LWPOLYLINE');
   const covered=new Set(inspected.entities.filter(e=>{
@@ -113,5 +130,5 @@ export function compactDxf(source: string) {
   }
   const content=output.flatMap(t=>[t.code,t.value]).join('\n')+'\n';
   const check=inspectDxfDuplicates(content);if(check.error||check.entities.length!==inspected.entities.length-covered.size)throw new Error('compact-validation');
-  return {content,removedHatches:covered.size,entityCount:check.entities.length};
+  return {content,removedHatches:covered.size,entityCount:check.entities.length,removedAnnotations,removedAnnotationEntities};
 }

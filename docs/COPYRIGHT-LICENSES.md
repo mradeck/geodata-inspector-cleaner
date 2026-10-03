@@ -1,6 +1,6 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2610.3.15
+**Release:** 2610.3.18
 
 **Prüfstand:** 3. Oktober 2026
 
@@ -129,3 +129,9 @@ der Aktivierung eine Sanitizing-Schicht verpflichtend.
 Einpunkt-Polylinien-Reparatur 2610.3.14: eigene lokale TypeScript-Implementierung, keine neuen Bibliotheken, Datenquellen oder externen Dienste.
 
 Sprachflaggen 2610.3.15: eigene einfache SVG-Zeichnungen der deutschen und britischen Flagge, lokal eingebunden; keine Icon-Bibliothek oder externen Abrufe.
+
+2610.3.16: Auswahlkarten nutzen das vorhandene Leaflet mit lokaler CRS.Simple-Darstellung ohne Kachelabrufe. Keine neuen Abhängigkeiten.
+
+2610.3.17: OSM-Hintergrund zusätzlich in den zwei Auswahlkarten, mit bestehendem Leaflet/proj4, sichtbarer OSM-Attribution und konfigurierbarer Kachel-URL. Keine neuen Abhängigkeiten.
+
+2610.3.18: Theme-Default und natives details-Element; keine neuen Abhängigkeiten oder Lizenzänderungen.

@@ -13,7 +13,7 @@ Der Sprachbutton verwendet mitgelieferte SVG-Flaggen für eine einheitliche Anze
 
 ## Projektstatus
 
-**Version 2610.3.15 – gezielte Reparatur von Einpunkt-Polylinien.** Der
+**Version 2610.3.18 – gezielte Reparatur von Einpunkt-Polylinien.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -174,21 +174,16 @@ CRS-Annahme weiterverwendet werden.
 ## Ein gemeinsamer Export für alle Prüfungen
 
 1. DXF oder GeoJSON laden. Die Quelldatei bleibt unverändert.
-2. Vorschau und vorausgewählte Änderungen prüfen:
-   - löschbare DXF-Duplikate sind in der Löschliste bereits ausgewählt,
-   - alle erkannten Außenbereiche sind rechts unten angehakt,
-   - Layer-/Typfilter wählen Einzelpunkte zunächst ab,
-   - bei geeigneten Schraffuren ist **Schraffur-Umrisse beim gemeinsamen Export
-     erzeugen** bereits aktiv.
-3. Auswahl bei Bedarf ändern. Duplikate lassen sich einzeln oder gesammelt
-   abwählen. Die Bereichsliste rechts unten erlaubt auch das Beibehalten eines
-   vorgeschlagenen Löschbereichs. Der Hauptbereich bleibt zunächst erhalten. Karten und Bereichsnummern dienen der Kontrolle.
-4. Rechts unten stehen eigene Schalter mit den erkannten Duplikaten und der
-   Löschanzahl sowie erkannten Schraffuren und der Anzahl neuer Umrisse. Beide
-   sind bei verfügbaren Aktionen vorausgewählt und mit den Detailansichten
-   synchronisiert. Die gemeinsame Bilanz zeigt: entfernte Objekte, ausgewählte
-   Duplikate, neue Umrisse und endgültige DXF-Objektzahl. Der Button nennt bei
-   aktivierter Erzeugung ausdrücklich **Schlanke DXF · mit Schraffur-Umrissen**.
+2. Standard ist Datenerhalt: Messpunkte, Namen, Codes und Höhenbeschriftungen
+   bleiben ausgewählt. Geometrische Z-Werte bleiben erhalten. Nur exakte
+   Duplikate auf demselben Layer und geeignete Einpunkt-Reparaturen sind vorausgewählt.
+3. Entfernte Bereiche, Duplikate auf anderen Layern und Schraffurumrisse bewusst
+   auswählen; räumliche Entfernung allein ist kein nachgewiesener Fehler.
+4. Rechts unten alle Aktionen und die tatsächliche Exportbilanz prüfen. Die
+   optionale Auswahl **Nur Geometrie** entfernt Beschriftungen und zusätzliche
+   CAD-Verwaltungsdaten, aber keine geometrischen Höhen. Ohne diese Option
+   bleibt die Originalstruktur erhalten. Exportkarte und Einpunkt-Karte zeigen
+   geplante Änderungen vor dem Speichern.
 5. Einmal exportieren und den Speicherort wählen. Es gibt keine separaten
    DXF-Downloads für Duplikate oder Schraffuren und keine zusätzliche
    Hauptbereichsbestätigung. Der erfolgreiche DXF-Export wird zum neuen
@@ -277,7 +272,7 @@ npm run build
 
 ## Versionierung
 
-Aktuell **2610.3.15**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
+Aktuell **2610.3.18**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
 lautet `JJMM.R.P`: Jahr/Monat, Release-Linie, Subversion. Derselbe Wert steht in
 `package.json`, `package-lock.json`, `displayVersion`, App und Prüfberichten.
 Bei neuen Runden wird auch der aktuelle Monat geprüft. Frühere Einträge mit
@@ -313,7 +308,7 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
-| `2610.3.15` | 2026-10-03 | Einpunkt-LWPOLYLINE-Prüfung mit expliziter Auswahl, Punktabgleich und unveränderter Originalreparatur. |
+| `2610.3.18` | 2026-10-03 | Einpunkt-LWPOLYLINE-Prüfung mit expliziter Auswahl, Punktabgleich und unveränderter Originalreparatur. |
 | `2610.3.12` | 2026-10-02 | Bereinigtes öffentliches MIT-Repository; bestehende Netlify-Site neu verknüpft. |
 | `2610.3.11` | 2026-10-02 | MIT-Lizenz und Ausschluss privater Vermessungsdaten. |
 | `2609.3.10` | 2026-09-28 | Schlanker Standardexport: native Geometrie und benötigte Ressourcen; vollständig abgedeckte Schraffuren durch Umrisse ersetzen. |
@@ -390,14 +385,54 @@ Zeichenbereich werden auch auf anderen Layern wiederverwendet. Andernfalls wird
 ein POINT mit originalen XYZ auf dem Layer der Linie erzeugt. Mehrere Umwandlungen
 am selben Standort erzeugen nur einen Punkt. Außenbereiche und ausdrücklich gesetzte
 Layerfilter haben Vorrang; entfernte Geometrie wird nicht wiederhergestellt.
-Punktkategorien betroffener Layer bleiben zunächst ausgewählt, damit der normale
-Punktfilter die Reparatur nicht unbemerkt entfernt.
+Alle Layer-/Typkategorien bleiben standardmäßig ausgewählt.
 
-Alle Schritte laufen über **Schlanke DXF exportieren** rechts unten. Es gelten die
-Regeln des schlanken Exports, keine bytegleiche Originalkopie. Nach dem Speichern
+Alle Schritte laufen über **DXF exportieren · Daten erhalten** rechts unten.
+Der kompakte Geometrieexport ist nur noch eine ausdrückliche Option. Nach dem Speichern
 wird neu analysiert. Der optionale **Prüfbericht** enthält Änderungen und Koordinaten
 und bleibt lokal.
 
 Ungültige XYZ/Zähler, abweichende Extrusion, Breiten/Bögen/Dicke, uneindeutige Handles
 und eingehende Referenzen sperren die Bearbeitung. Die Regel akzeptiert zunächst
 nur ASCII-Dateien und Einpunkt-LWPOLYLINE; weitere Geometriefehler brauchen eigene Regeln.
+
+## Punktbegleiter und Kartenkontrolle ab 2610.3.18
+
+Messpunkte, Beschriftungen und Blöcke sind getrennte Filterkategorien. Wird ein
+POINT abgewählt, folgen eindeutig zugeordnete TEXT-/MTEXT-Begleiter automatisch.
+Zuordnung über direkte Punkt-Handle-Verweise oder exakt gleiche XY-Anker im selben
+Zeichenbereich. Überlebt eine Punktkopie am Anker, bleiben gemeinsame Begleiter.
+Versetzte oder unklare Texte werden nicht dem nächstgelegenen Punkt zugeschlagen;
+die Anzahl unzugeordneter Texte ist sichtbar. Referenzschutz bleibt wirksam.
+
+**Exportauswahl auf der Karte** bietet Zoom und Verschieben sowie einen
+zuschaltbaren OSM-Hintergrund. Grün bedeutet behalten, Rot entfernen und Blau umwandeln.
+Objekte anklicken, um eine manuelle Abwahl zu setzen oder zurückzunehmen; weitere
+Filter gelten zusätzlich. **Kartenauswahl zurücksetzen** hebt nur diese manuellen
+Abwahlen auf. Layer-, Bereichs-, Duplikat- und Reparaturauswahl aktualisieren die
+Karte anhand des tatsächlichen Exportplans. Tooltips nennen Typ, Handle, Layer,
+XYZ und Aktion. Begleittexte sind an ihren Einfügepunkten dargestellt.
+
+Die eigene **Einpunkt-Linien**-Karte zeigt ausschließlich erkannte Einpunkt-Linien,
+beim Laden mit Zoom auf genau diese Objekte. Aktionen kommen aus der Reparaturliste;
+**Zoom auf alle** passt den Ausschnitt jederzeit erneut ein. Ungültige Koordinaten
+können nicht kartiert werden; die Befundliste bleibt dafür maßgeblich.
+
+## OSM in den ersten beiden Vorschauen ab 2610.3.18
+
+Exportauswahl und Einpunkt-Karte besitzen je einen unabhängigen Schalter
+**OSM-Hintergrund anzeigen**, anfangs eingeschaltet. Das eingestellte CRS/EPSG
+wird für die Darstellung nach WGS84/Web Mercator umgerechnet; Quell- und
+Exportkoordinaten bleiben unverändert. Beim Umschalten wird der zugehörige
+Objektausschnitt erneut eingepasst, in der Einpunkt-Karte ausschließlich die Befunde.
+Bei fehlender oder nicht darstellbarer Projektion bleibt die vollständige lokale
+XY-Ansicht mit Hinweis sichtbar. CRS-Widersprüche werden ausdrücklich angezeigt.
+Sichtbare Kartenkacheln werden online geladen; OSM sieht Ausschnitt und IP-Adresse,
+keine hochgeladene DXF. Attribution bleibt sichtbar. ALKIS ist nicht eingebunden.
+
+## Heller Standard und kompakte Exportkachel
+
+Hell ist das Standarddesign; eine ausdrücklich gespeicherte Dunkelwahl bleibt
+erhalten. Die Exportdetails sind bei jeder neu geladenen Datei geschlossen.
+Kurzbilanz und Exportbutton bleiben sichtbar. **Exportdetails und Auswahl**
+öffnet alle Optionen. Das Einklappen ändert keine Auswahl oder Exportaktion.

@@ -191,7 +191,7 @@ input[type="range"] { width: 100%; accent-color: var(--green); margin: 15px 0 6p
 .object-filter-confirmation.confirmed { color: var(--green); background: rgba(77,226,177,.045); }
 .object-filter-confirmation .button { flex: 0 0 auto; padding: 7px 10px; color: var(--green); border-color: rgba(77,226,177,.28); font-size: 9px; }
 .object-filter-table { overflow-x: auto; padding: 0 12px 12px; }
-.object-filter-row { min-width: 560px; display: grid; grid-template-columns: minmax(210px, 1.7fr) repeat(4, minmax(68px, .55fr)); border-bottom: 1px solid rgba(171,209,202,.08); }
+.object-filter-row { min-width: 800px; display: grid; grid-template-columns: minmax(210px, 1.7fr) repeat(6, minmax(90px, .55fr)); border-bottom: 1px solid rgba(171,209,202,.08); }
 .object-filter-row-head { position: sticky; top: 0; z-index: 2; color: #78938e; background: var(--panel); font-size: 8px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
 .object-filter-cell { min-width: 0; display: flex; align-items: center; padding: 9px 8px; }
 .object-filter-cell-type { justify-content: center; text-align: center; }
@@ -355,4 +355,17 @@ input[type="range"] { width: 100%; accent-color: var(--green); margin: 15px 0 6p
 .repair-select { max-width: 100%; min-width: 0; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); color: var(--text); font: inherit; }
 .repair-operation .repair-select { width: 100%; }
 /* Keep the shared export reachable when its operation list grows. */
-.cleaner-card { max-height: 65%; overflow-y: auto; overscroll-behavior: contain; }
+.cleaner-card { flex: 0 0 auto; min-height: 0; max-height: 45%; overflow-y: auto; overscroll-behavior: contain; }
+
+.selection-map { height: 340px; margin-top: 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; }
+.selection-map.leaflet-container { background-color: var(--panel-2); background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 32px 32px; }
+
+.selection-map.leaflet-container.has-osm { background-image: none; }
+.map-background-choice { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.map-background-choice input { accent-color: var(--green); }
+
+.cleaner-card #cleaner-compact-summary { min-height: 0; margin-bottom: 6px; }
+.cleaner-details { margin: 6px 0 10px; }
+.cleaner-details > summary { cursor: pointer; color: var(--green); font-size: 11px; padding: 5px 0; }
+.cleaner-details[open] > summary { margin-bottom: 8px; }
+.cleaner-details:not([open]) > :not(summary) { display: none; }

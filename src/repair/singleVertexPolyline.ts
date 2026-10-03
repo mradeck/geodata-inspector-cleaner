@@ -122,7 +122,7 @@ export function applySingleVertexActions(source: string, actions: ReadonlyMap<st
         const eol = source.includes('\r\n') ? '\r\n' : '\n';
         // Carry common entity properties, handle, owner, layer and drawing space.
         const common = e.tags.filter(t => [5,330,8,6,62,420,430,440,48,60,67,370,410].includes(t.code));
-        const tags = [{code:0,value:'POINT'}, ...common.filter(t=>[5,330].includes(t.code)), {code:100,value:'AcDbEntity'}, ...common.filter(t=>![5,330].includes(t.code)), {code:100,value:'AcDbPoint'}, ...[10,20,30].map((code,i)=>({code,value:String(f.xyz![i])}))];
+        const tags = [{code:0,value:'POINT'}, ...common.filter(t=>[5,330].includes(t.code)), {code:100,value:'AcDbEntity'}, ...common.filter(t=>![5,330].includes(t.code)), {code:100,value:'AcDbPoint'}, ...[10,20,30].map((code,i)=>({code,value:String(f.xyz![i])})), ...e.tags.filter(t=>t.code>=1000)];
         text = tags.map(t=>`${t.code}${eol}${t.value}${eol}`).join('');
       }
     } else deleted++;

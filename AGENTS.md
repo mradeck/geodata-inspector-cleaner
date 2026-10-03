@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2610.3.15`
-- **npm-kompatible Version:** `2610.3.15`
+- **Aktuelle Release-Version:** `2610.3.18`
+- **npm-kompatible Version:** `2610.3.18`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
@@ -220,6 +220,9 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2610.3.18` | 2026-10-03 | Helles Standarddesign; Exportdetails zunächst eingeklappt, Kurzbilanz und Exportbutton sichtbar. |
+| `2610.3.17` | 2026-10-03 | Unabhängig zuschaltbarer OSM-Hintergrund in Export- und Einpunkt-Karte; CRS-Projektion nur für Darstellung. |
+| `2610.3.16` | 2026-10-03 | Datenerhalt als Standard; optional ohne Beschriftungen, Punktbegleiter und interaktive Auswahl-/Einpunkt-Karten. |
 | `2610.3.15` | 2026-10-03 | Sprachbutton auf App-, Hilfe- und Konzeptseite mit lokalen SVG-Flaggen statt plattformabhängigen Emojis. |
 | `2610.3.14` | 2026-10-03 | Einpunkt-Linien standardmäßig in Punkte wandeln, alternativ löschen; gemeinsamer Export und synchronisierte Bilanz. |
 | `2610.3.13` | 2026-10-03 | Einpunkt-LWPOLYLINE-Prüfung mit expliziter Auswahl, Punktabgleich und unveränderter Originalreparatur. |
@@ -292,3 +295,27 @@ Nach Filterung neu prüfen und nur tatsächlich erhaltene POINT-Kopien wiederver
 sonst POINT mit exaktem XYZ und Quelllayer erzeugen. Keine doppelt erzeugten Punkte.
 Gesperrte Referenzen/Geometriesonderfälle bleiben gesperrt. Audit für Konvertierung,
 Löschung und Wiederverwendung. ASCII-Grenze weiter ausdrücklich anzeigen.
+
+## Aktuelle Vorrangregel 2610.3.16
+
+Nutzerkorrektur ersetzt ältere aggressive Defaults: alle Layer-/Objektkategorien
+behalten; Beschriftungen und Blöcke nicht mehr als Punkte behandeln. Kein
+pauschaler Punktfilter, keine automatisch entfernten Außenbereiche, keine
+vorausgewählten Cross-Layer-Duplikate oder Schraffurerzeugung. Same-Layer-Exaktduplikate
+und Einpunkt-Umwandlung bleiben vorausgewählt. Originalstruktur ist Standard;
+compact + stripAnnotations nur bei explizitem Nur-Geometrie-Schalter. Z niemals
+abflachen. POINT-Begleiter nur über direkte Referenzen/exakten XY-Anker mitnehmen,
+unklare/versetzte Texte behalten. Karte aus tatsächlichem Exportplan färben;
+Einpunkt-Karte nur auf Befunde einpassen. Keine realen Testdaten einchecken.
+
+## OSM-Auswahlkarten 2610.3.17
+
+Beide SelectionMap-Instanzen können unabhängig OSM anzeigen (anfangs an).
+Nur explizites Analyse-/Datei-CRS benutzen, keine zusätzliche CRS-Schätzung.
+Bei nicht projizierbarer Geometrie vollständige lokale Ansicht erhalten und
+Hinweis anzeigen. Modus-/CRS-Wechsel passt nur den jeweiligen Objektumfang ein.
+Tiles erst nach Fit laden, kein Prefetch; bestehende Provider-URL und Attribution.
+Exportdaten werden nie durch die Darstellungsprojektion ersetzt.
+
+2610.3.18: Heller Theme-Fallback, gespeicherte Nutzerwahl respektieren. Exportdetails
+bei Datensatzwechsel zuklappen; bestehende Aktionen bleiben dabei unverändert.

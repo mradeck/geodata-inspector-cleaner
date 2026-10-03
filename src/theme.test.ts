@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { normalizeStoredTheme } from "./theme";
 
 describe("Theme-Einstellung", () => {
-  it("verwendet dunkel als sicheren Default", () => {
-    expect(normalizeStoredTheme(null)).toBe("dark");
-    expect(normalizeStoredTheme("unknown")).toBe("dark");
+  it("verwendet hell als Default", () => {
+    expect(normalizeStoredTheme(null)).toBe("light");
+    expect(normalizeStoredTheme("unknown")).toBe("light");
   });
 
   it("akzeptiert eine gespeicherte helle Auswahl", () => {

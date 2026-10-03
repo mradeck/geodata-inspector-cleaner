@@ -2,7 +2,7 @@ export type Theme = "dark" | "light";
 
 const STORAGE_KEY = "gic.theme";
 const listeners = new Set<(theme: Theme) => void>();
-let currentTheme: Theme = "dark";
+let currentTheme: Theme = "light";
 
 export function getTheme(): Theme {
   return currentTheme;
@@ -32,11 +32,11 @@ export function onThemeChange(listener: (theme: Theme) => void): () => void {
 }
 
 export function normalizeStoredTheme(value: string | null): Theme {
-  return value === "light" ? "light" : "dark";
+  return value === "dark" ? "dark" : "light";
 }
 
 function readStoredTheme(): Theme {
-  try { return normalizeStoredTheme(window.localStorage.getItem(STORAGE_KEY)); } catch { return "dark"; }
+  try { return normalizeStoredTheme(window.localStorage.getItem(STORAGE_KEY)); } catch { return "light"; }
 }
 
 function applyTheme(theme: Theme): void {

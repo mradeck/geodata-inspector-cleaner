@@ -1,3 +1,4 @@
+import { pointCompanions, ANNOTATION_TYPES } from "../analysis/pointCompanions";
 import { applySingleVertexActions, type SingleVertexAction } from "../repair/singleVertexPolyline";
 import { compactDxf } from "./compactDxf";
 import { removalDependencies } from "../duplicates/removalDependencies";
@@ -10,6 +11,8 @@ export interface ExportPlan {
   removedFeatureIds: ReadonlySet<string>;
   hatchOutlines: boolean;
   compact?: boolean;
+  stripAnnotations?: boolean;
+  removedEntityIds?: ReadonlySet<string>;
   singleVertexActions?: ReadonlyMap<string, SingleVertexAction>;
 }
 
@@ -24,6 +27,12 @@ export function createPlannedDxf(dataset: GeoDataset, plan: ExportPlan) {
   const featuresByEntity = new Map<string, typeof dataset.features>();
   for (const f of dataset.features) if (f.sourceEntityId) { const list = featuresByEntity.get(f.sourceEntityId) ?? []; list.push(f); featuresByEntity.set(f.sourceEntityId, list); }
   const selected = new Set(plan.duplicateIds);
+  for (const id of plan.removedEntityIds ?? []) {
+    const e=source.entities.find(e=>e.id===id);
+    if(!e) throw new Error('invalid-selection');
+    if(!plan.compact && e.protected && !removalDependencies(source,e)) continue;
+    selected.add(id);
+  }
   const blocked: string[] = [];
   const partial: string[] = [];
   for (const entity of source.entities) {
@@ -34,6 +43,13 @@ export function createPlannedDxf(dataset: GeoDataset, plan: ExportPlan) {
     if (requested.length !== features.length) { partial.push(entity.handle ?? entity.id); continue; }
     if (!plan.compact && entity.protected && !removalDependencies(source, entity)) { blocked.push(entity.handle ?? entity.id); continue; }
     selected.add(entity.id);
+  }
+  const companions=pointCompanions(source), removedCompanions:string[]=[], protectedCompanions:string[]=[];
+  for(const [id,owners] of companions.links){
+    if(!owners.every(owner=>selected.has(owner))||selected.has(id))continue;
+    const e=source.entities.find(e=>e.id===id)!;
+    if(!plan.compact&&e.protected&&!removalDependencies(source,e)){protectedCompanions.push(id);continue;}
+    selected.add(id);removedCompanions.push(id);
   }
   const removal = plan.compact ? (() => {
     let content=source.source;
@@ -54,14 +70,18 @@ export function createPlannedDxf(dataset: GeoDataset, plan: ExportPlan) {
   if (plan.hatchOutlines && check.outlines.some((o) => !o.exists)) {
     const result = createHatchOutlineExport(remaining); content = result.content; created = result.created;
   }
-  const compact = plan.compact ? compactDxf(content) : null;
+  const compact = plan.compact ? compactDxf(content, { stripAnnotations: plan.stripAnnotations }) : null;
   if(compact)content=compact.content;
   const final = inspectDxfDuplicates(content);
-  if (final.error || final.entities.length !== removal.keptCount - repair.deleted - repair.reused + created.length - (compact?.removedHatches ?? 0)) throw new Error("validation");
+  if (final.error || final.entities.length !== removal.keptCount - repair.deleted - repair.reused + created.length - (compact?.removedHatches ?? 0) - (compact?.removedAnnotationEntities ?? 0)) throw new Error("validation");
+  const originalRepair=repair.changes.map(c=>({...c,id:survivors[filtered.entities.findIndex(e=>e.id===c.id)]!.id}));
+  const previewRemoved=new Set([...removal.removed.map(e=>e.id),...originalRepair.filter(c=>c.action==='delete'||c.action==='reuse-point').map(c=>c.id)]);
+  if(plan.stripAnnotations)for(const e of source.entities)if(ANNOTATION_TYPES.has(e.type))previewRemoved.add(e.id);
   return {
+    preview: { removedEntityIds: [...previewRemoved], convertedEntityIds:originalRepair.filter(c=>c.action==='convert').map(c=>c.id) },
     content, fileName: dataset.fileName.replace(/\.dxf$/i, "") + (plan.compact ? "-clean.dxf" : "-export.dxf"),
-    keptCount: final.entities.length, removedCount: removal.removedCount + repair.deleted + repair.reused,
-    audit: { singleVertexRepair: repair.changes, convertedSingleVertices: repair.converted, deletedSingleVertices: repair.deleted, reusedPoints: repair.reused, sourceFile: dataset.fileName, removed: removal.removed, removedIdBufferReferences: removal.removedReferenceCount,
+    keptCount: final.entities.length, removedCount: removal.removedCount + repair.deleted + repair.reused + (compact?.removedAnnotationEntities ?? 0),
+    audit: { removedCompanions, protectedCompanions, unresolvedCompanions:companions.unresolved, geometryOnly: Boolean(plan.stripAnnotations), removedAnnotations: compact?.removedAnnotations ?? 0, singleVertexRepair: originalRepair, convertedSingleVertices: repair.converted, deletedSingleVertices: repair.deleted, reusedPoints: repair.reused, sourceFile: dataset.fileName, removed: removal.removed, removedIdBufferReferences: removal.removedReferenceCount,
       removedOwnedObjectCount: removal.removedOwnedObjectCount, repairedReferenceCount: removal.repairedReferenceCount,
       removedFeatureCount: removal.removed.reduce((sum, e) => sum + (featuresByEntity.get(e.id)?.length ?? 0), 0) + repair.changes.filter(c=>c.action==='delete'||c.action==='reuse-point').reduce((sum,c)=>{
         const index=filtered.entities.findIndex(e=>e.id===c.id);
@@ -74,7 +94,8 @@ export function createPlannedDxf(dataset: GeoDataset, plan: ExportPlan) {
   };
 }
 
-/** User default: retain the main area; preselect every detected outside area. */
+/** Spatial distance is a finding, not proof of an error: require explicit selection. */
 export function defaultAreaRemovalIds(clusters: readonly Pick<SpatialCluster, "isPrimary" | "featureIds">[]): Set<string> {
-  return new Set(clusters.filter((cluster) => !cluster.isPrimary).flatMap((cluster) => cluster.featureIds));
+  void clusters;
+  return new Set();
 }

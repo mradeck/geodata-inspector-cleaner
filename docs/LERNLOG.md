@@ -4,6 +4,60 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## Release-Prüfung 2610.3.18
+
+Nutzer hat den Push des gesamten lokalen Standes 2610.3.16–2610.3.18 freigegeben.
+161 Tests bestanden, 8 optionale Tests übersprungen; Produktionsbuild,
+Diff-Prüfung und Versionskonsistenz erfolgreich. Lizenzübersicht aktuell,
+keine neuen Abhängigkeiten. Audit: vier bestehende Entwicklungsbefunde,
+keine Produktionsbefunde. Öffentlicher main-Stand 0b26b06 als Grundlage.
+Private Reparaturvorlage und reale Vermessungsdateien bleiben außerhalb des Commits.
+
+## 3. Oktober 2026 – Helles Interface und kompakte Exportkachel 2610.3.18
+
+Theme-Fallback von dunkel auf hell geändert; gespeicherte Wahl bleibt erhalten.
+HTML startet ebenfalls hell. Exportdetails in initial geschlossenes details-Element
+verschoben; Kurzbilanz und Exportbutton bleiben außerhalb. Bei neuem Datensatz
+zuklappen, bei Auswahländerungen den Öffnungszustand erhalten. Kachelhöhe begrenzt,
+damit die Befunde Platz behalten. Keine neuen Abhängigkeiten oder Lizenzänderungen.
+161 Tests bestanden, 8 optionale Tests übersprungen; Build und Diff erfolgreich.
+Browsertest im hellen Design: initial zugeklappt, Auf-/Zuklappen funktionsfähig,
+Exportbutton außerhalb der Details. Audit weiterhin vier Entwicklungsbefunde,
+keine Produktionsbefunde. Repository unverändert öffentlich.
+
+## 3. Oktober 2026 – OSM in Auswahlkarten 2610.3.17
+
+Lokale XY-Ansichten reichten dem Nutzer zur räumlichen Orientierung nicht aus.
+Export- und Einpunkt-Karte besitzen nun eigene OSM-Schalter, standardmäßig an.
+Bestehende CRS-Projektion und Kachelprovider wiederverwendet. Originalkoordinaten
+bleiben unverändert; fehlende/nicht projizierbare Geometrie führt zur vollständigen
+lokalen Ansicht mit Hinweis statt stillem Auslassen. Beim Umschalten neu einpassen;
+Einpunkt-Karte bleibt auf ihre eigenen Befunde beschränkt. Kacheln erst nach Fit
+laden, Attribution und Datenschutzhinweis anzeigen. Keine neuen Abhängigkeiten.
+Verifiziert: 161 Tests bestanden, 8 optionale Tests übersprungen; Build und Diff
+fehlerfrei. Browser mit synthetischen UTM-Daten: Kacheln/Attribution sichtbar,
+Schalter unabhängig, Umwandlungsmarker und objektbezogenes Fit erhalten.
+Audit unverändert: vier Entwicklungsbefunde, keine Produktionsbefunde. Öffentliches
+Repository unverändert; kein Push ohne erneuten Auftrag.
+
+## 3. Oktober 2026 – Datenerhalt und Kartenkontrolle 2610.3.16
+
+Ursache des Datenverlusts: buildDefaultSelection wählte point-Kategorien pauschal
+ab, classifyFeature ordnete auch Beschriftungsanker dort ein. Das war keine
+Fehlererkennung. Jetzt alle Kategorien erhalten; Annotationen und Blöcke getrennt.
+Keine automatisch abgewählten Außenbereiche; Cross-Layer und Schraffuren opt-in.
+Standardexport strukturerhaltend; Geometrie-only ausdrücklich optional, Z bleibt.
+Punktbegleiter über direkte Handle-Verweise/exakte XY-Anker; überlebende Punktkopien
+schützen gemeinsame Labels. Keine Nächstpunkt-Heuristik für versetzte Beschriftungen.
+Lokale interaktive Exportkarte aus tatsächlichen Aktionen, inklusive Begleitern;
+eigene Einpunktkarte mit Auto-Fit nur auf Befunde. Private Original-Wacker-Datei
+in den durchsuchten Verzeichnissen nicht vorhanden; Pfad beim Nutzer erfragt.
+158 Tests erfolgreich, 8 optionale Tests übersprungen; Build und Diff-Prüfung
+bestanden. Synthetischer Browsertest: Punktfilter und direkter Kartenklick entfernen
+POINT + zugeordnetes MTEXT; Reset behält beide wieder. Einpunktkarte mit Auto-Fit
+und Aktionsfarben geprüft. Audit: vier bestehende Entwicklungsbefunde, keine
+Produktionsbefunde. Keine neuen Abhängigkeiten; Repository weiterhin öffentlich.
+
 ## Release-Prüfung 2610.3.15
 
 Push vom Nutzer freigegeben. 152 Tests und Produktionsbuild erfolgreich,

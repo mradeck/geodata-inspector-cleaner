@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,7 +17,7 @@
           <span class="brand-copy">
             <span class="brand-title-line">
               <strong>Geodata Inspector</strong>
-              <span id="header-version" class="brand-version">v2610.3.15</span>
+              <span id="header-version" class="brand-version">v2610.3.18</span>
             </span>
             <small>& Cleaner</small>
           </span>
@@ -133,6 +133,26 @@
               <article class="metric-card"><span data-i18n="metric.crs">CRS</span><strong id="metric-crs">–</strong><small id="metric-crs-status">–</small></article>
             </div>
 
+            <article id="selection-map-card" class="duplicate-panel" aria-labelledby="selection-map-title">
+              <h3 id="selection-map-title" data-i18n="selection.title">Exportauswahl auf der Karte</h3>
+              <p data-i18n="selection.legend">Grün: behalten · Rot: entfernen · Blau: in Punkt wandeln. Objekte anklicken zum Abwählen.</p>
+              <button id="selection-fit" class="button" data-i18n="selection.fit">Zoom auf alle</button>
+              <button id="selection-reset" class="button" data-i18n="selection.reset">Kartenauswahl zurücksetzen</button>
+              <p id="selection-map-summary" role="status"></p>
+              <label class="map-background-choice"><input id="selection-osm" type="checkbox" checked><span data-i18n="selection.osm">OSM-Hintergrund anzeigen</span></label>
+              <p id="selection-map-background-status" role="status"></p>
+              <small data-i18n="selection.osmPrivacy">OSM lädt sichtbare Kartenkacheln online. Quelldaten und Exportkoordinaten bleiben unverändert.</small>
+              <div id="selection-map" class="selection-map" role="region" aria-label="Exportauswahl" data-i18n-aria-label="selection.title"></div>
+            </article>
+            <article id="repair-map-card" class="duplicate-panel" aria-labelledby="repair-map-title" hidden>
+              <h3 id="repair-map-title" data-i18n="selection.repairTitle">Einpunkt-Linien: eigene Karte</h3>
+              <p data-i18n="selection.repairDetail">Nur defekte Einpunkt-Linien; automatisch auf alle diese Objekte gezoomt. Blau: Umwandlung · Rot: Entfernung · Grün: unverändert.</p>
+              <button id="repair-fit" class="button" data-i18n="selection.fit">Zoom auf alle</button>
+              <label class="map-background-choice"><input id="repair-osm" type="checkbox" checked><span data-i18n="selection.osm">OSM-Hintergrund anzeigen</span></label>
+              <p id="repair-map-background-status" role="status"></p>
+              <small data-i18n="selection.osmPrivacy">OSM lädt sichtbare Kartenkacheln online. Quelldaten und Exportkoordinaten bleiben unverändert.</small>
+              <div id="repair-map" class="selection-map" role="region" aria-label="Einpunkt-Linien" data-i18n-aria-label="selection.repairTitle"></div>
+            </article>
             <article id="single-vertex-panel" class="duplicate-panel" aria-labelledby="single-vertex-title" hidden></article>
 
             <article id="duplicate-panel" class="duplicate-panel" aria-labelledby="duplicate-title" hidden></article>
@@ -253,6 +273,9 @@
           <section class="cleaner-card" aria-labelledby="cleaner-title">
             <span class="cleaner-label" data-i18n="cleaner.label">04 · Cleaner</span>
             <strong id="cleaner-title" data-i18n="cleaner.title">Bereinigte Datei speichern</strong>
+            <p id="cleaner-compact-summary" data-i18n="cleaner.compactEmpty">Noch keine Datei geladen.</p>
+            <details id="cleaner-details" class="cleaner-details">
+              <summary data-i18n="cleaner.details">Exportdetails und Auswahl</summary>
             <p id="cleaner-summary" data-i18n="cleaner.empty">Datei laden und den korrekten Hauptbereich auf der Karte bestätigen.</p>
             <div id="export-plan-controls"></div>
             <label class="dxf-version-field" for="dxf-acad-version">
@@ -263,12 +286,14 @@
               </select>
               <small data-i18n="cleaner.dxfVersion.hint">AC1015 ist der kompatible Standard für strenge CAD-/OEM-Programme; AC1032 für moderne AutoCAD-Workflows.</small>
             </label>
+            <small data-i18n="cleaner.normalized">Originaldaten erhalten; nur Geometrie ist optional.</small>
+            </details>
             <div class="cleaner-actions">
               <button id="download-cleaned" class="button cleaner-button" type="button" disabled data-i18n="cleaner.download">Bereinigte Datei speichern</button>
               <button id="download-geojson-as-dxf" class="button cleaner-button cleaner-convert-button" type="button" disabled hidden data-i18n="cleaner.convertDxf">Als DXF exportieren</button>
             </div>
             <small id="cleaner-conversion-note" hidden data-i18n="cleaner.conversionNote">Koordinaten bleiben unverändert; es erfolgt keine automatische Reprojektion.</small>
-            <small data-i18n="cleaner.normalized">Erzeugt eine neue normalisierte Datei; die Quelldatei bleibt unverändert.</small>
+
           </section>
         </aside>
       </main>
@@ -292,7 +317,7 @@
         </div>
         <div class="statusbar">
         <span id="status"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></span>
-        <span data-i18n="version.label">Version 2610.3.15</span>
+        <span data-i18n="version.label">Version 2610.3.18</span>
         </div>
       </footer>
     </div>

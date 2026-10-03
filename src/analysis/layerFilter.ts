@@ -1,9 +1,9 @@
 import type { GeoDataset, GeoFeature, GeoLayerMetadata } from "../model";
 
 /** An die DXF-Importmatrix des Pointcloud-Managers angelehnte Geometrietypen. */
-export type FilterShapeType = "point" | "line" | "polyline" | "area";
+export type FilterShapeType = "point" | "line" | "polyline" | "area" | "annotation" | "block";
 
-export const FILTER_SHAPE_TYPES: readonly FilterShapeType[] = ["point", "line", "polyline", "area"];
+export const FILTER_SHAPE_TYPES: readonly FilterShapeType[] = ["point", "line", "polyline", "area", "annotation", "block"];
 
 export interface LayerObjectSummary {
   layerName: string;
@@ -20,6 +20,9 @@ export function selectionKey(layerName: string, type: FilterShapeType): string {
 }
 
 export function classifyFeature(feature: GeoFeature): FilterShapeType {
+  if (['TEXT','MTEXT','ATTRIB','ATTDEF','DIMENSION','LEADER','MLEADER'].includes(feature.sourceType)) return 'annotation';
+  if (feature.sourceType === 'INSERT') return 'block';
+  if (['LWPOLYLINE','POLYLINE'].includes(feature.sourceType) && feature.points.length===1) return 'polyline';
   if (feature.kind === "point" || feature.kind === "anchor" || feature.points.length === 1) return "point";
   if (feature.kind === "polygon") return "area";
   if (feature.kind === "line" || feature.points.length === 2) return "line";
@@ -35,7 +38,7 @@ export function summarizeLayers(dataset: GeoDataset): LayerObjectSummary[] {
       summary = {
         layerName: feature.layer,
         metadata: metadataByName.get(feature.layer) ?? fallbackMetadata(feature.layer),
-        counts: { point: 0, line: 0, polyline: 0, area: 0 },
+        counts: { point: 0, line: 0, polyline: 0, area: 0, annotation:0, block:0 },
         total: 0,
       };
       summaries.set(feature.layer, summary);
@@ -48,12 +51,12 @@ export function summarizeLayers(dataset: GeoDataset): LayerObjectSummary[] {
   );
 }
 
-/** Wie im Pointcloud-Manager: alles behalten, redundante Einzelpunkte zunächst abwählen. */
+/** Retain every category: object type alone is never evidence of an error. */
 export function buildDefaultSelection(summaries: LayerObjectSummary[]): FeatureFilterSelection {
   const selection: FeatureFilterSelection = new Set();
   for (const summary of summaries) {
     for (const type of FILTER_SHAPE_TYPES) {
-      if (type !== "point" && summary.counts[type] > 0) selection.add(selectionKey(summary.layerName, type));
+      if (summary.counts[type] > 0) selection.add(selectionKey(summary.layerName, type));
     }
   }
   return selection;

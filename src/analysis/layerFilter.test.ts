@@ -29,14 +29,14 @@ describe("Layer- und Objekttypfilter", () => {
   it("fasst numerisch sortiert zusammen und übernimmt Metadaten", () => {
     const summaries = summarizeLayers(dataset);
     expect(summaries.map((summary) => summary.layerName)).toEqual(["2 Punkte", "10 Linien"]);
-    expect(summaries[0]?.counts.point).toBe(2);
+    expect(summaries[0]?.counts.point).toBe(1);
     expect(summaries[0]?.metadata).toMatchObject({ color: "#00ff00", lineType: "DASHED", isLocked: true });
   });
 
-  it("klassifiziert Anker als exportierte Punkte und wählt Punkte standardmäßig ab", () => {
-    expect(classifyFeature(dataset.features[1]!)).toBe("point");
+  it("behält Messpunkte und Beschriftungsanker standardmäßig", () => {
+    expect(classifyFeature(dataset.features[1]!)).toBe("annotation");
     const selection = buildDefaultSelection(summarizeLayers(dataset));
-    expect(selection.has(selectionKey("2 Punkte", "point"))).toBe(false);
-    expect(filterFeatures(dataset.features, selection).map((feature) => feature.id)).toEqual(["l"]);
+    expect(selection.has(selectionKey("2 Punkte", "point"))).toBe(true);
+    expect(filterFeatures(dataset.features, selection).map((feature) => feature.id)).toEqual(["p", "t", "l"]);
   });
 });

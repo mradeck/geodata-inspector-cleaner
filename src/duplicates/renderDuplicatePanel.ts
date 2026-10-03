@@ -45,7 +45,7 @@ export class DuplicatePanel {
     if (dataset !== this.dataset) {
       this.dataset = dataset; this.check = dataset.dxfDuplicates;
       this.candidatesById = new Map(this.check?.candidates.map((c) => [c.entityId, c]) ?? []);
-      this.selected = new Set(this.check?.candidates.filter((c) => !c.blocked).map((c) => c.entityId) ?? []); this.page = 0; this.filter = "all"; this.expanded = false; this.message = "";
+      this.selected = new Set(this.check?.candidates.filter((c) => !c.blocked && c.kind === "same-layer").map((c) => c.entityId) ?? []); this.page = 0; this.filter = "all"; this.expanded = false; this.message = "";
     }
     this.root.hidden = !this.check;
     this.root.replaceChildren();

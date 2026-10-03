@@ -25,7 +25,7 @@ export class HatchPanel {
     if (dataset !== this.dataset) {
       this.dataset = dataset;
       this.check = dataset.dxfDuplicates ? inspectHatchOutlines(dataset.dxfDuplicates) : null;
-      this.enabled = Boolean(this.check && !this.check.error && this.check.outlines.some((o) => !o.exists));
+      this.enabled = false;
     }
     this.root.replaceChildren();
     this.root.hidden = !this.check || (!this.check.hatchCount && !this.check.error);

@@ -1,3 +1,4 @@
+import { SelectionMap } from "./map/selectionMap";
 import { SingleVertexPanel } from "./repair/renderSingleVertexPanel";
 import { canRepair } from "./repair/singleVertexPolyline";
 import { parseDxf } from "./io/parseDxf";
@@ -116,6 +117,15 @@ let currentDataset: GeoDataset | null = null;
 let currentReport: InspectionReport | null = null;
 let planDataset: GeoDataset | null = null;
 let selectedRemovalIds = new Set<string>();
+let geometryOnly = false;
+let mapExcluded = new Set<string>();
+let selectionMap:SelectionMap|null=null;
+let repairMap:SelectionMap|null=null;
+let mapsDataset:GeoDataset|null=null;
+for(const id of ['selection-osm','repair-osm']) byId<HTMLInputElement>(id).addEventListener('change',()=>{if(currentReport)renderSelectionMaps(currentReport);});
+byId<HTMLButtonElement>('selection-fit').addEventListener('click',()=>selectionMap?.fit());
+byId<HTMLButtonElement>('repair-fit').addEventListener('click',()=>repairMap?.fit());
+byId<HTMLButtonElement>('selection-reset').addEventListener('click',()=>{mapExcluded.clear();if(currentReport)renderCleaner(currentReport);});
 let preparedDxf: ReturnType<typeof createPlannedDxf> | null = null;
 let lastExportAudit: unknown = null;
 
@@ -513,10 +523,7 @@ function resetObjectFilter(): void {
   }
   layerSummaries = summarizeLayers(currentDataset);
   featureFilterSelection = buildDefaultSelection(layerSummaries);
-  // Keep the singleton geometry and its possible point copies available by default.
-  // Explicit subsequent layer filters and outside-area selection still take precedence.
-  const repairLayers = new Set((currentDataset.singleVertexPolylines?.findings ?? []).filter(canRepair).flatMap(f => [f.layer,...f.pointCopies.map(p=>p.layer)]));
-  for (const layer of repairLayers) featureFilterSelection.add(selectionKey(layer, 'point'));
+
 }
 
 function setObjectFilter(type: FilterShapeType | null, selected: boolean): void {
@@ -623,7 +630,7 @@ function filterTypeLabel(type: FilterShapeType): string {
     point: "filter.type.point",
     line: "filter.type.line",
     polyline: "filter.type.polyline",
-    area: "filter.type.area",
+    area: "filter.type.area", annotation: "filter.type.annotation", block: "filter.type.block",
   } as const)[type]);
 }
 
@@ -650,6 +657,9 @@ function formatLayerMetadata(summary: LayerObjectSummary): string {
 function renderCleaner(report: InspectionReport): void {
   if (planDataset !== report.dataset) {
     planDataset = report.dataset;
+    byId<HTMLDetailsElement>("cleaner-details").open = false;
+    geometryOnly = false;
+    mapExcluded.clear();
     selectedRemovalIds = defaultAreaRemovalIds(report.clusters);
   }
   const controls = byId<HTMLElement>("export-plan-controls"); controls.replaceChildren();
@@ -677,9 +687,12 @@ function renderCleaner(report: InspectionReport): void {
   preparedDxf = null;
   if (isDxf) {
     try {
-      preparedDxf = createPlannedDxf(report.dataset, { duplicateIds: duplicatePanel.selection(), removedFeatureIds: removed, hatchOutlines: hatchPanel.active(), compact: true, singleVertexActions: singleVertexPanel.selection() });
+      preparedDxf = createPlannedDxf(report.dataset, { duplicateIds: duplicatePanel.selection(), removedFeatureIds: removed, hatchOutlines: hatchPanel.active(), compact: geometryOnly, stripAnnotations: geometryOnly, removedEntityIds:mapExcluded, singleVertexActions: singleVertexPanel.selection() });
       const a = preparedDxf.audit;
       elements.cleanerSummary.textContent = t("plan.summary", { removed: preparedDxf.removedCount, features: a.removedFeatureCount, duplicates: a.selectedDuplicateCount, outlines: a.createdOutlines.length, kept: preparedDxf.keptCount });
+      if (a.removedCompanions.length) elements.cleanerSummary.textContent += ' '+t('selection.companions',{count:a.removedCompanions.length});
+      if (a.protectedCompanions.length) elements.cleanerSummary.textContent += ' '+t('selection.protected',{count:a.protectedCompanions.length});
+      if (a.removedAnnotations) elements.cleanerSummary.textContent += " " + t("plan.annotationsRemoved", { count: a.removedAnnotations });
       if (a.replacedHatchCount) elements.cleanerSummary.textContent += " " + t("plan.replacedHatches", { count: a.replacedHatchCount });
       const protectedCount = a.protectedObjectsRetained.length + a.partialObjectsRetained.length;
       if (protectedCount) elements.cleanerSummary.textContent += " " + t("plan.protected", { count: protectedCount });
@@ -705,13 +718,14 @@ function renderCleaner(report: InspectionReport): void {
       label.append(input, document.createTextNode(text));
       input.addEventListener("change", () => change(input.checked)); controls.append(label);
     };
+    addChoice(t("plan.geometryOnly"), geometryOnly, false, enabled => { geometryOnly = enabled; renderCleaner(report); });
     addChoice(t("plan.duplicatesRow", { detected: duplicates.detected, removed: selected }),
       selected > 0 && selected === duplicates.eligible, !duplicates.eligible,
       (enabled) => duplicatePanel.selectAll(enabled), selected > 0 && selected < duplicates.eligible);
     const hatches = hatchPanel.stats();
     addChoice(t("plan.hatchesRow", { detected: hatches.detected, created: preparedDxf?.audit.createdOutlines.length ?? 0 }),
       hatchPanel.active(), !hatches.available, (enabled) => hatchPanel.setActive(enabled));
-    elements.downloadCleaned.textContent = t(hatchPanel.active() ? "plan.exportHatches" : "plan.exportDxf");
+    elements.downloadCleaned.textContent = t(geometryOnly ? "plan.exportGeometry" : hatchPanel.active() ? "plan.exportHatches" : "plan.exportDxf");
     if (preparedDxf?.audit.convertedSingleVertices) elements.downloadCleaned.textContent += ' · ' + t('repair.exportConvert', {count:preparedDxf.audit.convertedSingleVertices});
     if (preparedDxf?.audit.deletedSingleVertices) elements.downloadCleaned.textContent += ' · ' + t('repair.exportDelete', {count:preparedDxf.audit.deletedSingleVertices});
     elements.downloadCleaned.disabled = !preparedDxf || !preparedDxf.keptCount;
@@ -720,6 +734,32 @@ function renderCleaner(report: InspectionReport): void {
     elements.downloadCleaned.textContent = t(report.dataset.format === "dxf" ? "plan.exportDxf" : "cleaner.downloadGeoJson");
     elements.downloadCleaned.disabled = !chosen.length;
   }
+  setText('cleaner-compact-summary',isDxf
+    ? preparedDxf ? t('cleaner.compactSummary',{kept:preparedDxf.keptCount,removed:preparedDxf.removedCount}) : t('cleaner.compactError')
+    : t('cleaner.compactSummary',{kept:chosen.length,removed:removed.size}));
+  renderSelectionMaps(report);
+}
+
+function renderSelectionMaps(report:InspectionReport):void {
+  const isDxf=Boolean(report.dataset.dxfDuplicates);
+  byId<HTMLElement>('selection-map-card').hidden=!isDxf;
+  if(!isDxf){byId<HTMLElement>('repair-map-card').hidden=true;return;}
+  const fresh=mapsDataset!==report.dataset;mapsDataset=report.dataset;
+  const removed=new Set(preparedDxf?.preview.removedEntityIds??[]),converted=new Set(preparedDxf?.preview.convertedEntityIds??[]);
+  selectionMap??=new SelectionMap(byId<HTMLElement>('selection-map'));
+  const selectionOsm=selectionMap.render(report.dataset.features,new Set([...removed,...(geometryOnly?report.dataset.features.filter(f=>['TEXT','MTEXT','ATTRIB','ATTDEF'].includes(f.sourceType)).map(f=>f.id):[])]),converted,fresh,id=>{if(mapExcluded.has(id))mapExcluded.delete(id);else mapExcluded.add(id);renderCleaner(report);},{osm:byId<HTMLInputElement>('selection-osm').checked,crs:report.analysisCrs??report.dataset.declaredCrs});
+  setBackgroundStatus('selection',selectionOsm,report);
+  setText('selection-map-summary',preparedDxf?t('selection.summary',{removed:removed.size,converted:preparedDxf.audit.convertedSingleVertices,unresolved:preparedDxf.audit.unresolvedCompanions.length}):t('plan.failed'));
+  const findings=report.dataset.singleVertexPolylines?.findings??[];
+  const features=findings.filter(f=>f.xyz).map(f=>({id:f.id,sourceEntityId:f.id,sourceHandle:f.handle??undefined,layer:f.layer,kind:'point' as const,sourceType:'LWPOLYLINE',points:[{x:f.xyz![0],y:f.xyz![1],z:f.xyz![2]}]}));
+  byId<HTMLElement>('repair-map-card').hidden=!features.length;
+  if(features.length){repairMap??=new SelectionMap(byId<HTMLElement>('repair-map'));const repairOsm=repairMap.render(features,new Set([...removed].filter(id=>!preparedDxf?.audit.singleVertexRepair.some(c=>c.id===id&&c.action==='reuse-point'))),new Set([...converted,...(preparedDxf?.audit.singleVertexRepair.filter(c=>c.action==='reuse-point').map(c=>c.id)??[])]),fresh,undefined,{osm:byId<HTMLInputElement>('repair-osm').checked,crs:report.analysisCrs??report.dataset.declaredCrs});setBackgroundStatus('repair',repairOsm,report);}
+  renderCanvases();
+}
+
+function setBackgroundStatus(prefix:string,osm:boolean,report:InspectionReport):void {
+ const enabled=byId<HTMLInputElement>(prefix+'-osm').checked;
+ setText(prefix+'-map-background-status',osm?t('selection.osmActive',{crs:report.analysisCrs??report.dataset.declaredCrs??''})+(report.crs.status==='contradictory'?' '+t('selection.crsWarning'):''):t(enabled?'selection.osmUnavailable':'selection.local'));
 }
 
 function renderMapSection(report: InspectionReport): void {
@@ -888,7 +928,8 @@ function renderFindings(report: InspectionReport): void {
 function renderCanvases(): void {
   if (!currentDataset || !currentReport || elements.results.hidden) return;
   const primaryIds = new Set(currentReport.clusters.find((cluster) => cluster.isPrimary)?.featureIds ?? []);
-  const selectedIds = new Set(filterFeatures(currentDataset.features, featureFilterSelection).map((feature) => feature.id));
+  const excluded = new Set(preparedDxf?.preview.removedEntityIds ?? []);
+  const selectedIds = new Set(filterFeatures(currentDataset.features, featureFilterSelection).filter(f=>!excluded.has(f.sourceEntityId??f.id)).map((feature) => feature.id));
   const filteredPrimaryIds = new Set([...primaryIds].filter((id) => selectedIds.has(id)));
   renderPreview(elements.overviewCanvas, currentDataset, currentReport, {
     bounds: currentReport.fullBounds,

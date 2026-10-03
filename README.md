@@ -6,7 +6,7 @@ A local-first single-page app for inspecting and cleaning spatial outliers in DX
 
 [Open the app](https://geodata-inspector-cleaner.netlify.app/)
 
-**Version: 2610.3.15.** The source code is licensed under MIT. Real survey files, coordinate-based private regression fixtures and project screenshots are excluded from the repository and its published history.
+**Version: 2610.3.18.** The source code is licensed under MIT. Real survey files, coordinate-based private regression fixtures and project screenshots are excluded from the repository and its published history.
 
 The language button uses bundled SVG flags for consistent display on Windows, macOS and Linux.
 
@@ -31,7 +31,7 @@ The language button uses bundled SVG flags for consistent display on Windows, ma
 1. Open the app and load a DXF or GeoJSON file.
 2. Review the full extent, spatial clusters, warnings and CRS. Heuristic CRS candidates are suggestions, not proof of a coordinate reference system.
 3. Inspect the main and disturbance areas. Confirm the intended main area explicitly where the result is ambiguous.
-4. Review the combined export selection, including duplicates, outside-area geometry and hatch outlines. Some eligible items are preselected; inspect them before exporting.
+4. Review the combined export selection, including duplicates, outside-area geometry and hatch outlines. All valid categories are retained; only exact same-layer duplicates and eligible singleton repairs are preselected.
 5. Export a new cleaned file. The source file is never overwritten. The app checks the result by reimporting it before offering it for download.
 
 The detailed [German manual](README.de.md) is also rendered by the in-app help page. The help navigation follows the selected UI language; the detailed manual remains German.
@@ -91,14 +91,39 @@ Existing retained POINTs with exactly matching XYZ in the same drawing space are
 reused, even across layers. Otherwise a POINT is created on the original line’s
 layer with the original XYZ. Multiple conversions at the same position produce
 only one point. Outside-area and explicit layer filters take precedence; removed
-geometry is never recreated. Point categories on affected layers are retained by
-default so the default point filter does not silently discard the repair.
+geometry is never recreated. All point, annotation and block categories are retained by default.
 
-All selected operations run together through the bottom-right **Export compact DXF**
-button. The output follows the existing compact export rules; it is not a
-byte-preserving copy. After saving, the working dataset is reanalyzed. The optional
+All selected operations run together through the bottom-right **Export DXF**
+button. Source data is retained by default; compact geometry-only export is opt-in. After saving, the working dataset is reanalyzed. The optional
 **Inspection report** contains the changes and coordinates and stays local.
 
 Invalid XYZ/counts, nonstandard extrusion, width/bulge/thickness, ambiguous handles
 and incoming references block repair. This rule currently accepts only ASCII input
 and single-vertex LWPOLYLINE. Other degenerate geometry requires separate rules.
+
+## Survey data and selection maps (2610.3.18)
+
+Points, annotations and blocks have separate filters and start retained. Spatial
+outliers and cross-layer matches require explicit selection; hatch generation is
+also opt-in. **Geometry only** removes labels and CAD metadata on request while
+preserving geometric XYZ. Text, MTEXT and block attributes are omitted in that mode.
+
+When a POINT is removed, companions linked by a direct point handle or exact XY
+anchor in the same drawing space follow it. Shared labels remain while another
+point copy survives. Offset or ambiguous annotations are counted and left
+independent; there is no nearest-neighbour deletion. Reference protection remains.
+
+The **Export selection map** reflects the actual export plan: green
+retained, red removed, blue converted. Click objects to toggle manual exclusions;
+other filters still apply. Reset only clears map exclusions. Tooltips identify
+objects and XYZ. Labels appear at their insertion points. The dedicated singleton
+map fits only the detected single-vertex lines on load, with a Zoom to all button.
+Both maps have an independently switchable OSM background, enabled initially. The selected CRS/EPSG is used only for display projection; export XYZ stays unchanged. If projection fails, all geometry remains in the local XY view with a warning. Visible OSM tiles are fetched online with attribution; the provider receives the viewed area and IP address, not DXF uploads. Findings with invalid coordinates remain in
+the report but cannot appear on the map.
+
+## Default appearance and compact export panel
+
+The default theme is light; an explicitly saved dark preference is still respected.
+Export details start collapsed on each newly loaded dataset. The compact count
+and export button remain visible. Open **Export details and selection** to review
+all options; collapsing the panel never changes the selected operations.
