@@ -4,6 +4,59 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## Release-Prüfung 2610.3.14
+
+Push vom Nutzer freigegeben. 152 Tests erfolgreich, 8 optionale Tests übersprungen;
+Produktionsbuild, Diff-Prüfung und Versionskonsistenz erfolgreich. Keine neuen
+Abhängigkeiten; Lizenzübersicht geprüft. npm audit: vier bestehende Befunde in
+Entwicklungsabhängigkeiten, keine Produktionsbefunde. Öffentlicher main-Stand
+bfa920c als Grundlage. Nur Implementierung, synthetische Tests und Dokumentation;
+die lokal bereitgestellte Reparaturvorlage bleibt außerhalb des Commits.
+
+## 3. Oktober 2026 – Gemeinsame Einpunkt-Umwandlung 2610.3.14
+
+Nutzerkorrektur: Umwandlung in POINT vorauswählen, alternativ löschen, Bilanz und
+Auswahl rechts unten; separaten Download entfernen. Pro-Zeile-Aktionen bleiben
+synchron mit der globalen Auswahl. Ohne Punktkopie jetzt Umwandlung möglich;
+ausdrückliche Löschwahl darf den Standort verwerfen. Geometrie-/Referenzsperren bleiben.
+Erst reguläre Filter anwenden, dann auf neu geprüfter Quelle konvertieren. Nur
+erhaltene Punkte wiederverwenden, Mehrfachkonvertierungen deduplizieren. Default-
+Punktfilter auf betroffenen Layern öffnen. Audit mit tatsächlich ausgeführten Aktionen.
+152 Tests bestanden (8 optionale übersprungen), inklusive Filterpriorität, fehlender
+Punktkopie, gleichem XYZ, gemischter Auswahl, XYZ/Layer-Erhalt und erneutem Import.
+Keine neuen Abhängigkeiten oder Lizenzänderungen. Browserprüfung bestätigt globale
+Umwandlungs-/Löschwahl, vorausgewählte Umwandlung und synchronisierte Zeilen. Build
+und Diff-Prüfung erfolgreich; npm audit weiterhin 4 Entwicklungsbefunde (2 mittel,
+2 hoch), keine Produktionsbefunde. Repository-Sichtbarkeit öffentlich.
+
+## 3. Oktober 2026 – Einpunkt-Polylinien 2610.3.13
+
+Grundlage ist der öffentliche, bereinigte Stand 2610.3.12 von origin/main.
+Die ältere lokale Kopie wurde auf einen neuen Arbeitsbranch dieses Standes
+umgestellt, ohne die alte Historie in den öffentlichen Stand zu übernehmen.
+
+Originaltags liefern Einpunkt-LWPOLYLINE-Befunde unabhängig vom Vorschauparser.
+Entfernung nur bei exakt gleicher erhaltener XYZ-Punktkopie, gültigem Zähler,
+Standardextrusion und ohne Breiten-/Bogen-/Dickenbesonderheiten. Alle eingehenden
+Verweise einschließlich IDBUFFER und 391–399 sperren. Andere Zeichnungsbereiche
+zählen nicht als Punktkopie. Keine Toleranz, keine erfundene zweite Koordinate.
+
+Eigene Originalreparatur mit leerer Auswahl und separatem Speicherbutton.
+Gemeinsame Cleaner-Optionen werden dabei nicht angewendet. Quelle erneut prüfen,
+ausschließlich Textbereiche entfernen und Restentitäten exakt vergleichen.
+Erst nach erfolgreichem Speichern neu analysieren; bei Dateiwechsel während des
+Dialogs keinen neueren Datensatz ersetzen. Protokoll optional im Prüfbericht.
+ASCII-only ist bewusst sichtbar begrenzt. Tests enthalten nur synthetische Daten.
+Keine neuen Abhängigkeiten oder Lizenzänderungen.
+
+Verifiziert: 145 Tests bestanden, 8 optionale Tests übersprungen; Produktionsbuild
+und Diff-Prüfung erfolgreich. Synthetische UI-Prüfung in DE/EN und Hell/Dunkel:
+leere Auswahl, freigegebene/gesperrte Zeilen und synchronisierte Befundanzeige.
+Der native Speicherdialog wurde geöffnet; sein abschließender Klick war durch
+die Codex-Automatisierung nicht bedienbar. Export und Kontrollimport sind
+automatisiert geprüft. npm audit: 4 bestehende Entwicklungsabhängigkeitsbefunde
+(2 mittel, 2 hoch), keine Produktionsbefunde. Repository weiterhin öffentlich.
+
 ## 2. Oktober 2026 – Öffentlicher Stand 2610.3.12
 
 Auf Nutzerauftrag wurde ein unabhängiges öffentliches Repository unter dem

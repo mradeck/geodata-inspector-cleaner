@@ -350,3 +350,9 @@ input[type="range"] { width: 100%; accent-color: var(--green); margin: 15px 0 6p
 .plan-areas { max-height: 100px; overflow-y: auto; }
 .plan-operation { border-top: 1px solid var(--line); padding-top: 8px; }
 .plan-cluster input { flex-shrink: 0; }
+
+.repair-operation { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.repair-select { max-width: 100%; min-width: 0; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); color: var(--text); font: inherit; }
+.repair-operation .repair-select { width: 100%; }
+/* Keep the shared export reachable when its operation list grows. */
+.cleaner-card { max-height: 65%; overflow-y: auto; overscroll-behavior: contain; }

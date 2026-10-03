@@ -1,8 +1,8 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2610.3.12
+**Release:** 2610.3.14
 
-**Prüfstand:** 2. Oktober 2026
+**Prüfstand:** 3. Oktober 2026
 
 **Repository:** öffentlich; bereinigtes, unabhängiges Repository unter MIT
 
@@ -125,3 +125,5 @@ der Aktivierung eine Sanitizing-Schicht verpflichtend.
   keine Daten an externe Dienste,
 - `npm audit`: vier bestehende Befunde in Entwicklungsabhängigkeiten (2 moderat,
   2 hoch); `npm audit --omit=dev`: keine bekannten Schwachstellen.
+
+Einpunkt-Polylinien-Reparatur 2610.3.14: eigene lokale TypeScript-Implementierung, keine neuen Bibliotheken, Datenquellen oder externen Dienste.

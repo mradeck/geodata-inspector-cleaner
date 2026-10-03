@@ -1,3 +1,4 @@
+import { applySingleVertexActions, type SingleVertexAction } from "../repair/singleVertexPolyline";
 import { compactDxf } from "./compactDxf";
 import { removalDependencies } from "../duplicates/removalDependencies";
 import { createEntityRemovalExport, inspectDxfDuplicates } from "../duplicates/dxfDuplicates";
@@ -9,6 +10,7 @@ export interface ExportPlan {
   removedFeatureIds: ReadonlySet<string>;
   hatchOutlines: boolean;
   compact?: boolean;
+  singleVertexActions?: ReadonlyMap<string, SingleVertexAction>;
 }
 
 /** All choices apply to the unchanged source. Remove first, then generate boundaries
@@ -16,6 +18,7 @@ export interface ExportPlan {
 export function createPlannedDxf(dataset: GeoDataset, plan: ExportPlan) {
   const source = dataset.dxfDuplicates;
   if (!source || source.error) throw new Error("invalid-dxf");
+  if ([...(plan.singleVertexActions?.keys() ?? [])].some(id => !source.entities.some(e=>e.id===id))) throw new Error('repair-selection');
   const duplicateIds = new Set(source.candidates.filter((c) => !c.blocked).map((c) => c.entityId));
   if ([...plan.duplicateIds].some((id) => !duplicateIds.has(id))) throw new Error("invalid-duplicate-selection");
   const featuresByEntity = new Map<string, typeof dataset.features>();
@@ -39,6 +42,11 @@ export function createPlannedDxf(dataset: GeoDataset, plan: ExportPlan) {
     return {content,removed:removed.map(e=>({id:e.id,handle:e.handle,layer:e.layer,type:e.type})),removedCount:removed.length,keptCount:source.entities.length-removed.length,removedReferenceCount:0,removedOwnedObjectCount:0,repairedReferenceCount:0};
   })() : createEntityRemovalExport(source, selected);
   let content = removal.content;
+  const survivors = source.entities.filter(e => !selected.has(e.id));
+  const filtered = inspectDxfDuplicates(content);
+  const actions = new Map(filtered.entities.map((e,i) => [e.id, plan.singleVertexActions?.get(survivors[i]!.id) ?? 'keep'] as const));
+  const repair = applySingleVertexActions(content, actions);
+  content = repair.content;
   const remaining = inspectDxfDuplicates(content);
   const check = inspectHatchOutlines(remaining);
   let created: ReturnType<typeof createHatchOutlineExport>["created"] = [];
@@ -49,13 +57,16 @@ export function createPlannedDxf(dataset: GeoDataset, plan: ExportPlan) {
   const compact = plan.compact ? compactDxf(content) : null;
   if(compact)content=compact.content;
   const final = inspectDxfDuplicates(content);
-  if (final.error || final.entities.length !== removal.keptCount + created.length - (compact?.removedHatches ?? 0)) throw new Error("validation");
+  if (final.error || final.entities.length !== removal.keptCount - repair.deleted - repair.reused + created.length - (compact?.removedHatches ?? 0)) throw new Error("validation");
   return {
     content, fileName: dataset.fileName.replace(/\.dxf$/i, "") + (plan.compact ? "-clean.dxf" : "-export.dxf"),
-    keptCount: final.entities.length, removedCount: removal.removedCount,
-    audit: { sourceFile: dataset.fileName, removed: removal.removed, removedIdBufferReferences: removal.removedReferenceCount,
+    keptCount: final.entities.length, removedCount: removal.removedCount + repair.deleted + repair.reused,
+    audit: { singleVertexRepair: repair.changes, convertedSingleVertices: repair.converted, deletedSingleVertices: repair.deleted, reusedPoints: repair.reused, sourceFile: dataset.fileName, removed: removal.removed, removedIdBufferReferences: removal.removedReferenceCount,
       removedOwnedObjectCount: removal.removedOwnedObjectCount, repairedReferenceCount: removal.repairedReferenceCount,
-      removedFeatureCount: removal.removed.reduce((sum, e) => sum + (featuresByEntity.get(e.id)?.length ?? 0), 0),
+      removedFeatureCount: removal.removed.reduce((sum, e) => sum + (featuresByEntity.get(e.id)?.length ?? 0), 0) + repair.changes.filter(c=>c.action==='delete'||c.action==='reuse-point').reduce((sum,c)=>{
+        const index=filtered.entities.findIndex(e=>e.id===c.id);
+        return sum+(index>=0 ? featuresByEntity.get(survivors[index]!.id)?.length ?? 0 : 0);
+      },0),
       selectedDuplicateCount: plan.duplicateIds.size, createdOutlines: created, hatchOutlinesEnabled: plan.hatchOutlines,
       skippedHatches: plan.hatchOutlines ? check.skipped : [], protectedObjectsRetained: blocked, partialObjectsRetained: partial,
       replacedHatchCount: compact?.removedHatches ?? 0,

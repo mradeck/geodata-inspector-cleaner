@@ -51,6 +51,7 @@ export interface GeoDataset {
   declaredCrs: string | null;
   warnings: ImportWarning[];
   layerMetadata?: GeoLayerMetadata[];
+  singleVertexPolylines?: import("./repair/singleVertexPolyline").SingleVertexCheck;
   dxfDuplicates?: import("./duplicates/dxfDuplicates").DxfDuplicateCheck;
 }
 
@@ -86,7 +87,7 @@ export type FindingRecommendation = "keep" | "review" | "remove" | "set-crs";
 
 export interface InspectionFinding {
   id: string;
-  category: "remote-cluster" | "extent-inflation" | "z-zero" | "crs" | "import-loss" | "ambiguous-primary" | "dxf-duplicates";
+  category: "remote-cluster" | "extent-inflation" | "z-zero" | "crs" | "import-loss" | "ambiguous-primary" | "dxf-duplicates" | "dxf-single-vertex";
   severity: FindingSeverity;
   title: string;
   detail: string;

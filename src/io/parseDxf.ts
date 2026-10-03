@@ -1,3 +1,4 @@
+import { inspectSingleVertexPolylines } from "../repair/singleVertexPolyline";
 import { readHatchGeometry, sampleVertices, toWorld, type Vertex } from "../hatches/hatchBoundaries";
 import { inspectDxfDuplicates } from "../duplicates/dxfDuplicates";
 import type { GeoDataset, GeoFeature, GeoLayerMetadata, GeometryKind, ImportWarning, Position3 } from "../model";
@@ -67,6 +68,7 @@ export function parseDxf(text: string, fileName: string): GeoDataset {
     fileName,
     format: "dxf",
     dxfDuplicates: duplicateCheck,
+    singleVertexPolylines: inspectSingleVertexPolylines(text, duplicateCheck),
     features: state.features,
     declaredCrs: findDeclaredCrs(groups),
     warnings,

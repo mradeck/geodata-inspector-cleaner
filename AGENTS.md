@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2610.3.12`
-- **npm-kompatible Version:** `2610.3.12`
+- **Aktuelle Release-Version:** `2610.3.14`
+- **npm-kompatible Version:** `2610.3.14`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
@@ -129,7 +129,9 @@ Merksätze:
   Preview-Grid deshalb überschreiben und darf sich im Elterngrid nicht strecken.
 - Die rechte Seitenleiste scrollt nicht als Ganzes: Überschrift und Cleaner
   bleiben stehen, ausschließlich `.findings-list` wächst mit `flex: 1` und
-  scrollt intern. Die DWG-Roadmap bleibt in der Dokumentation, erhält aber keine
+  scrollt intern. Die Cleaner-Karte darf bei vielen Exportoptionen zusätzlich
+  innerhalb ihrer begrenzten Höhe scrollen, damit der Exportbutton erreichbar bleibt.
+  Die DWG-Roadmap bleibt in der Dokumentation, erhält aber keine
   separate Kachel in der knappen Seitenleiste.
 - Die Versionsnummer neben dem App-Titel, im Browser-Tab, in der Statuszeile und
   in Exportberichten stammt zentral aus `displayVersion`; keine zweite
@@ -218,6 +220,8 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2610.3.14` | 2026-10-03 | Einpunkt-Linien standardmäßig in Punkte wandeln, alternativ löschen; gemeinsamer Export und synchronisierte Bilanz. |
+| `2610.3.13` | 2026-10-03 | Einpunkt-LWPOLYLINE-Prüfung mit expliziter Auswahl, Punktabgleich und unveränderter Originalreparatur. |
 | `2610.3.12` | 2026-10-02 | Bereinigtes öffentliches MIT-Repository und neue Verknüpfung der bestehenden Netlify-Site. |
 | `2610.3.11` | 2026-10-02 | MIT-Lizenz für den Quellcode; echte Vermessungsdaten einschließlich Historie aus dem Repository entfernt. |
 | `2609.3.10` | 2026-09-28 | Schlanker Standardexport: native Geometrie und benötigte Ressourcen; vollständig abgedeckte Schraffuren durch Umrisse ersetzen. |
@@ -276,3 +280,14 @@ Doppel-HATCHs allein sind kein Abdeckungsnachweis. Benötigte Blockdefinitionen
 rekursiv erhalten; unbekannte Geometrietypen mit Typangabe sperren. Keine
 OBJECTS-/Anwendungsdaten der Quelle mitkopieren. Der ältere strukturerhaltende
 Pfad bleibt intern für Regressionen verfügbar, ist kein zweiter UI-Export.
+
+## Einpunkt-Reparatur ab 2610.3.14
+
+Aktueller Nutzerwunsch ersetzt die separate Originalreparatur aus .13:
+Umwandlung in POINT vorauswählen, alternativ löschen oder behalten, pro Zeile
+und gemeinsam rechts unten. Nur gemeinsamer Export; Außenbereiche und explizite
+Layerfilter haben Vorrang. Punkte auf betroffenen Layern zunächst behalten.
+Nach Filterung neu prüfen und nur tatsächlich erhaltene POINT-Kopien wiederverwenden;
+sonst POINT mit exaktem XYZ und Quelllayer erzeugen. Keine doppelt erzeugten Punkte.
+Gesperrte Referenzen/Geometriesonderfälle bleiben gesperrt. Audit für Konvertierung,
+Löschung und Wiederverwendung. ASCII-Grenze weiter ausdrücklich anzeigen.

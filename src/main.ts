@@ -1,3 +1,5 @@
+import { SingleVertexPanel } from "./repair/renderSingleVertexPanel";
+import { canRepair } from "./repair/singleVertexPolyline";
 import { parseDxf } from "./io/parseDxf";
 import { createPlannedDxf, defaultAreaRemovalIds } from "./io/exportPlan";
 import { saveTextFile } from "./io/saveFile";
@@ -103,6 +105,8 @@ const elements = {
   themeToggle: byId<HTMLButtonElement>("btn-toggle-theme"),
   themeIcon: byId<HTMLElement>("theme-icon"),
 };
+
+const singleVertexPanel = new SingleVertexPanel(byId<HTMLElement>("single-vertex-panel"), () => { if (currentReport) { renderFindings(currentReport); renderCleaner(currentReport); } });
 
 const duplicatePanel = new DuplicatePanel(byId<HTMLElement>("duplicate-panel"), () => { if (currentReport) renderCleaner(currentReport); });
 
@@ -320,6 +324,7 @@ elements.downloadReport.addEventListener("click", () => {
       ...localizeFinding(finding, currentReport!),
     })),
     recommendedRemovalIds: [...currentReport.recommendedRemovalIds],
+    singleVertexPolylines: singleVertexPanel.report(),
     duplicates: duplicatePanel.report(),
     hatchOutlines: hatchPanel.report(),
     lastExportAudit,
@@ -490,6 +495,7 @@ function renderDashboard(report: InspectionReport): void {
       <div><dt>${escapeHtml(t("inventory.warnings"))}</dt><dd>${formatNumber(report.dataset.warnings.length)}</dd></div>
     </dl>`;
 
+  singleVertexPanel.render(report.dataset);
   duplicatePanel.render(report.dataset);
   hatchPanel.render(report.dataset);
   renderFindings(report);
@@ -507,6 +513,10 @@ function resetObjectFilter(): void {
   }
   layerSummaries = summarizeLayers(currentDataset);
   featureFilterSelection = buildDefaultSelection(layerSummaries);
+  // Keep the singleton geometry and its possible point copies available by default.
+  // Explicit subsequent layer filters and outside-area selection still take precedence.
+  const repairLayers = new Set((currentDataset.singleVertexPolylines?.findings ?? []).filter(canRepair).flatMap(f => [f.layer,...f.pointCopies.map(p=>p.layer)]));
+  for (const layer of repairLayers) featureFilterSelection.add(selectionKey(layer, 'point'));
 }
 
 function setObjectFilter(type: FilterShapeType | null, selected: boolean): void {
@@ -667,7 +677,7 @@ function renderCleaner(report: InspectionReport): void {
   preparedDxf = null;
   if (isDxf) {
     try {
-      preparedDxf = createPlannedDxf(report.dataset, { duplicateIds: duplicatePanel.selection(), removedFeatureIds: removed, hatchOutlines: hatchPanel.active(), compact: true });
+      preparedDxf = createPlannedDxf(report.dataset, { duplicateIds: duplicatePanel.selection(), removedFeatureIds: removed, hatchOutlines: hatchPanel.active(), compact: true, singleVertexActions: singleVertexPanel.selection() });
       const a = preparedDxf.audit;
       elements.cleanerSummary.textContent = t("plan.summary", { removed: preparedDxf.removedCount, features: a.removedFeatureCount, duplicates: a.selectedDuplicateCount, outlines: a.createdOutlines.length, kept: preparedDxf.keptCount });
       if (a.replacedHatchCount) elements.cleanerSummary.textContent += " " + t("plan.replacedHatches", { count: a.replacedHatchCount });
@@ -675,6 +685,17 @@ function renderCleaner(report: InspectionReport): void {
       if (protectedCount) elements.cleanerSummary.textContent += " " + t("plan.protected", { count: protectedCount });
       if (a.skippedHatches.length) elements.cleanerSummary.textContent += " " + t("hatch.skipped", { count: a.skippedHatches.length });
     } catch (error) { elements.cleanerSummary.textContent = error instanceof Error && error.message.startsWith("compact-unsupported:") ? t("plan.unsupported", { types: error.message.split(":")[1]! }) : t("plan.failed"); }
+    const repair = singleVertexPanel.stats();
+    const repairLabel = document.createElement('label'); repairLabel.className = 'plan-cluster plan-operation repair-operation';
+    const repairSelect = document.createElement('select'); repairSelect.className = 'repair-select'; repairSelect.setAttribute('aria-label', t('repair.action'));
+    for (const action of ['convert','delete','keep','mixed'] as const) {
+      const option=document.createElement('option');option.value=action;option.textContent=t(`repair.${action}`);option.disabled=action==='mixed';repairSelect.append(option);
+    }
+    repairSelect.value = repair.converted===repair.eligible ? 'convert' : repair.deleted===repair.eligible ? 'delete' : !repair.converted&&!repair.deleted ? 'keep' : 'mixed';
+    repairSelect.disabled=!repair.eligible;
+    repairSelect.addEventListener('change',()=>singleVertexPanel.setAll(repairSelect.value as 'convert'|'delete'|'keep'));
+    repairLabel.append(document.createTextNode(t('repair.planRow',{count:repair.detected,converted:preparedDxf?.audit.convertedSingleVertices??0,deleted:preparedDxf?.audit.deletedSingleVertices??0,reused:preparedDxf?.audit.reusedPoints??0})),repairSelect);
+    controls.append(repairLabel);
     const duplicates = duplicatePanel.stats();
     const selected = duplicatePanel.selection().size;
     const addChoice = (text: string, checked: boolean, disabled: boolean, change: (value: boolean) => void, mixed = false) => {
@@ -691,6 +712,8 @@ function renderCleaner(report: InspectionReport): void {
     addChoice(t("plan.hatchesRow", { detected: hatches.detected, created: preparedDxf?.audit.createdOutlines.length ?? 0 }),
       hatchPanel.active(), !hatches.available, (enabled) => hatchPanel.setActive(enabled));
     elements.downloadCleaned.textContent = t(hatchPanel.active() ? "plan.exportHatches" : "plan.exportDxf");
+    if (preparedDxf?.audit.convertedSingleVertices) elements.downloadCleaned.textContent += ' · ' + t('repair.exportConvert', {count:preparedDxf.audit.convertedSingleVertices});
+    if (preparedDxf?.audit.deletedSingleVertices) elements.downloadCleaned.textContent += ' · ' + t('repair.exportDelete', {count:preparedDxf.audit.deletedSingleVertices});
     elements.downloadCleaned.disabled = !preparedDxf || !preparedDxf.keptCount;
   } else {
     elements.cleanerSummary.textContent = t("plan.geoSummary", { kept: chosen.length, removed: removed.size });
@@ -843,6 +866,10 @@ function renderFindings(report: InspectionReport): void {
       </span>
       <span class="finding-count">${finding.featureIds.length ? formatNumber(finding.featureIds.length) : "–"}</span>`;
     article.addEventListener("click", () => {
+      if (finding.category === "dxf-single-vertex") {
+        byId<HTMLElement>("single-vertex-panel").scrollIntoView({ block: "start", behavior: "smooth" });
+        return;
+      }
       if (finding.category === "dxf-duplicates") {
         const panel = byId<HTMLElement>("duplicate-panel");
         const details = panel.querySelector("details");
@@ -911,6 +938,7 @@ function formatDistance(meters: number): string {
 }
 
 function categoryLabel(category: InspectionFinding["category"]): string {
+  if (category === "dxf-single-vertex") return t("repair.title");
   if (category === "dxf-duplicates") return t("duplicate.title");
   return ({
     "remote-cluster": t("finding.category.remote-cluster"),
@@ -932,6 +960,10 @@ function recommendationLabel(recommendation: InspectionFinding["recommendation"]
 }
 
 function localizeFinding(finding: InspectionFinding, report: InspectionReport): { title: string; detail: string } {
+  if (finding.category === "dxf-single-vertex" && report.dataset.singleVertexPolylines) {
+    const check = report.dataset.singleVertexPolylines;
+    return { title: t("repair.title"), detail: check.error ? t(`repair.error.${check.error}`) : t("repair.summary", {count: check.findings.length, eligible: check.findings.filter(canRepair).length, selected: singleVertexPanel.report()?.findings.filter(f => f.selected).length ?? 0}) };
+  }
   if (finding.category === "ambiguous-primary") {
     const primary = report.clusters.find((cluster) => cluster.isPrimary);
     const share = primary && report.dataset.features.length > 0

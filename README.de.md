@@ -11,7 +11,7 @@ Bounds-Berechnungen, Exporte und GIS-/CAD-Weiterverarbeitung unbrauchbar macht.
 
 ## Projektstatus
 
-**Version 2610.3.12 – MIT-Lizenz für den Quellcode, Cleaner unverändert.** Der
+**Version 2610.3.14 – gezielte Reparatur von Einpunkt-Polylinien.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -275,7 +275,7 @@ npm run build
 
 ## Versionierung
 
-Aktuell **2610.3.12**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
+Aktuell **2610.3.14**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
 lautet `JJMM.R.P`: Jahr/Monat, Release-Linie, Subversion. Derselbe Wert steht in
 `package.json`, `package-lock.json`, `displayVersion`, App und Prüfberichten.
 Bei neuen Runden wird auch der aktuelle Monat geprüft. Frühere Einträge mit
@@ -311,6 +311,7 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2610.3.14` | 2026-10-03 | Einpunkt-LWPOLYLINE-Prüfung mit expliziter Auswahl, Punktabgleich und unveränderter Originalreparatur. |
 | `2610.3.12` | 2026-10-02 | Bereinigtes öffentliches MIT-Repository; bestehende Netlify-Site neu verknüpft. |
 | `2610.3.11` | 2026-10-02 | MIT-Lizenz und Ausschluss privater Vermessungsdaten. |
 | `2609.3.10` | 2026-09-28 | Schlanker Standardexport: native Geometrie und benötigte Ressourcen; vollständig abgedeckte Schraffuren durch Umrisse ersetzen. |
@@ -372,3 +373,29 @@ gesperrt. Die Exportbilanz unterscheidet CAD-Objekte von Vorschauobjekten:
 ein Plankopf mit 25 Attributen zählt als ein CAD-Objekt und 26 Vorschauobjekte.
 Nach erfolgreichem Export zeigt die Oberfläche den neuen Arbeitsstand; null
 weitere Löschungen oder Umrisse sind dann das erwartete Ergebnis.
+
+## Ungültige DXF-Linien reparieren
+
+Vermessungsexporte, unter anderem aus Emlid, können Einpunkt-LWPOLYLINE enthalten
+und „Invalid Line String size“ verursachen. **Ungültige DXF-Linien** prüft Originaltags.
+**In Punkte umwandeln** ist für geeignete Linien vorausgewählt. Alternativ **Linien
+löschen** oder **Unverändert behalten**, rechts unten für alle oder einzeln je Zeile.
+Die ausdrückliche Löschwahl entfernt Linien auch ohne vorhandene Punktkopie.
+
+Im gemeinsamen Export stehen die tatsächlichen Umwandlungen, Löschungen und
+wiederverwendeten Punkte. Erhaltene POINTs mit exakt gleichen XYZ im selben
+Zeichenbereich werden auch auf anderen Layern wiederverwendet. Andernfalls wird
+ein POINT mit originalen XYZ auf dem Layer der Linie erzeugt. Mehrere Umwandlungen
+am selben Standort erzeugen nur einen Punkt. Außenbereiche und ausdrücklich gesetzte
+Layerfilter haben Vorrang; entfernte Geometrie wird nicht wiederhergestellt.
+Punktkategorien betroffener Layer bleiben zunächst ausgewählt, damit der normale
+Punktfilter die Reparatur nicht unbemerkt entfernt.
+
+Alle Schritte laufen über **Schlanke DXF exportieren** rechts unten. Es gelten die
+Regeln des schlanken Exports, keine bytegleiche Originalkopie. Nach dem Speichern
+wird neu analysiert. Der optionale **Prüfbericht** enthält Änderungen und Koordinaten
+und bleibt lokal.
+
+Ungültige XYZ/Zähler, abweichende Extrusion, Breiten/Bögen/Dicke, uneindeutige Handles
+und eingehende Referenzen sperren die Bearbeitung. Die Regel akzeptiert zunächst
+nur ASCII-Dateien und Einpunkt-LWPOLYLINE; weitere Geometriefehler brauchen eigene Regeln.

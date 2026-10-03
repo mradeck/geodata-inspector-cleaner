@@ -89,6 +89,12 @@ export function inspectDataset(
   const crs = assessCrs(dataset, focusBounds, analysisCrs);
   const findings: InspectionFinding[] = [];
   const recommendedRemovalIds = new Set<string>();
+  const singleVertex = dataset.singleVertexPolylines;
+  if (singleVertex && (singleVertex.error || singleVertex.findings.length)) {
+    findings.push({ id: "dxf-single-vertex", category: "dxf-single-vertex", severity: "warning",
+      title: "Invalid DXF lines", detail: singleVertex.error ?? String(singleVertex.findings.length),
+      featureIds: [], recommendation: "review" });
+  }
   const duplicateCheck = dataset.dxfDuplicates;
   if (duplicateCheck) {
     const counts = duplicateCounts(duplicateCheck);

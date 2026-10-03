@@ -6,7 +6,7 @@ A local-first single-page app for inspecting and cleaning spatial outliers in DX
 
 [Open the app](https://geodata-inspector-cleaner.netlify.app/)
 
-**Version: 2610.3.12.** The source code is licensed under MIT. Real survey files, coordinate-based private regression fixtures and project screenshots are excluded from the repository and its published history.
+**Version: 2610.3.14.** The source code is licensed under MIT. Real survey files, coordinate-based private regression fixtures and project screenshots are excluded from the repository and its published history.
 
 ## Features
 
@@ -75,3 +75,28 @@ The app extends the spatial outlier inspection developed for [Pointcloud Manager
 [MIT](LICENSE) — Copyright © 2026 Michael Radeck.
 
 Third-party library licenses and map-data attribution requirements remain in effect. The project license does not cover private survey data. See the [license inventory](docs/COPYRIGHT-LICENSES.md).
+
+## Repair single-vertex DXF lines
+
+Survey exports (including Emlid) can contain LWPOLYLINE entities with one vertex,
+causing “Invalid Line String size”. **Invalid DXF lines** checks source tags.
+Eligible lines are preselected for **Convert to points**. Choose **Delete lines**
+or **Keep unchanged** instead, globally in the bottom-right export panel or per row.
+Deletion is explicit and can remove a line even without a matching point copy.
+
+The common export lists the actual conversion, deletion and reused-point counts.
+Existing retained POINTs with exactly matching XYZ in the same drawing space are
+reused, even across layers. Otherwise a POINT is created on the original line’s
+layer with the original XYZ. Multiple conversions at the same position produce
+only one point. Outside-area and explicit layer filters take precedence; removed
+geometry is never recreated. Point categories on affected layers are retained by
+default so the default point filter does not silently discard the repair.
+
+All selected operations run together through the bottom-right **Export compact DXF**
+button. The output follows the existing compact export rules; it is not a
+byte-preserving copy. After saving, the working dataset is reanalyzed. The optional
+**Inspection report** contains the changes and coordinates and stays local.
+
+Invalid XYZ/counts, nonstandard extrusion, width/bulge/thickness, ambiguous handles
+and incoming references block repair. This rule currently accepts only ASCII input
+and single-vertex LWPOLYLINE. Other degenerate geometry requires separate rules.
