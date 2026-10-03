@@ -9,9 +9,11 @@ Bounds-Berechnungen, Exporte und GIS-/CAD-Weiterverarbeitung unbrauchbar macht.
 
 **Live-Anwendung:** [geodata-inspector-cleaner.netlify.app](https://geodata-inspector-cleaner.netlify.app/)
 
+Der Sprachbutton verwendet mitgelieferte SVG-Flaggen für eine einheitliche Anzeige unter Windows, macOS und Linux.
+
 ## Projektstatus
 
-**Version 2610.3.14 – gezielte Reparatur von Einpunkt-Polylinien.** Der
+**Version 2610.3.15 – gezielte Reparatur von Einpunkt-Polylinien.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -275,7 +277,7 @@ npm run build
 
 ## Versionierung
 
-Aktuell **2610.3.14**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
+Aktuell **2610.3.15**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
 lautet `JJMM.R.P`: Jahr/Monat, Release-Linie, Subversion. Derselbe Wert steht in
 `package.json`, `package-lock.json`, `displayVersion`, App und Prüfberichten.
 Bei neuen Runden wird auch der aktuelle Monat geprüft. Frühere Einträge mit
@@ -311,7 +313,7 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
-| `2610.3.14` | 2026-10-03 | Einpunkt-LWPOLYLINE-Prüfung mit expliziter Auswahl, Punktabgleich und unveränderter Originalreparatur. |
+| `2610.3.15` | 2026-10-03 | Einpunkt-LWPOLYLINE-Prüfung mit expliziter Auswahl, Punktabgleich und unveränderter Originalreparatur. |
 | `2610.3.12` | 2026-10-02 | Bereinigtes öffentliches MIT-Repository; bestehende Netlify-Site neu verknüpft. |
 | `2610.3.11` | 2026-10-02 | MIT-Lizenz und Ausschluss privater Vermessungsdaten. |
 | `2609.3.10` | 2026-09-28 | Schlanker Standardexport: native Geometrie und benötigte Ressourcen; vollständig abgedeckte Schraffuren durch Umrisse ersetzen. |

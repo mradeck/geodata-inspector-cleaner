@@ -1,6 +1,6 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2610.3.14
+**Release:** 2610.3.15
 
 **Prüfstand:** 3. Oktober 2026
 
@@ -127,3 +127,5 @@ der Aktivierung eine Sanitizing-Schicht verpflichtend.
   2 hoch); `npm audit --omit=dev`: keine bekannten Schwachstellen.
 
 Einpunkt-Polylinien-Reparatur 2610.3.14: eigene lokale TypeScript-Implementierung, keine neuen Bibliotheken, Datenquellen oder externen Dienste.
+
+Sprachflaggen 2610.3.15: eigene einfache SVG-Zeichnungen der deutschen und britischen Flagge, lokal eingebunden; keine Icon-Bibliothek oder externen Abrufe.

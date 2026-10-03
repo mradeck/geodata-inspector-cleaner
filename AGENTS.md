@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2610.3.14`
-- **npm-kompatible Version:** `2610.3.14`
+- **Aktuelle Release-Version:** `2610.3.15`
+- **npm-kompatible Version:** `2610.3.15`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
@@ -220,6 +220,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2610.3.15` | 2026-10-03 | Sprachbutton auf App-, Hilfe- und Konzeptseite mit lokalen SVG-Flaggen statt plattformabhängigen Emojis. |
 | `2610.3.14` | 2026-10-03 | Einpunkt-Linien standardmäßig in Punkte wandeln, alternativ löschen; gemeinsamer Export und synchronisierte Bilanz. |
 | `2610.3.13` | 2026-10-03 | Einpunkt-LWPOLYLINE-Prüfung mit expliziter Auswahl, Punktabgleich und unveränderter Originalreparatur. |
 | `2610.3.12` | 2026-10-02 | Bereinigtes öffentliches MIT-Repository und neue Verknüpfung der bestehenden Netlify-Site. |

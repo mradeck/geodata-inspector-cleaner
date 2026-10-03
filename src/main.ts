@@ -100,7 +100,7 @@ const elements = {
   mapEmpty: byId<HTMLElement>("map-empty"),
   mapCandidates: byId<HTMLElement>("map-candidates"),
   languageToggle: byId<HTMLButtonElement>("btn-toggle-language"),
-  languageFlag: byId<HTMLElement>("language-flag"),
+  languageFlag: byId<HTMLImageElement>("language-flag"),
   languageCode: byId<HTMLElement>("language-code"),
   themeToggle: byId<HTMLButtonElement>("btn-toggle-theme"),
   themeIcon: byId<HTMLElement>("theme-icon"),
@@ -1139,7 +1139,7 @@ function localizeReadError(message: string): string {
 
 function syncLanguageControl(): void {
   const language = getLanguage();
-  elements.languageFlag.textContent = LANGUAGE_LABELS[language].flag;
+  elements.languageFlag.src = LANGUAGE_LABELS[language].flag;
   elements.languageCode.textContent = language.toUpperCase();
   elements.languageToggle.setAttribute("aria-label", t("lang.toggle.title"));
   elements.helpLink.href = `./help.html?lang=${language}`;

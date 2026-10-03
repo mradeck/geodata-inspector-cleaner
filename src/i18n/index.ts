@@ -4,8 +4,8 @@ import { en } from "./en";
 export type Lang = "de" | "en";
 
 export const LANGUAGE_LABELS: Record<Lang, { name: string; flag: string }> = {
-  de: { name: "Deutsch", flag: "🇩🇪" },
-  en: { name: "English", flag: "🇬🇧" },
+  de: { name: "Deutsch", flag: new URL("../assets/flag-de.svg", import.meta.url).href },
+  en: { name: "English", flag: new URL("../assets/flag-gb.svg", import.meta.url).href },
 };
 
 const DICTS = { de, en } satisfies Record<Lang, Record<TranslationKey, string>>;

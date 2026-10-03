@@ -63,7 +63,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .button:hover:not(:disabled) { border-color: rgba(77,226,177,.45); color: var(--green); }
 .button:disabled { opacity: .35; cursor: not-allowed; }
 .language-button { display: inline-flex; align-items: center; gap: 6px; min-width: 67px; justify-content: center; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-.language-button span:first-child { font-family: system-ui, sans-serif; font-size: 14px; }
+.language-button img { display: block; width: 21px; height: 14px; object-fit: cover; border-radius: 1px; box-shadow: 0 0 0 1px var(--line); }
 .theme-button { display: inline-grid; min-width: 39px; padding-inline: 10px; place-items: center; font-family: system-ui, sans-serif; font-size: 16px; line-height: 1; }
 .header-menu { position: relative; }
 .header-menu summary { list-style: none; user-select: none; }

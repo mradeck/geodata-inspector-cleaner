@@ -4,6 +4,25 @@ Technische Erkenntnisse, Fehlerbilder und belastbare Lösungen des Projekts.
 Das Lernlog wird zum Abschluss jeder Feature-/Bugfix-Runde und zusätzlich vor
 jedem beauftragten Git-Push aktualisiert.
 
+## Release-Prüfung 2610.3.15
+
+Push vom Nutzer freigegeben. 152 Tests und Produktionsbuild erfolgreich,
+8 optionale Tests übersprungen. Versionen und Diff geprüft; Lizenzübersicht
+aktuell. Audit unverändert: vier Entwicklungsbefunde, keine Produktionsbefunde.
+Öffentlicher main-Stand e014302 als Grundlage; private Reparaturvorlage bleibt lokal.
+
+## 3. Oktober 2026 – Windows-Sprachflaggen 2610.3.15
+
+Flaggen-Emojis können unter Windows als Länderbuchstaben erscheinen; dadurch
+wirkte der deutsche Sprachbutton wie „DE DE“. Lokale SVG-Grafiken ersetzen
+Emojis in Hauptseite, Hilfe und Konzeptseite. Sprachkürzel und zugänglicher
+Buttonname bleiben erhalten; die Grafik ist dekorativ. Vite bündelt beide
+Flaggen ohne externe Requests oder zusätzliche Abhängigkeiten.
+152 Tests bestanden, 8 optionale Tests übersprungen; Build und Diff-Prüfung
+erfolgreich. SVG-Flagge in der lokalen Browseransicht sichtbar. Kein nativer
+Windows-Test verfügbar. Audit unverändert: vier Entwicklungsbefunde, keine
+Produktionsbefunde; Repository öffentlich.
+
 ## Release-Prüfung 2610.3.14
 
 Push vom Nutzer freigegeben. 152 Tests erfolgreich, 8 optionale Tests übersprungen;

@@ -15,7 +15,7 @@ import {
 
 const content = byId<HTMLElement>("concept-content");
 const languageToggle = byId<HTMLButtonElement>("btn-toggle-language");
-const languageFlag = byId<HTMLElement>("language-flag");
+const languageFlag = byId<HTMLImageElement>("language-flag");
 const languageCode = byId<HTMLElement>("language-code");
 
 initI18n();
@@ -41,7 +41,7 @@ function renderConcept(): void {
 }
 
 function syncLanguageControl(language: Lang): void {
-  languageFlag.textContent = LANGUAGE_LABELS[language].flag;
+  languageFlag.src = LANGUAGE_LABELS[language].flag;
   languageCode.textContent = language.toUpperCase();
   languageToggle.setAttribute("aria-label", t("lang.toggle.title"));
 }

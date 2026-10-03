@@ -15,7 +15,7 @@ import { getTheme, initTheme, onThemeChange, toggleTheme } from "./theme";
 
 const content = byId<HTMLElement>("help-content");
 const languageToggle = byId<HTMLButtonElement>("btn-toggle-language");
-const languageFlag = byId<HTMLElement>("language-flag");
+const languageFlag = byId<HTMLImageElement>("language-flag");
 const languageCode = byId<HTMLElement>("language-code");
 const themeToggle = byId<HTMLButtonElement>("btn-toggle-theme");
 const themeIcon = byId<HTMLElement>("theme-icon");
@@ -46,7 +46,7 @@ function renderHelp(): void {
 }
 
 function syncLanguageControl(language: Lang): void {
-  languageFlag.textContent = LANGUAGE_LABELS[language].flag;
+  languageFlag.src = LANGUAGE_LABELS[language].flag;
   languageCode.textContent = language.toUpperCase();
   languageToggle.setAttribute("aria-label", t("lang.toggle.title"));
 }
