@@ -191,9 +191,12 @@ function deriveLayer(properties: Record<string, unknown>, fileName: string): str
 
 function readDeclaredCrs(root: Record<string, unknown>): string | null {
   const crs = root.crs;
-  if (!isRecord(crs) || !isRecord(crs.properties)) return null;
+  if (crs == null) return null;
+  if (!isRecord(crs) || !isRecord(crs.properties)) throw new Error("Ungültige GeoJSON-CRS-Angabe / Invalid GeoJSON CRS declaration");
   const name = crs.properties.name;
-  return typeof name === "string" && name.trim() ? name.trim() : null;
+  if (typeof name === "string" && name.trim()) return name.trim();
+  if (crs.type === "EPSG" && typeof crs.properties.code === "number") return `EPSG:${crs.properties.code}`;
+  throw new Error("Unbekannte GeoJSON-CRS-Angabe / Unknown GeoJSON CRS declaration");
 }
 
 function asArray(value: unknown): unknown[] {

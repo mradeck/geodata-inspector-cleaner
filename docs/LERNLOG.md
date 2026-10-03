@@ -849,3 +849,21 @@ Anonymisierungsprüfung.
 mit `2607.01.0`. npm erlaubt keine führende Null im numerischen Minor-Segment.
 Deshalb speichern `package.json` und Lockfile `2607.1.0`; `displayVersion`, UI,
 Dokumentation und Berichtsexport bleiben bei `2607.01.0`.
+
+## 2026-10-03 · 2610.3.19 · GeoJSON wirklich reprojizieren
+
+Ursache: GeoJSON ohne CRS lieferte Gradkoordinaten, während das Analysefeld
+EPSG:25832 vorgab. Import nun getrennt vom koordinatentreuen Parser: RFC-7946-
+Default WGS84 oder unterstützte explizite Quelle nach EPSG:25832 transformieren.
+Z bleibt unverändert, alte manuelle CRS-Vorgabe wird zurückgesetzt. Herkunft
+und Ziel sichtbar; unbekannte CRS nicht still ersetzen. Synthetische Tests
+für Quelle, Z, UTM-Identität und DXF-/GeoJSON-Roundtrip; private Datei nur lokal.
+
+## 2026-10-03 · 2610.3.20 · GeoJSON hinzuladen
+
+GeoJSON-Laden ergänzt bestehende Daten statt sie zu ersetzen. Reine GeoJSON
+erhält eindeutige Feature-IDs; bei DXF werden nur neue Geometrie und Layer
+eingefügt, vorhandene Entitäten bleiben bytegleich. Quell-DXF, Prüfungen,
+Karten und gemeinsamer Export nutzen den kombinierten Stand. CRS-Konflikte
+brechen vor Übernahme ab. Synthetische Tests für mehrfaches Hinzufügen,
+Handle-/ID-Eindeutigkeit, Layer, Originalerhalt und gemeinsamen Export.

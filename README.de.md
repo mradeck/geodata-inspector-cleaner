@@ -13,7 +13,7 @@ Der Sprachbutton verwendet mitgelieferte SVG-Flaggen für eine einheitliche Anze
 
 ## Projektstatus
 
-**Version 2610.3.18 – gezielte Reparatur von Einpunkt-Polylinien.** Der
+**Version 2610.3.20 – gezielte Reparatur von Einpunkt-Polylinien.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -272,7 +272,7 @@ npm run build
 
 ## Versionierung
 
-Aktuell **2610.3.18**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
+Aktuell **2610.3.20**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
 lautet `JJMM.R.P`: Jahr/Monat, Release-Linie, Subversion. Derselbe Wert steht in
 `package.json`, `package-lock.json`, `displayVersion`, App und Prüfberichten.
 Bei neuen Runden wird auch der aktuelle Monat geprüft. Frühere Einträge mit
@@ -308,6 +308,8 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2610.3.20` | 2026-10-03 | GeoJSON zu vorhandenen Daten hinzufügen; gemeinsame Karte und Export, originale DXF-Objekte erhalten. |
+| `2610.3.19` | 2026-10-03 | GeoJSON-Quell-CRS berücksichtigen und beim Import wirklich nach EPSG:25832 transformieren; Z erhalten. |
 | `2610.3.18` | 2026-10-03 | Einpunkt-LWPOLYLINE-Prüfung mit expliziter Auswahl, Punktabgleich und unveränderter Originalreparatur. |
 | `2610.3.12` | 2026-10-02 | Bereinigtes öffentliches MIT-Repository; bestehende Netlify-Site neu verknüpft. |
 | `2610.3.11` | 2026-10-02 | MIT-Lizenz und Ausschluss privater Vermessungsdaten. |
@@ -436,3 +438,11 @@ Hell ist das Standarddesign; eine ausdrücklich gespeicherte Dunkelwahl bleibt
 erhalten. Die Exportdetails sind bei jeder neu geladenen Datei geschlossen.
 Kurzbilanz und Exportbutton bleiben sichtbar. **Exportdetails und Auswahl**
 öffnet alle Optionen. Das Einklappen ändert keine Auswahl oder Exportaktion.
+
+## GeoJSON-Koordinaten (2610.3.19)
+
+GeoJSON ohne CRS-Angabe verwendet WGS84 in der Reihenfolge Längengrad/Breitengrad (RFC 7946). Beim Laden werden XY jetzt tatsächlich nach EPSG:25832 für Analyse und DXF-Export umgerechnet; Z und Eigenschaften bleiben erhalten. Unterstützte ältere CRS-Angaben haben Vorrang; unbekannte CRS oder ungültige geografische Koordinaten stoppen den Import. Die Dateiübersicht zeigt Quelle und Ziel. Bereits vorhandene EPSG:25832-Koordinaten bleiben unverändert. Der Import setzt eine frühere manuelle Analysevorgabe auf das Arbeits-CRS zurück. Das Analysefeld selbst rechnet weiterhin keine Koordinaten um. GeoJSON-Exporte behalten das bisherige ältere Format mit ausdrücklicher EPSG:25832-CRS-Angabe bei und sind keine RFC-7946-Austauschdateien. Bestehende Einschränkungen bei Polygonlöchern in Vorschau/Export werden weiterhin gemeldet.
+
+## GeoJSON hinzuladen (2610.3.20)
+
+Eine weitere GeoJSON wird zu vorhandenen Daten in EPSG:25832 hinzugefügt. Vorhandene Geometrie bleibt in Karte und gemeinsamem Export. Bei DXF bleiben originale CAD-Objekte erhalten; neue Geometrie und fehlende Layer werden mit eindeutigen Handles ergänzt. Ein abweichendes Arbeits-CRS verhindert das Hinzufügen, ohne vorhandene Daten zu ersetzen. Prüfungen und Bereinigungsauswahl werden für den gemeinsamen Datensatz neu aufgebaut. Eine DXF zu laden beginnt weiterhin einen neuen Datensatz.

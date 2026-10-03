@@ -1,6 +1,6 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2610.3.18
+**Release:** 2610.3.20
 
 **Prüfstand:** 3. Oktober 2026
 
@@ -135,3 +135,8 @@ Sprachflaggen 2610.3.15: eigene einfache SVG-Zeichnungen der deutschen und briti
 2610.3.17: OSM-Hintergrund zusätzlich in den zwei Auswahlkarten, mit bestehendem Leaflet/proj4, sichtbarer OSM-Attribution und konfigurierbarer Kachel-URL. Keine neuen Abhängigkeiten.
 
 2610.3.18: Theme-Default und natives details-Element; keine neuen Abhängigkeiten oder Lizenzänderungen.
+
+2610.3.19: GeoJSON-Reprojektion mit vorhandenem proj4; keine neuen Bibliotheken
+oder externen Dienste. Bestehende Lizenz- und Attributionspflichten unverändert.
+
+2610.3.20: Lokales GeoJSON-Hinzuladen; keine neuen Abhängigkeiten oder Dienste.

@@ -45,6 +45,8 @@ export interface GeoLayerMetadata {
 }
 
 export interface GeoDataset {
+  /** Provenance of the GeoJSON import; declaredCrs describes the working coordinates. */
+  coordinateImport?: { sourceCrs: string; targetCrs: string; source: "declared" | "geojson-default" };
   fileName: string;
   format: SourceFormat;
   features: GeoFeature[];

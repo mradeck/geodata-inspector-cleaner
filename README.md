@@ -6,7 +6,7 @@ A local-first single-page app for inspecting and cleaning spatial outliers in DX
 
 [Open the app](https://geodata-inspector-cleaner.netlify.app/)
 
-**Version: 2610.3.18.** The source code is licensed under MIT. Real survey files, coordinate-based private regression fixtures and project screenshots are excluded from the repository and its published history.
+**Version: 2610.3.20.** The source code is licensed under MIT. Real survey files, coordinate-based private regression fixtures and project screenshots are excluded from the repository and its published history.
 
 The language button uses bundled SVG flags for consistent display on Windows, macOS and Linux.
 
@@ -127,3 +127,11 @@ The default theme is light; an explicitly saved dark preference is still respect
 Export details start collapsed on each newly loaded dataset. The compact count
 and export button remain visible. Open **Export details and selection** to review
 all options; collapsing the panel never changes the selected operations.
+
+## GeoJSON coordinates (2610.3.19)
+
+GeoJSON without a CRS declaration uses WGS84 longitude/latitude (RFC 7946). Import now actually transforms XY to EPSG:25832 for analysis and DXF export, retaining Z and properties. Supported legacy CRS declarations take precedence; unsupported declarations or invalid geographic coordinates stop import. The inventory shows source and target CRS. Existing EPSG:25832 coordinates are unchanged. Import resets any previous manual analysis CRS to the working CRS. The manual analysis field itself still does not transform coordinates. GeoJSON exports retain the existing legacy format with an explicit EPSG:25832 CRS member; they are not RFC 7946 interchange files. Existing polygon-hole preview/export limitations remain reported.
+
+## Adding GeoJSON (2610.3.20)
+
+Loading another GeoJSON adds it to the existing data in EPSG:25832. Existing geometry stays in the map and joint export. For DXF, original CAD entities are preserved; only new geometry and missing layers are appended with unique handles. An incompatible working CRS stops the addition without replacing existing data. Checks and cleanup selections are rebuilt for the combined dataset. Loading DXF still starts a new dataset.

@@ -33,6 +33,7 @@ import {
   setLanguage,
   t,
 } from "./i18n";
+import { appendGeoJson } from "./io/appendGeoJson";
 import { readDataset } from "./io/readDataset";
 import { CleanerError, createCleanedExport } from "./io/exportCleaned";
 import { getDxfAcadVersion, setDxfAcadVersion } from "./io/dxfExportSettings";
@@ -413,13 +414,17 @@ function applyDuplicateCleanup(dataset: GeoDataset, status: string): void {
 async function loadFile(file: File): Promise<void> {
   setStatus(t("status.reading", { file: file.name }), "working");
   try {
-    currentDataset = await readDataset(file);
+    const incoming = await readDataset(file);
+    const adding = incoming.format === "geojson" && currentDataset !== null;
+    currentDataset = adding
+      ? appendGeoJson(currentDataset!, incoming, normalizeEpsg(elements.analysisCrs.value))
+      : incoming;
     lastExportAudit = null;
     syncAnalysisCrsFromDataset(currentDataset);
     resetObjectFilter();
     highlightedIds.clear();
     preferredPrimaryFeatureId = null;
-    analyzeAndRender(t("status.analyzed", { file: file.name }));
+    analyzeAndRender(t(adding ? "status.added" : "status.analyzed", { file: file.name }));
   } catch (error) {
     setStatus(error instanceof Error ? localizeReadError(error.message) : t("status.readError"), "error");
   } finally {
@@ -503,7 +508,8 @@ function renderDashboard(report: InspectionReport): void {
       <div><dt>${escapeHtml(t("inventory.features"))}</dt><dd>${formatNumber(report.dataset.features.length)}</dd></div>
       <div><dt>${escapeHtml(t("inventory.layers"))}</dt><dd>${formatNumber(layerCount)}</dd></div>
       <div><dt>${escapeHtml(t("inventory.warnings"))}</dt><dd>${formatNumber(report.dataset.warnings.length)}</dd></div>
-    </dl>`;
+    </dl>
+    ${report.dataset.coordinateImport ? `<p>${escapeHtml(t("inventory.coordinateImport", { source: report.dataset.coordinateImport.sourceCrs, target: report.dataset.coordinateImport.targetCrs }))} ${escapeHtml(t(report.dataset.coordinateImport.source === "geojson-default" ? "inventory.geojsonDefault" : "inventory.geojsonDeclared"))}</p>` : ""}`;
 
   singleVertexPanel.render(report.dataset);
   duplicatePanel.render(report.dataset);
@@ -1116,6 +1122,7 @@ function localizeCrsAssessment(report: InspectionReport): { label: string; expla
 }
 
 function syncAnalysisCrsFromDataset(dataset: GeoDataset): void {
+  if (dataset.coordinateImport) analysisCrsWasEdited = false;
   if (analysisCrsWasEdited) return;
   elements.analysisCrs.value = normalizeEpsg(dataset.declaredCrs) ?? "EPSG:25832";
   setAnalysisCrsValidity(true);
@@ -1167,6 +1174,11 @@ function localizeWarning(code: string, fallback: string): string {
 }
 
 function localizeReadError(message: string): string {
+  if (message === "append-crs") return t("error.appendCrs");
+  if (message.startsWith("append-")) return t("error.appendFailed");
+  if (message.includes("GeoJSON-CRS-Angabe") || message.includes("unsupported CRS:")) return t("error.geojsonCrs");
+  if (message.includes("check source CRS")) return t("error.geojsonCoordinates");
+  if (message.includes("coordinate transformation failed")) return t("error.geojsonTransform");
   if (message === "Die Datei ist kein gültiges JSON.") return t("error.invalidJson");
   if (message === "GeoJSON muss ein Objekt als Wurzelelement enthalten.") return t("error.geojsonRoot");
   if (message === "Nicht unterstützte GeoJSON-Wurzelstruktur.") return t("error.geojsonStructure");

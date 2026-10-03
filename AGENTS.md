@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2610.3.18`
-- **npm-kompatible Version:** `2610.3.18`
+- **Aktuelle Release-Version:** `2610.3.20`
+- **npm-kompatible Version:** `2610.3.20`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
@@ -220,6 +220,8 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2610.3.20` | 2026-10-03 | GeoJSON zu vorhandenen Daten hinzufügen; gemeinsame Karte und Export, originale DXF-Objekte erhalten. |
+| `2610.3.19` | 2026-10-03 | GeoJSON-Quell-CRS berücksichtigen und beim Import wirklich nach EPSG:25832 transformieren; Z erhalten. |
 | `2610.3.18` | 2026-10-03 | Helles Standarddesign; Exportdetails zunächst eingeklappt, Kurzbilanz und Exportbutton sichtbar. |
 | `2610.3.17` | 2026-10-03 | Unabhängig zuschaltbarer OSM-Hintergrund in Export- und Einpunkt-Karte; CRS-Projektion nur für Darstellung. |
 | `2610.3.16` | 2026-10-03 | Datenerhalt als Standard; optional ohne Beschriftungen, Punktbegleiter und interaktive Auswahl-/Einpunkt-Karten. |
@@ -319,3 +321,15 @@ Exportdaten werden nie durch die Darstellungsprojektion ersetzt.
 
 2610.3.18: Heller Theme-Fallback, gespeicherte Nutzerwahl respektieren. Exportdetails
 bei Datensatzwechsel zuklappen; bestehende Aktionen bleiben dabei unverändert.
+
+2610.3.19: GeoJSON ausschließlich an der Dateiimport-Grenze mit importGeoJson
+nach EPSG:25832 transformieren. parseGeoJson bleibt koordinatentreu für
+Exportvalidierung. coordinateImport hält Herkunft/Standardannahme fest;
+declaredCrs beschreibt danach Arbeitskoordinaten. Z unverändert lassen.
+Import überschreibt alte manuelle Analysevorgaben. Fehlende CRS-Angabe bedeutet
+RFC-7946-WGS84; unbekannte explizite CRS niemals durch diesen Default ersetzen.
+
+2610.3.20: Weitere GeoJSON ergänzt vorhandene Daten. DXF-Quelldaten niemals
+normalisieren: neue Entitäten/Layer ergänzen, Handles kollisionsfrei vergeben,
+HANDSEED und Extents aktualisieren, alte Entitäten bytegleich validieren.
+CRS-Konflikte vor Änderungen ablehnen. DXF-Laden bleibt Datensatzwechsel.

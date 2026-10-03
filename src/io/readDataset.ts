@@ -1,6 +1,6 @@
 import type { GeoDataset } from "../model";
 import { parseDxf } from "./parseDxf";
-import { parseGeoJson } from "./parseGeoJson";
+import { importGeoJson } from "./importGeoJson";
 
 export async function readDataset(file: File): Promise<GeoDataset> {
   const extension = file.name.split(".").pop()?.toLowerCase();
@@ -12,6 +12,6 @@ export async function readDataset(file: File): Promise<GeoDataset> {
     ? new TextDecoder("utf-8", { ignoreBOM: true }).decode(await file.arrayBuffer())
     : await file.text();
   if (extension === "dxf") return parseDxf(text, file.name);
-  if (extension === "geojson" || extension === "json") return parseGeoJson(text, file.name);
+  if (extension === "geojson" || extension === "json") return importGeoJson(text, file.name);
   throw new Error("Unterstützt werden derzeit .dxf, .geojson und .json.");
 }
