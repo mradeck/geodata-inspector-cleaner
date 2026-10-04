@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2610.3.20`
-- **npm-kompatible Version:** `2610.3.20`
+- **Aktuelle Release-Version:** `2610.3.22`
+- **npm-kompatible Version:** `2610.3.22`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
@@ -220,6 +220,8 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2610.3.22` | 2026-10-04 | Footer-Buttons wie MeasureMap, beidseitiger Link-Abgleich und englisches Imprint. |
+| `2610.3.21` | 2026-10-03 | DXF und GeoJSON in jeder Reihenfolge hinzufügen; Mehrfachauswahl, expliziter Reset, native CAD-Ressourcen zusammenführen. |
 | `2610.3.20` | 2026-10-03 | GeoJSON zu vorhandenen Daten hinzufügen; gemeinsame Karte und Export, originale DXF-Objekte erhalten. |
 | `2610.3.19` | 2026-10-03 | GeoJSON-Quell-CRS berücksichtigen und beim Import wirklich nach EPSG:25832 transformieren; Z erhalten. |
 | `2610.3.18` | 2026-10-03 | Helles Standarddesign; Exportdetails zunächst eingeklappt, Kurzbilanz und Exportbutton sichtbar. |
@@ -333,3 +335,14 @@ RFC-7946-WGS84; unbekannte explizite CRS niemals durch diesen Default ersetzen.
 normalisieren: neue Entitäten/Layer ergänzen, Handles kollisionsfrei vergeben,
 HANDSEED und Extents aktualisieren, alte Entitäten bytegleich validieren.
 CRS-Konflikte vor Änderungen ablehnen. DXF-Laden bleibt Datensatzwechsel.
+
+2610.3.21 ersetzt die Beschränkung aus .20: Alle weiteren DXF/GeoJSON
+ergänzen den Bestand. Mehrfachauswahl/Drop seriell verarbeiten, Reset explizit.
+appendDataset prüft CRS; mergeDxf erhält native CAD-Records und ordnet
+Handles, Ressourcen, Blöcke und Dictionaries um. Quell-ENTITIES des ersten
+DXF bytegleich prüfen. Namenskonflikte isolieren, Einheitenkonflikte ablehnen.
+Unbekannte gefüllte DXF-Sektionen nicht still verwerfen.
+
+## 2610.3.22 · 2026-10-04 · Footer
+
+Gemeinsame Footer-Links mit MeasureMap abgleichen, öffentliche App-Websites verwenden. Link-Pills in beiden Themes; englische Beschriftung Imprint.

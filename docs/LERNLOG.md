@@ -867,3 +867,16 @@ eingefügt, vorhandene Entitäten bleiben bytegleich. Quell-DXF, Prüfungen,
 Karten und gemeinsamer Export nutzen den kombinierten Stand. CRS-Konflikte
 brechen vor Übernahme ab. Synthetische Tests für mehrfaches Hinzufügen,
 Handle-/ID-Eindeutigkeit, Layer, Originalerhalt und gemeinsamen Export.
+
+## 2026-10-03 · 2610.3.21 · Hinzufügen für beide Formate
+
+Die Formatabfrage aus .20 ließ DXF weiterhin ersetzen. Durch gemeinsamen
+appendDataset-Einstieg ersetzt: GeoJSON/DXF in jeder Reihenfolge, mehrfach
+und über Mehrfachauswahl/Drop ergänzen. Neues Reset-Element, Quelldateiliste.
+Native DXF-Ressourcen, Blöcke, Layouts und Dictionary-Verweise berücksichtigen,
+Handles kollisionsfrei neu zuordnen. Prüfung mit synthetischen Tagen inklusive
+gleichnamiger Blöcke/Layer und Layouts sowie unabhängigem ezdxf-Audit.
+
+## 2610.3.22 · 2026-10-04 · Footer
+
+Footer mit MeasureMap abgeglichen: Link-Pills, fehlende öffentliche Projekt-/Quellenlinks beidseitig ergänzt, englisches Imprint. Eigene Hilfe-/Quellcode-Aktionen bleiben app-spezifisch.

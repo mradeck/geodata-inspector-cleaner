@@ -232,15 +232,20 @@ input[type="range"] { width: 100%; accent-color: var(--green); margin: 15px 0 6p
 
 .modal-overlay { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 24px; background: rgba(2, 9, 10, .76); backdrop-filter: blur(8px); }
 .app-footer { background: var(--panel); border-top: 1px solid var(--line); }
-.related-apps, .footer-meta, .footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 24px; }
+.related-apps, .footer-meta, .footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 7px; }
 .related-apps { padding: 10px 20px; font-size: 11px; }
 .related-apps strong { color: var(--muted); font-weight: 550; }
 .related-apps a { color: var(--green); text-decoration: none; }
-.related-apps a span { margin-left: 7px; }
 .footer-meta { justify-content: space-between; padding: 8px 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
-.footer-links { gap: 10px 20px; }
-.footer-links a, .footer-links button { border: 0; padding: 0; background: none; color: var(--muted); font: inherit; text-decoration: none; cursor: pointer; }
-.app-footer a:hover, .app-footer button:hover { color: var(--green); text-decoration: underline; text-underline-offset: 3px; }
+.footer-links { gap: 6px 7px; }
+.related-apps a, .footer-links a, .footer-links button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 5px 9px; border: 1px solid var(--line); border-radius: 20px;
+  background: var(--panel-2); color: var(--muted);
+  font: inherit; font-size: 10px; line-height: 1.5; text-decoration: none; cursor: pointer;
+}
+.related-apps a span { margin-left: 0; }
+.app-footer a:hover, .app-footer button:hover { border-color: var(--green); color: var(--text); text-decoration: none; }
 .app-footer :focus-visible, .support-dialog :focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
 .app-footer .statusbar { min-height: 28px; }
 .support-dialog { padding: 0; color: var(--text); }

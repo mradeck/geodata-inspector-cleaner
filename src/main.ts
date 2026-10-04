@@ -33,7 +33,7 @@ import {
   setLanguage,
   t,
 } from "./i18n";
-import { appendGeoJson } from "./io/appendGeoJson";
+import { appendDataset } from "./io/appendDataset";
 import { readDataset } from "./io/readDataset";
 import { CleanerError, createCleanedExport } from "./io/exportCleaned";
 import { getDxfAcadVersion, setDxfAcadVersion } from "./io/dxfExportSettings";
@@ -208,8 +208,7 @@ onLanguageChange((language) => {
 });
 
 elements.fileInput.addEventListener("change", () => {
-  const file = elements.fileInput.files?.[0];
-  if (file) void loadFile(file);
+  queueFiles(Array.from(elements.fileInput.files ?? []));
 });
 
 for (const eventName of ["dragenter", "dragover"]) {
@@ -225,8 +224,7 @@ for (const eventName of ["dragleave", "drop"]) {
   });
 }
 elements.dropZone.addEventListener("drop", (event) => {
-  const file = event.dataTransfer?.files[0];
-  if (file) void loadFile(file);
+  queueFiles(Array.from(event.dataTransfer?.files ?? []));
 });
 
 elements.loadDemo.addEventListener("click", () => {
@@ -400,6 +398,7 @@ function applyDuplicateCleanup(dataset: GeoDataset, status: string): void {
     clusterDistanceMeters: Number(elements.clusterDistance.value),
   }, { analysisCrs });
   cancelAnalysisCrsUpdate();
+  dataset.importedFileNames = currentDataset?.importedFileNames;
   currentDataset = dataset;
   currentReport = report;
   elements.analysisCrs.value = analysisCrs ?? normalizeEpsg(dataset.declaredCrs) ?? "";
@@ -411,14 +410,21 @@ function applyDuplicateCleanup(dataset: GeoDataset, status: string): void {
   setStatus(status, "ok");
 }
 
+let importQueue = Promise.resolve();
+function queueFiles(files: File[]): void {
+  for (const file of files) importQueue = importQueue.then(() => loadFile(file));
+}
+byId<HTMLButtonElement>("new-session").addEventListener("click", () => window.location.reload());
+
 async function loadFile(file: File): Promise<void> {
   setStatus(t("status.reading", { file: file.name }), "working");
   try {
     const incoming = await readDataset(file);
-    const adding = incoming.format === "geojson" && currentDataset !== null;
+    const adding = currentDataset !== null;
     currentDataset = adding
-      ? appendGeoJson(currentDataset!, incoming, normalizeEpsg(elements.analysisCrs.value))
+      ? appendDataset(currentDataset!, incoming, normalizeEpsg(elements.analysisCrs.value))
       : incoming;
+    currentDataset.importedFileNames ??= [file.name];
     lastExportAudit = null;
     syncAnalysisCrsFromDataset(currentDataset);
     resetObjectFilter();
@@ -503,6 +509,7 @@ function renderDashboard(report: InspectionReport): void {
   elements.fileFacts.classList.remove("empty");
   elements.fileFacts.innerHTML = `
     <p class="eyebrow">${escapeHtml(t("inventory.title"))}</p>
+    <p>${escapeHtml((report.dataset.importedFileNames ?? [report.dataset.fileName]).join(" · "))}</p>
     <dl>
       <div><dt>${escapeHtml(t("inventory.format"))}</dt><dd>${escapeHtml(report.dataset.format.toUpperCase())}</dd></div>
       <div><dt>${escapeHtml(t("inventory.features"))}</dt><dd>${formatNumber(report.dataset.features.length)}</dd></div>
@@ -1174,6 +1181,7 @@ function localizeWarning(code: string, fallback: string): string {
 }
 
 function localizeReadError(message: string): string {
+  if (message === "append-units") return t("error.appendUnits");
   if (message === "append-crs") return t("error.appendCrs");
   if (message.startsWith("append-")) return t("error.appendFailed");
   if (message.includes("GeoJSON-CRS-Angabe") || message.includes("unsupported CRS:")) return t("error.geojsonCrs");

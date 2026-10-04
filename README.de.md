@@ -13,7 +13,7 @@ Der Sprachbutton verwendet mitgelieferte SVG-Flaggen für eine einheitliche Anze
 
 ## Projektstatus
 
-**Version 2610.3.20 – gezielte Reparatur von Einpunkt-Polylinien.** Der
+**Version 2610.3.22 – gezielte Reparatur von Einpunkt-Polylinien.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -272,7 +272,7 @@ npm run build
 
 ## Versionierung
 
-Aktuell **2610.3.20**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
+Aktuell **2610.3.22**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
 lautet `JJMM.R.P`: Jahr/Monat, Release-Linie, Subversion. Derselbe Wert steht in
 `package.json`, `package-lock.json`, `displayVersion`, App und Prüfberichten.
 Bei neuen Runden wird auch der aktuelle Monat geprüft. Frühere Einträge mit
@@ -308,6 +308,8 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2610.3.22` | 2026-10-04 | Footer-Buttons wie MeasureMap, beidseitiger Link-Abgleich und englisches Imprint. |
+| `2610.3.21` | 2026-10-03 | DXF und GeoJSON in jeder Reihenfolge hinzufügen; Mehrfachauswahl, expliziter Reset, native CAD-Ressourcen zusammenführen. |
 | `2610.3.20` | 2026-10-03 | GeoJSON zu vorhandenen Daten hinzufügen; gemeinsame Karte und Export, originale DXF-Objekte erhalten. |
 | `2610.3.19` | 2026-10-03 | GeoJSON-Quell-CRS berücksichtigen und beim Import wirklich nach EPSG:25832 transformieren; Z erhalten. |
 | `2610.3.18` | 2026-10-03 | Einpunkt-LWPOLYLINE-Prüfung mit expliziter Auswahl, Punktabgleich und unveränderter Originalreparatur. |
@@ -445,4 +447,12 @@ GeoJSON ohne CRS-Angabe verwendet WGS84 in der Reihenfolge Längengrad/Breitengr
 
 ## GeoJSON hinzuladen (2610.3.20)
 
-Eine weitere GeoJSON wird zu vorhandenen Daten in EPSG:25832 hinzugefügt. Vorhandene Geometrie bleibt in Karte und gemeinsamem Export. Bei DXF bleiben originale CAD-Objekte erhalten; neue Geometrie und fehlende Layer werden mit eindeutigen Handles ergänzt. Ein abweichendes Arbeits-CRS verhindert das Hinzufügen, ohne vorhandene Daten zu ersetzen. Prüfungen und Bereinigungsauswahl werden für den gemeinsamen Datensatz neu aufgebaut. Eine DXF zu laden beginnt weiterhin einen neuen Datensatz.
+Eine weitere GeoJSON wird zu vorhandenen Daten in EPSG:25832 hinzugefügt. Vorhandene Geometrie bleibt in Karte und gemeinsamem Export. Bei DXF bleiben originale CAD-Objekte erhalten; neue Geometrie und fehlende Layer werden mit eindeutigen Handles ergänzt. Ein abweichendes Arbeits-CRS verhindert das Hinzufügen, ohne vorhandene Daten zu ersetzen. Prüfungen und Bereinigungsauswahl werden für den gemeinsamen Datensatz neu aufgebaut. Seit 2610.3.21 ergänzt auch das Laden einer DXF den vorhandenen Datensatz.
+
+## Messdateien gemeinsam laden (2610.3.21)
+
+Jede weitere DXF oder GeoJSON wird hinzugefügt – unabhängig von der Reihenfolge. Mehrere Dateien lassen sich gleichzeitig auswählen oder ablegen; der Import läuft nacheinander. Das Inventar zeigt die geladenen Dateinamen. **Neue Sitzung · Daten leeren** beginnt bewusst neu. Geometrie und Z bleiben in gemeinsamer Karte und Export; Prüfungen und Bereinigungsauswahl werden nach dem Hinzufügen neu aufgebaut. GeoJSON wird nach EPSG:25832 transformiert. DXF ohne CRS-Angabe verwendet die aktuelle Analysevorgabe; widersprüchliche deklarierte CRS oder DXF-Einheiten führen zum Abbruch des Hinzufügens, ohne vorhandene Daten zu ersetzen. Native Blöcke, Beschriftungen und Ressourcen werden mit neu zugeordneten Handles und Verweisen übernommen. Namenskonflikte erhalten einen Zusatz (z. B. `Survey__2`); gleichwertige Definitionen können geteilt werden. Der bestehende Layer 0 und aktive Viewport bleiben maßgeblich. Nicht unterstützte gefüllte DXF-Sektionen stoppen das Hinzufügen statt Inhalte still zu verlieren.
+
+## 2610.3.22 · 2026-10-04 · Footer
+
+Die Fußleisten-Links nutzen abgerundete Buttons wie MeasureMap. Gemeinsame Projekt- und Quellenlinks sind in beiden Apps abgeglichen; der englische Impressumslink heißt „Imprint“.

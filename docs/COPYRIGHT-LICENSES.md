@@ -1,6 +1,6 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2610.3.20
+**Release:** 2610.3.22
 
 **Prüfstand:** 3. Oktober 2026
 
@@ -140,3 +140,11 @@ Sprachflaggen 2610.3.15: eigene einfache SVG-Zeichnungen der deutschen und briti
 oder externen Dienste. Bestehende Lizenz- und Attributionspflichten unverändert.
 
 2610.3.20: Lokales GeoJSON-Hinzuladen; keine neuen Abhängigkeiten oder Dienste.
+
+2610.3.21: Gemeinsamer Dateiimport mit vorhandenen Abhängigkeiten; keine neuen
+Laufzeitbibliotheken oder externen Dienste. Native DXF-Testdateien synthetisch;
+lokaler unabhängiger Kontrollimport mit bereits installiertem ezdxf.
+
+## 2610.3.22 · 2026-10-04 · Footer
+
+Nur Footer-CSS und externe Links ergänzt; keine neue Bibliothek. ALKIS/LDBV und Datenlizenz sind weiterführende Links, keine zusätzlich eingebundenen Kartendienste.
