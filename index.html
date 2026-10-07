@@ -17,7 +17,7 @@
           <span class="brand-copy">
             <span class="brand-title-line">
               <strong>Geodata Inspector</strong>
-              <span id="header-version" class="brand-version">v2610.3.22</span>
+              <span id="header-version" class="brand-version">v2610.3.23</span>
             </span>
             <small>& Cleaner</small>
           </span>
@@ -64,28 +64,23 @@
 
           <section class="settings-section">
             <p class="eyebrow" data-i18n="analysis.eyebrow">02 · Analyse</p>
-            <label class="analysis-crs-field" for="analysis-crs">
+            <label class="analysis-crs-field" for="analysis-crs-select">
               <span data-i18n="analysis.crs">CRS / EPSG</span>
-              <input
-                id="analysis-crs"
-                type="text"
-                value="EPSG:25832"
-                placeholder="z. B. EPSG:25832"
-                data-i18n-placeholder="analysis.crsPlaceholder"
-                spellcheck="false"
-                autocomplete="off"
-                inputmode="text"
-                list="analysis-crs-options"
-                aria-describedby="analysis-crs-help"
-              />
+              <select id="analysis-crs-select" aria-describedby="analysis-crs-help">
+                <option value="EPSG:25832">EPSG:25832 · ETRS89 / UTM 32N</option>
+                <option value="EPSG:25833">EPSG:25833 · ETRS89 / UTM 33N</option>
+                <option value="EPSG:31468" data-i18n="analysis.gk4">EPSG:31468 · DHDN / Gauß-Krüger 4 (GK4)</option>
+                <option value="EPSG:4326">EPSG:4326 · WGS 84</option>
+                <option value="EPSG:3857">EPSG:3857 · Web Mercator</option>
+                <option value="custom" data-i18n="analysis.customCrs">Anderer EPSG-Code / keine Vorgabe</option>
+              </select>
             </label>
-            <datalist id="analysis-crs-options">
-              <option value="EPSG:25832"></option>
-              <option value="EPSG:25833"></option>
-              <option value="EPSG:31468"></option>
-              <option value="EPSG:4326"></option>
-              <option value="EPSG:3857"></option>
-            </datalist>
+            <label id="analysis-crs-custom" class="analysis-crs-field" for="analysis-crs" hidden>
+              <span data-i18n="analysis.customCrsLabel">Eigene CRS-Angabe</span>
+              <input id="analysis-crs" type="text" value="EPSG:25832"
+                placeholder="z. B. EPSG:25832" data-i18n-placeholder="analysis.crsPlaceholder"
+                spellcheck="false" autocomplete="off" aria-describedby="analysis-crs-help" />
+            </label>
             <p id="analysis-crs-help" class="field-help analysis-crs-help" data-i18n="analysis.crsHelp">Standard EPSG:25832. Änderungen starten die Analyse neu; es findet keine Reprojektion statt.</p>
             <label class="field-label" for="cluster-distance">
               <span data-i18n="analysis.clusterDistance">Cluster-Abstand</span>
@@ -325,7 +320,7 @@
         </div>
         <div class="statusbar">
         <span id="status"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></span>
-        <span data-i18n="version.label">Version 2610.3.22</span>
+        <span data-i18n="version.label">Version 2610.3.23</span>
         </div>
       </footer>
     </div>

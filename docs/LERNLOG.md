@@ -880,3 +880,9 @@ gleichnamiger Blöcke/Layer und Layouts sowie unabhängigem ezdxf-Audit.
 ## 2610.3.22 · 2026-10-04 · Footer
 
 Footer mit MeasureMap abgeglichen: Link-Pills, fehlende öffentliche Projekt-/Quellenlinks beidseitig ergänzt, englisches Imprint. Eigene Hilfe-/Quellcode-Aktionen bleiben app-spezifisch.
+
+## 2610.3.23 · 2026-10-08 · CRS-Auswahl
+
+Native datalist filtert nach dem bereits eingetragenen Wert; dadurch sah die Liste wie eine Beschränkung auf 25832 aus. Durch select mit allen fünf integrierten CRS ersetzt. Eigene Eingabe separat erreichbar, Synchronisierung bei Import/Export und Sprachwechsel. Keine Änderung der Erkennung oder Koordinaten.
+
+Prüfung: 179 Tests bestanden, 10 optionale Tests übersprungen; Typprüfung und Produktionsbuild erfolgreich. Browser: GK4-Auswahl und eigene Eingabe mit Normalisierung geprüft. npm audit: 5 Befunde in Entwicklungsabhängigkeiten (2 moderat, 3 hoch), Produktionsabhängigkeiten ohne Befund; keine Abhängigkeiten geändert. Repository öffentlich.

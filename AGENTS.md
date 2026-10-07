@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2610.3.22`
-- **npm-kompatible Version:** `2610.3.22`
+- **Aktuelle Release-Version:** `2610.3.23`
+- **npm-kompatible Version:** `2610.3.23`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
@@ -220,6 +220,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2610.3.23` | 2026-10-08 | Ungefilterte CRS-Auswahl mit Namen und separater eigener Eingabe. |
 | `2610.3.22` | 2026-10-04 | Footer-Buttons wie MeasureMap, beidseitiger Link-Abgleich und englisches Imprint. |
 | `2610.3.21` | 2026-10-03 | DXF und GeoJSON in jeder Reihenfolge hinzufügen; Mehrfachauswahl, expliziter Reset, native CAD-Ressourcen zusammenführen. |
 | `2610.3.20` | 2026-10-03 | GeoJSON zu vorhandenen Daten hinzufügen; gemeinsame Karte und Export, originale DXF-Objekte erhalten. |
@@ -346,3 +347,7 @@ Unbekannte gefüllte DXF-Sektionen nicht still verwerfen.
 ## 2610.3.22 · 2026-10-04 · Footer
 
 Gemeinsame Footer-Links mit MeasureMap abgleichen, öffentliche App-Websites verwenden. Link-Pills in beiden Themes; englische Beschriftung Imprint.
+
+## 2610.3.23 · 2026-10-08 · CRS-Auswahl
+
+Die CRS-Auswahl zeigt alle fünf integrierten Karten-Koordinatensysteme mit EPSG-Code und Namen, unabhängig vom aktuellen Wert. GK4 ist direkt als EPSG:31468 wählbar. Eigene EPSG-Eingabe bleibt möglich; nicht registrierte Codes erhalten dadurch keine Kartenprojektion. Ein Wechsel startet die Analyse neu, ohne Quellkoordinaten zu transformieren.

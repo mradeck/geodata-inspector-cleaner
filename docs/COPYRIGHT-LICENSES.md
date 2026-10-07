@@ -1,8 +1,8 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2610.3.22
+**Release:** 2610.3.23
 
-**Prüfstand:** 3. Oktober 2026
+**Prüfstand:** 8. Oktober 2026
 
 **Repository:** öffentlich; bereinigtes, unabhängiges Repository unter MIT
 
@@ -148,3 +148,5 @@ lokaler unabhängiger Kontrollimport mit bereits installiertem ezdxf.
 ## 2610.3.22 · 2026-10-04 · Footer
 
 Nur Footer-CSS und externe Links ergänzt; keine neue Bibliothek. ALKIS/LDBV und Datenlizenz sind weiterführende Links, keine zusätzlich eingebundenen Kartendienste.
+
+2610.3.23: CRS-Auswahl mit nativen HTML-Elementen; Abhängigkeiten, Lockfile-Lizenzen und externe Dienste unverändert.

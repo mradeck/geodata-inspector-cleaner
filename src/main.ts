@@ -260,6 +260,19 @@ elements.clusterDistance.addEventListener("input", () => {
   if (currentDataset) analyzeAndRender(t("status.parametersUpdated"));
 });
 
+const analysisCrsSelect = byId<HTMLSelectElement>("analysis-crs-select");
+const analysisCrsCustom = byId<HTMLElement>("analysis-crs-custom");
+analysisCrsSelect.addEventListener("change", () => {
+  cancelAnalysisCrsUpdate();
+  analysisCrsCustom.hidden = analysisCrsSelect.value !== "custom";
+  if (analysisCrsSelect.value === "custom") {
+    elements.analysisCrs.focus();
+    return;
+  }
+  elements.analysisCrs.value = analysisCrsSelect.value;
+  applyAnalysisCrsInput();
+});
+
 elements.analysisCrs.addEventListener("input", () => {
   cancelAnalysisCrsUpdate();
   analysisCrsUpdateTimer = window.setTimeout(() => {
@@ -1136,6 +1149,12 @@ function syncAnalysisCrsFromDataset(dataset: GeoDataset): void {
 }
 
 function setAnalysisCrsValidity(valid: boolean): void {
+  const select = byId<HTMLSelectElement>("analysis-crs-select");
+  const value = normalizeEpsg(elements.analysisCrs.value);
+  const known = Array.from(select.options).some(option => option.value === value);
+  select.value = known ? value! : "custom";
+  byId<HTMLElement>("analysis-crs-custom").hidden = known;
+
   elements.analysisCrs.setAttribute("aria-invalid", String(!valid));
   elements.analysisCrsHelp.classList.toggle("error", !valid);
   elements.analysisCrsHelp.dataset.i18n = valid ? "analysis.crsHelp" : "analysis.crsInvalid";

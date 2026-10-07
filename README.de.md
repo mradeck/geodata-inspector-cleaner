@@ -13,7 +13,7 @@ Der Sprachbutton verwendet mitgelieferte SVG-Flaggen für eine einheitliche Anze
 
 ## Projektstatus
 
-**Version 2610.3.22 – gezielte Reparatur von Einpunkt-Polylinien.** Der
+**Version 2610.3.23 – gezielte Reparatur von Einpunkt-Polylinien.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -272,7 +272,7 @@ npm run build
 
 ## Versionierung
 
-Aktuell **2610.3.22**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
+Aktuell **2610.3.23**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
 lautet `JJMM.R.P`: Jahr/Monat, Release-Linie, Subversion. Derselbe Wert steht in
 `package.json`, `package-lock.json`, `displayVersion`, App und Prüfberichten.
 Bei neuen Runden wird auch der aktuelle Monat geprüft. Frühere Einträge mit
@@ -308,6 +308,7 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2610.3.23` | 2026-10-08 | Ungefilterte CRS-Auswahl mit Namen und separater eigener Eingabe. |
 | `2610.3.22` | 2026-10-04 | Footer-Buttons wie MeasureMap, beidseitiger Link-Abgleich und englisches Imprint. |
 | `2610.3.21` | 2026-10-03 | DXF und GeoJSON in jeder Reihenfolge hinzufügen; Mehrfachauswahl, expliziter Reset, native CAD-Ressourcen zusammenführen. |
 | `2610.3.20` | 2026-10-03 | GeoJSON zu vorhandenen Daten hinzufügen; gemeinsame Karte und Export, originale DXF-Objekte erhalten. |
@@ -456,3 +457,7 @@ Jede weitere DXF oder GeoJSON wird hinzugefügt – unabhängig von der Reihenfo
 ## 2610.3.22 · 2026-10-04 · Footer
 
 Die Fußleisten-Links nutzen abgerundete Buttons wie MeasureMap. Gemeinsame Projekt- und Quellenlinks sind in beiden Apps abgeglichen; der englische Impressumslink heißt „Imprint“.
+
+## 2610.3.23 · 2026-10-08 · CRS-Auswahl
+
+Die CRS-Auswahl zeigt alle fünf integrierten Karten-Koordinatensysteme mit EPSG-Code und Namen, unabhängig vom aktuellen Wert. GK4 ist direkt als EPSG:31468 wählbar. Eigene EPSG-Eingabe bleibt möglich; nicht registrierte Codes erhalten dadurch keine Kartenprojektion. Ein Wechsel startet die Analyse neu, ohne Quellkoordinaten zu transformieren.

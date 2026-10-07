@@ -89,8 +89,8 @@ h1 { max-width: 260px; font-family: var(--font-ui); font-size: 27px; line-height
 .drop-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: var(--green); border: 1px solid rgba(77,226,177,.28); font-size: 20px; }
 .settings-section { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
 .analysis-crs-field { display: grid; gap: 6px; margin-bottom: 7px; color: var(--green); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
-.analysis-crs-field input { width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; outline: none; color: var(--text); background: rgba(6, 16, 18, .72); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; transition: border-color .18s ease, box-shadow .18s ease; }
-.analysis-crs-field input:focus { border-color: rgba(77,226,177,.58); box-shadow: 0 0 0 3px rgba(77,226,177,.08); }
+.analysis-crs-field :is(input, select) { width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; outline: none; color: var(--text); background: rgba(6, 16, 18, .72); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; transition: border-color .18s ease, box-shadow .18s ease; }
+.analysis-crs-field :is(input, select):focus { border-color: rgba(77,226,177,.58); box-shadow: 0 0 0 3px rgba(77,226,177,.08); }
 .analysis-crs-field input[aria-invalid="true"] { border-color: rgba(255,100,124,.7); box-shadow: 0 0 0 3px rgba(255,100,124,.08); }
 .analysis-crs-help { margin-bottom: 17px; }
 .analysis-crs-help.error { color: var(--red); }
@@ -299,7 +299,7 @@ input[type="range"] { width: 100%; accent-color: var(--green); margin: 15px 0 6p
 [data-theme="light"] .object-filter-note,
 [data-theme="light"] .map-privacy-note { background: rgba(8, 123, 93, .045); }
 [data-theme="light"] .dxf-version-field select { background: #fff; }
-[data-theme="light"] .analysis-crs-field input { background: #fff; }
+[data-theme="light"] .analysis-crs-field :is(input, select) { background: #fff; }
 [data-theme="light"] .statusbar { color: var(--muted); background: #fff; }
 [data-theme="light"] .drop-zone small,
 [data-theme="light"] .metric-card small,
@@ -374,3 +374,5 @@ input[type="range"] { width: 100%; accent-color: var(--green); margin: 15px 0 6p
 .cleaner-details > summary { cursor: pointer; color: var(--green); font-size: 11px; padding: 5px 0; }
 .cleaner-details[open] > summary { margin-bottom: 8px; }
 .cleaner-details:not([open]) > :not(summary) { display: none; }
+
+.analysis-crs-field[hidden] { display: none; }
