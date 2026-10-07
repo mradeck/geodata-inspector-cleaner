@@ -69,7 +69,7 @@ export const de = {
   "plan.hatches": "Schraffur-Umrisse beim gemeinsamen Export erzeugen",
   "plan.hatchNote": "Schraffuren werden durch vollständige Umrisse ersetzt. Vorhandene Umrisse werden wiederverwendet. Abwählen deaktiviert die Erzeugung neuer Umrisse.",
   "plan.saved": "Gemeinsamer Export gespeichert · {count} DXF-Objekte · Arbeitsstand aktualisiert",
-  "plan.unsupported": "Kompakter Export unterstützt diese ausgewählten Objekttypen noch nicht: {types}. Bitte abwählen oder die Quelldatei weiterverwenden.",
+  "plan.unsupported": "Kompakter Export unterstützt diese ausgewählten Objekttypen noch nicht: {types}. „Nur Geometrie“ ausschalten, um diese Objekte beim normalen Export zu erhalten.",
   "plan.replacedHatches": "{count} Schraffuren durch vollständige Umrisse ersetzt.",
   "plan.failed": "Exportplan kann nicht erstellt werden. Bitte Datei und Auswahl prüfen.",
   "plan.removeCluster": "Bereich {index} löschen · {count} Objekte",

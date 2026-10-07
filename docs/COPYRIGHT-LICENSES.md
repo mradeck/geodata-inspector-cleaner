@@ -1,6 +1,6 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2610.3.23
+**Release:** 2610.3.24
 
 **Prüfstand:** 8. Oktober 2026
 
@@ -150,3 +150,5 @@ lokaler unabhängiger Kontrollimport mit bereits installiertem ezdxf.
 Nur Footer-CSS und externe Links ergänzt; keine neue Bibliothek. ALKIS/LDBV und Datenlizenz sind weiterführende Links, keine zusätzlich eingebundenen Kartendienste.
 
 2610.3.23: CRS-Auswahl mit nativen HTML-Elementen; Abhängigkeiten, Lockfile-Lizenzen und externe Dienste unverändert.
+
+2610.3.24: Eigene Parserkorrektur für DXF-Kommentare; keine neue Bibliothek, keine Einbindung von LibreDWG, unveränderte Lockfile-Lizenzen und Dienste.

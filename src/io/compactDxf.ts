@@ -10,6 +10,8 @@ function records(text: string): Record[] {
   const lines=text.split(/\r\n|\n|\r/); if(lines.at(-1)==='')lines.pop();
   const out: Record[]=[];let section='';let r:Record|undefined;
   for(let i=0;i<lines.length;i+=2){const t=pair(Number(lines[i]),lines[i+1]!);
+    // DXF comments may precede the first SECTION; they are not CAD records.
+    if(t.code===999)continue;
     if(t.code===0){r={type:t.value.trim(),tags:[],section};out.push(r);}
     if(!r)throw new Error('invalid-dxf');r.tags.push(t);
     if(r.type==='SECTION'&&t.code===2){section=t.value.trim();r.section=section;}

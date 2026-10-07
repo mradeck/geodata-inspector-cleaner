@@ -70,7 +70,7 @@ export const en: Record<TranslationKey, string> = {
   "plan.hatches": "Generate hatch outlines in the combined export",
   "plan.hatchNote": "Hatches are replaced by complete outlines. Existing outlines are reused. Uncheck to disable generation of new outlines.",
   "plan.saved": "Combined export saved · {count} DXF objects · working dataset updated",
-  "plan.unsupported": "Compact export does not yet support these selected object types: {types}. Deselect them or keep using the source file.",
+  "plan.unsupported": "Compact export does not yet support these selected object types: {types}. Turn off geometry-only mode to preserve these objects in the normal export.",
   "plan.replacedHatches": "{count} hatches replaced by complete outlines.",
   "plan.failed": "Could not prepare the export plan. Check the file and selection.",
   "plan.removeCluster": "Remove area {index} · {count} objects",

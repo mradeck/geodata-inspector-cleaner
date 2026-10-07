@@ -43,3 +43,16 @@ it('retains only used block definitions and their layers with complete INSERT at
  const out=compactDxf(source);expect(out.entityCount).toBe(1);expect(out.content).toContain('Used');expect(out.content).not.toContain('Unused');expect(out.content).toContain('block-layer');
  expect(inspectDxfDuplicates(out.content).entities[0]!.tags.filter(t=>t.code===0).map(t=>t.value)).toEqual(['INSERT','ATTRIB','SEQEND']);
 });
+
+it.each([false, true])('accepts DXF comments before SECTION and between records (stripAnnotations=%s)', stripAnnotations => {
+ const point=tags(0,'POINT',5,'A',100,'AcDbEntity',8,'Survey',100,'AcDbPoint',10,123.456789,999,'Comment within entity',20,456.789123,30,42.123456);
+ const text=tags(0,'TEXT',5,'B',100,'AcDbEntity',8,'Labels',100,'AcDbText',10,123,20,456,30,42,40,1,1,'Point name');
+ const source=tags(999,'Synthetic CAD exporter',999,'Second comment')+file(point+text);
+ const dataset=parseDxf(source,'synthetic-comments.dxf');
+ const result=createPlannedDxf(dataset,{compact:true,stripAnnotations,duplicateIds:new Set(),removedFeatureIds:new Set(),hatchOutlines:false});
+ const check=inspectDxfDuplicates(result.content);
+ expect(check.error).toBeNull();
+ expect(check.entities.map(e=>e.type)).toEqual(stripAnnotations?['POINT']:['POINT','TEXT']);
+ for(const code of [10,20,30])expect(check.entities[0]!.tags.find(t=>t.code===code)?.value).toBe(dataset.dxfDuplicates!.entities[0]!.tags.find(t=>t.code===code)?.value);
+ expect(dataset.dxfDuplicates!.source).toBe(source);
+});

@@ -17,7 +17,7 @@
           <span class="brand-copy">
             <span class="brand-title-line">
               <strong>Geodata Inspector</strong>
-              <span id="header-version" class="brand-version">v2610.3.23</span>
+              <span id="header-version" class="brand-version">v2610.3.24</span>
             </span>
             <small>& Cleaner</small>
           </span>
@@ -286,7 +286,8 @@
             <small data-i18n="cleaner.normalized">Originaldaten erhalten; nur Geometrie ist optional.</small>
             </details>
             <div class="cleaner-actions">
-              <button id="download-cleaned" class="button cleaner-button" type="button" disabled data-i18n="cleaner.download">Bereinigte Datei speichern</button>
+              <p id="export-plan-error" class="export-plan-error" role="alert" hidden></p>
+              <button aria-describedby="export-plan-error" id="download-cleaned" class="button cleaner-button" type="button" disabled data-i18n="cleaner.download">Bereinigte Datei speichern</button>
               <button id="download-geojson-as-dxf" class="button cleaner-button cleaner-convert-button" type="button" disabled hidden data-i18n="cleaner.convertDxf">Als DXF exportieren</button>
             </div>
             <small id="cleaner-conversion-note" hidden data-i18n="cleaner.conversionNote">Koordinaten bleiben unverändert; es erfolgt keine automatische Reprojektion.</small>
@@ -320,7 +321,7 @@
         </div>
         <div class="statusbar">
         <span id="status"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></span>
-        <span data-i18n="version.label">Version 2610.3.23</span>
+        <span data-i18n="version.label">Version 2610.3.24</span>
         </div>
       </footer>
     </div>

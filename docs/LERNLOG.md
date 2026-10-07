@@ -886,3 +886,11 @@ Footer mit MeasureMap abgeglichen: Link-Pills, fehlende öffentliche Projekt-/Qu
 Native datalist filtert nach dem bereits eingetragenen Wert; dadurch sah die Liste wie eine Beschränkung auf 25832 aus. Durch select mit allen fünf integrierten CRS ersetzt. Eigene Eingabe separat erreichbar, Synchronisierung bei Import/Export und Sprachwechsel. Keine Änderung der Erkennung oder Koordinaten.
 
 Prüfung: 179 Tests bestanden, 10 optionale Tests übersprungen; Typprüfung und Produktionsbuild erfolgreich. Browser: GK4-Auswahl und eigene Eingabe mit Normalisierung geprüft. npm audit: 5 Befunde in Entwicklungsabhängigkeiten (2 moderat, 3 hoch), Produktionsabhängigkeiten ohne Befund; keine Abhängigkeiten geändert. Repository öffentlich.
+
+## 2610.3.24 · 2026-10-08 · DXF-Kommentare
+
+Nur-Geometrie scheiterte bereits beim ersten Kommentar (999) vor SECTION. Kommentar-Tags im kompakten Record-Parser überspringen, ohne Geometrie zu verändern. Synthetische Regression für führende und interne Kommentare, beide Beschriftungsmodi und exakten XYZ-Erhalt. Private Originaldatei nur lokal geprüft.
+
+Exportfehler stehen zusätzlich direkt über dem Exportbutton. Nicht unterstützte Objekte wie Layout-VIEWPORTs sperren den kompakten Export weiterhin; „Nur Geometrie“ ausschalten, um sie im normalen Export zu erhalten.
+
+Verifiziert: 181 Tests bestanden, 10 optionale Tests übersprungen; Build erfolgreich. Private HBF-Datei: normaler Export mit 9613 Entitäten möglich, kompakter Export nach Kommentarfix wegen zweier Layout-VIEWPORTs gesperrt. Browserprüfung mit synthetischer VIEWPORT-Datei: Sperrgrund am Button sichtbar, nach Ausschalten wieder exportierbar. Audit weiterhin 5 Entwicklungsbefunde; Abhängigkeiten unverändert, Repository öffentlich.

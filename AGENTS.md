@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2610.3.23`
-- **npm-kompatible Version:** `2610.3.23`
+- **Aktuelle Release-Version:** `2610.3.24`
+- **npm-kompatible Version:** `2610.3.24`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
@@ -220,6 +220,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2610.3.24` | 2026-10-08 | DXF-Kommentare im Nur-Geometrie-Export akzeptieren. |
 | `2610.3.23` | 2026-10-08 | Ungefilterte CRS-Auswahl mit Namen und separater eigener Eingabe. |
 | `2610.3.22` | 2026-10-04 | Footer-Buttons wie MeasureMap, beidseitiger Link-Abgleich und englisches Imprint. |
 | `2610.3.21` | 2026-10-03 | DXF und GeoJSON in jeder Reihenfolge hinzufügen; Mehrfachauswahl, expliziter Reset, native CAD-Ressourcen zusammenführen. |
@@ -351,3 +352,9 @@ Gemeinsame Footer-Links mit MeasureMap abgleichen, öffentliche App-Websites ver
 ## 2610.3.23 · 2026-10-08 · CRS-Auswahl
 
 Die CRS-Auswahl zeigt alle fünf integrierten Karten-Koordinatensysteme mit EPSG-Code und Namen, unabhängig vom aktuellen Wert. GK4 ist direkt als EPSG:31468 wählbar. Eigene EPSG-Eingabe bleibt möglich; nicht registrierte Codes erhalten dadurch keine Kartenprojektion. Ein Wechsel startet die Analyse neu, ohne Quellkoordinaten zu transformieren.
+
+## 2610.3.24 · 2026-10-08 · DXF comments
+
+Nur-Geometrie-Export akzeptiert gültige DXF-Kommentare vor der ersten SECTION, etwa aus LibreDWG. Diese Kommentare sperrten den Export bisher fälschlich. Geometrie und Z-Werte bleiben erhalten.
+
+Exportfehler stehen zusätzlich direkt über dem Exportbutton. Nicht unterstützte Objekte wie Layout-VIEWPORTs sperren den kompakten Export weiterhin; „Nur Geometrie“ ausschalten, um sie im normalen Export zu erhalten.

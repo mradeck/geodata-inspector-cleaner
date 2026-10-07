@@ -711,6 +711,9 @@ function renderCleaner(report: InspectionReport): void {
   elements.downloadGeoJsonAsDxf.disabled = !chosen.length;
   elements.cleanerConversionNote.hidden = report.dataset.format !== "geojson";
   preparedDxf = null;
+  const exportError = byId<HTMLElement>("export-plan-error");
+  exportError.hidden = true;
+  exportError.textContent = "";
   if (isDxf) {
     try {
       preparedDxf = createPlannedDxf(report.dataset, { duplicateIds: duplicatePanel.selection(), removedFeatureIds: removed, hatchOutlines: hatchPanel.active(), compact: geometryOnly, stripAnnotations: geometryOnly, removedEntityIds:mapExcluded, singleVertexActions: singleVertexPanel.selection() });
@@ -723,7 +726,10 @@ function renderCleaner(report: InspectionReport): void {
       const protectedCount = a.protectedObjectsRetained.length + a.partialObjectsRetained.length;
       if (protectedCount) elements.cleanerSummary.textContent += " " + t("plan.protected", { count: protectedCount });
       if (a.skippedHatches.length) elements.cleanerSummary.textContent += " " + t("hatch.skipped", { count: a.skippedHatches.length });
-    } catch (error) { elements.cleanerSummary.textContent = error instanceof Error && error.message.startsWith("compact-unsupported:") ? t("plan.unsupported", { types: error.message.split(":")[1]! }) : t("plan.failed"); }
+    } catch (error) { elements.cleanerSummary.textContent = error instanceof Error && error.message.startsWith("compact-unsupported:") ? t("plan.unsupported", { types: error.message.split(":")[1]! }) : t("plan.failed");
+      exportError.textContent = elements.cleanerSummary.textContent;
+      exportError.hidden = false;
+    }
     const repair = singleVertexPanel.stats();
     const repairLabel = document.createElement('label'); repairLabel.className = 'plan-cluster plan-operation repair-operation';
     const repairSelect = document.createElement('select'); repairSelect.className = 'repair-select'; repairSelect.setAttribute('aria-label', t('repair.action'));

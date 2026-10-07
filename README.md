@@ -6,7 +6,7 @@ A local-first single-page app for inspecting and cleaning spatial outliers in DX
 
 [Open the app](https://geodata-inspector-cleaner.netlify.app/)
 
-**Version: 2610.3.23.** The source code is licensed under MIT. Real survey files, coordinate-based private regression fixtures and project screenshots are excluded from the repository and its published history.
+**Version: 2610.3.24.** The source code is licensed under MIT. Real survey files, coordinate-based private regression fixtures and project screenshots are excluded from the repository and its published history.
 
 The language button uses bundled SVG flags for consistent display on Windows, macOS and Linux.
 
@@ -147,3 +147,9 @@ Footer links now use rounded buttons matching MeasureMap. The shared project and
 ## 2610.3.23 · 2026-10-08 · CRS selection
 
 All five built-in map coordinate systems are now available in an unfiltered CRS dropdown, with EPSG codes and names. Select GK4 / EPSG:31468 for appropriate Gauss-Kruger zone 4 data. Custom EPSG input remains available; unregistered codes do not add map projection support. Changing the selection reruns analysis without transforming source coordinates.
+
+## 2610.3.24 · 2026-10-08 · DXF comments
+
+Geometry-only export now accepts valid DXF comments before the first SECTION, including files written by LibreDWG. Previously these comments incorrectly blocked export. Geometry and Z values are preserved.
+
+Export preparation errors are also shown directly above the export button. Unsupported objects such as layout VIEWPORTs continue to block compact export; turn off geometry-only mode to retain them in the normal export.

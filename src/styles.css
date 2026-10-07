@@ -376,3 +376,5 @@ input[type="range"] { width: 100%; accent-color: var(--green); margin: 15px 0 6p
 .cleaner-details:not([open]) > :not(summary) { display: none; }
 
 .analysis-crs-field[hidden] { display: none; }
+
+.export-plan-error { color: var(--red); font-size: 12px; line-height: 1.5; margin: 8px 0; }
