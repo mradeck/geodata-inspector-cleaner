@@ -1,4 +1,4 @@
-import { marked } from "marked";
+import { renderMarkdown } from "./markdown";
 import germanConcept from "../docs/PRODUCT-DESIGN.md?raw";
 import englishConcept from "../docs/PRODUCT-DESIGN.en.md?raw";
 import "./styles.css";
@@ -36,7 +36,7 @@ onLanguageChange(() => renderConcept());
 function renderConcept(): void {
   const language = getLanguage();
   const markdown = language === "de" ? germanConcept : englishConcept;
-  content.innerHTML = marked.parse(markdown, { async: false }) as string;
+  content.innerHTML = renderMarkdown(markdown);
   syncLanguageControl(language);
   document.title = `${t("header.concept")} · ${t("app.title")}`;
   window.history.replaceState(null, "", `?lang=${language}`);

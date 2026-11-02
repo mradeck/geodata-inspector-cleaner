@@ -1,4 +1,4 @@
-import { marked } from "marked";
+import { renderMarkdown } from "./markdown";
 import readme from "../README.de.md?raw";
 import "./styles.css";
 import "./concept.css";
@@ -38,7 +38,7 @@ onThemeChange(() => syncThemeControl());
 
 function renderHelp(): void {
   const language = getLanguage();
-  content.innerHTML = marked.parse(readme, { async: false }) as string;
+  content.innerHTML = renderMarkdown(readme);
   syncLanguageControl(language);
   syncThemeControl();
   document.title = `${t("header.help")} · ${t("app.title")}`;

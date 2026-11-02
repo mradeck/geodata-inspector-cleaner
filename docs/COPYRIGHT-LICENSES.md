@@ -1,6 +1,6 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2611.3.25
+**Release:** 26.22.1
 
 **Prüfstand:** 2. November 2026
 
@@ -154,3 +154,5 @@ Nur Footer-CSS und externe Links ergänzt; keine neue Bibliothek. ALKIS/LDBV und
 2610.3.24: Eigene Parserkorrektur für DXF-Kommentare; keine neue Bibliothek, keine Einbindung von LibreDWG, unveränderte Lockfile-Lizenzen und Dienste.
 
 2611.3.25: Einheitliches Erscheinungsbild (neutrales Farbschema, dreistufiger Theme-Knopf mit Inline-SVG-Symbolen, zwei Fußleisten). Keine neue Bibliothek, keine neuen externen Dienste; Lockfile-Lizenzen unverändert. Die Fußleiste verlinkt zusätzlich GeoTIFF Inspector und den Quellcode auf GitHub (reine Links, kein Embed oder Prefetch).
+
+26.22.1: Umstellung des Versionsschemas auf `Jahr.Push.Iteration` und gemeinsamer Markdown-Renderer (`src/markdown.ts`) für Haupt-App, Hilfe und Konzept. `marked` wird dadurch in der Haupt-App nicht mehr nachgeladen, sondern mit dem gemeinsamen Chunk ausgeliefert; Bibliotheken, Versionen, Lizenzen und Dienste unverändert.

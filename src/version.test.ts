@@ -12,9 +12,9 @@ describe("Versionskonsistenz", () => {
     expect(en["version.label"]).toBe(`Version ${packageMetadata.displayVersion}`);
   });
 
-  it("bildet die kanonische Version npm-kompatibel ohne führende Release-Null ab", () => {
-    const [period, release, patch] = packageMetadata.displayVersion.split(".");
-    expect(packageMetadata.version).toBe(`${period}.${Number(release)}.${patch}`);
+  it("folgt dem Schema Jahr.Push.Iteration und ist npm-kompatibel identisch", () => {
+    expect(packageMetadata.displayVersion).toMatch(/^\d{2}\.[1-9]\d*\.[1-9]\d*$/);
+    expect(packageMetadata.version).toBe(packageMetadata.displayVersion);
   });
 
   it("zeigt die vollständige Version neben dem App-Titel an", () => {

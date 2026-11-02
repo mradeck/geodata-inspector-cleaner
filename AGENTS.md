@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2611.3.25`
-- **npm-kompatible Version:** `2611.3.25`
+- **Aktuelle Release-Version:** `26.22.1`
+- **npm-kompatible Version:** `26.22.1`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
@@ -17,30 +17,39 @@
 Lokale, datenschutzfreundliche Single-Page-App zur Inspektion und bewussten
 Bereinigung räumlicher Auffälligkeiten in DXF- und GeoJSON-Dateien.
 
-## Versionsschema und Subversionen
+## Versionsschema `Jahr.Push.Iteration`
 
-Die sichtbare und npm-kompatible Version folgt `JJMM.R.P`, ohne führende Null
-im Release-Segment. `JJMM` ist das aktuelle Jahr/Monat; `R` bezeichnet die
-Release-Linie und `P` die Subversion. Bei jeder abgeschlossenen Feature-/Bugfix-
-Runde `P` erhöhen und den Kalendermonat ausdrücklich prüfen. Eine anderslautende
-konkrete Versionsvorgabe des Nutzers hat Vorrang. Kein starrer alter Monatspräfix.
+Seit **26.22.1** (2. November 2026) folgt die sichtbare und npm-kompatible
+Version `Jahr.Push.Iteration`, ohne führende Nullen außer im Jahr:
 
-Für die Runde vom 28. September 2026 ist die vom Nutzer ausdrücklich gewünschte
-Ausgangsversion **2609.3.3** vorgegeben; der anschließende Bugfix hat **2609.3.4**. Sie korrigiert zugleich den veralteten Juli-
-Präfix und enthält die Schraffur-Umrissfunktion. `displayVersion`, package/lock,
-HTML-Fallbacks und Dokumentation müssen übereinstimmen. Historische Versionen
-bleiben als tatsächlich veröffentlichte Stände dokumentiert.
+- `Jahr`: zweistellige Jahreszahl (`26` für 2026).
+- `Push`: laufende Nummer des GitHub-Pushes auf `main` im Jahr. Jeder Push auf
+  `main` erhöht sie um 1 und setzt die Iteration auf 1. Mit dem Jahreswechsel
+  beginnt die Zählung neu.
+- `Iteration`: lokale Arbeitsrunde vor dem nächsten Push. Jede abgeschlossene
+  Feature-/Bugfix-Runde ohne Push erhöht sie um 1.
+
+Der Wert steht identisch in `package.json` (`version`, `displayVersion`),
+`package-lock.json`, den HTML-Fallbacks, App-Kopf, Fußleiste, Statuszeile,
+Exportberichten und im Betreff der Kontakt-Mail. Eine anderslautende konkrete
+Versionsvorgabe des Nutzers hat Vorrang.
+
+Historie: Bis `2611.3.25` galt `JJMM.R.P` (Jahr/Monat, Release-Linie `R`,
+Subversion `P`). Der Push-Zähler für 26.22.1 wurde aus der Zahl der
+main-Commits 2026 abgeleitet (21 bisher, dieser Push ist Nummer 22). Die
+früheren Versionen bleiben als tatsächlich veröffentlichte Stände dokumentiert,
+ebenso die ausdrücklich vorgegebenen September-Versionen 2609.3.3/2609.3.4.
 
 ## Versionierungs-, Dokumentations- und Push-Regel
 
 Jede vollständig umgesetzte und verifizierte Feature-Runde beziehungsweise jeder
-Bugfix erhöht die lokale Subversion `P` vor der Übergabe automatisch. Dabei
+Bugfix erhöht die lokale Iteration vor der Übergabe automatisch. Dabei
 werden `package.json`, `package-lock.json`, `displayVersion`, sichtbare
 Dev-Server-Version, Berichtsversion, README, Lernlog und Versionshistorie
 konsistent nachgezogen. So ist am lokalen Dev-Server unmittelbar erkennbar,
 welcher Arbeitsstand aktiv ist.
 
-Git-Commits, GitHub-Pushes und das Eröffnen einer neuen Release-Linie `RR`
+Git-Commits und GitHub-Pushes (und damit eine neue Push-Nummer)
 erfolgen weiterhin **nur auf ausdrückliche Ansage des Nutzers**.
 
 Wenn ein GitHub-Push, Release-Stand oder explizites Dokumentationsupdate
@@ -48,7 +57,7 @@ beauftragt ist, sind Release-Stand und Dokumentation konsistent nachzuziehen.
 
 Pflichtschritte zum Abschluss jeder Feature-/Bugfix-Runde:
 
-1. **Subversion erhöhen**
+1. **Iteration erhöhen** (bei einem Push auf `main`: Push-Nummer +1, Iteration 1)
    - kanonische Release-Version bestimmen,
    - `package.json` und `package-lock.json` npm-kompatibel aktualisieren,
    - `displayVersion`, sichtbare App-Version und Berichtsversion aktualisieren,
@@ -84,8 +93,8 @@ Zusätzliche Pflichtschritte nur bei ausdrücklich beauftragtem Push:
 
 Merksätze:
 
-- **Jede abgeschlossene Feature-/Bugfix-Runde endet mit einer lokal sichtbaren Patchversion.**
-- **Keine neue `RR`-Release-Linie und kein Git-Push ohne ausdrückliche Ansage.**
+- **Jede abgeschlossene Feature-/Bugfix-Runde endet mit einer lokal sichtbaren Iteration.**
+- **Kein Git-Push (und keine neue Push-Nummer) ohne ausdrückliche Ansage.**
 - **Kein Push ohne Versionssprung und aktualisierte Kerndokumentation.**
 - **`push git` beziehungsweise `git push` meint den vollständigen
   Release-Ablauf einschließlich Lizenzcheck, Verifikation, Commit und Push.**
@@ -225,6 +234,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `26.22.1` | 2026-11-02 | Umstellung des Versionsschemas auf `Jahr.Push.Iteration` (zuletzt `2611.3.25`); Hilfe- und Konzeptseite im Produktions-Build wieder mit Inhalt. |
 | `2611.3.25` | 2026-11-02 | Einheitliches Erscheinungsbild: neutrales Farbschema, Theme automatisch/hell/dunkel, zwei Fußleisten mit GeoTIFF Inspector, Version und Quellcode. |
 | `2610.3.24` | 2026-10-08 | DXF-Kommentare im Nur-Geometrie-Export akzeptieren. |
 | `2610.3.23` | 2026-10-08 | Ungefilterte CRS-Auswahl mit Namen und separater eigener Eingabe. |
@@ -373,3 +383,17 @@ mit Inline-SVG (Halbkreis/Sonne/Mond), Sprachknopf mit SVG-Fahne und Kürzel,
 Fußleiste 1 „Weitere Apps“ (eigene App nicht verlinken, GeoTIFF Inspector
 ergänzt), Fußleiste 2 mit Autor · © Jahr · Version, Datenquellen, Quellcode,
 Hilfe/Bugreport/Kontakt, Lizenzen, Impressum, Ko-fi. Die Statuszeile bleibt.
+
+## 26.22.1 · 2026-11-02 · Versionsschema und Hilfeseite im Build
+
+Umstellung von `JJMM.R.P` (zuletzt `2611.3.25`) auf `Jahr.Push.Iteration`;
+Push-Zähler aus der Zahl der main-Commits 2026 abgeleitet. Altfehler behoben:
+`help.html`/`concept.html` blieben im Produktions-Build leer („Element
+#header-version fehlt.“), weil der gemeinsam genutzte marked-Chunk den
+main-Chunk importierte (Rolldown legte den Laufzeit-Helfer für den dynamischen
+`import("marked")` der Haupt-App dort ab) und so den App-Bootstrap startete.
+`src/markdown.ts` ist jetzt der gemeinsame Renderer und wird überall statisch
+importiert. Merksatz: Nebenseiten dürfen den main-Chunk nicht erreichen;
+`src/buildChunks.test.ts` prüft das am echten Build. Eine Rolldown-Gruppe für
+`\0rolldown/runtime.js` greift nicht (die Laufzeit läuft nicht durch die
+Gruppen-Tests).

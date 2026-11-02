@@ -13,7 +13,7 @@ Der Sprachbutton verwendet mitgelieferte SVG-Flaggen für eine einheitliche Anze
 
 ## Projektstatus
 
-**Version 2611.3.25 – einheitliches Erscheinungsbild.** Der
+**Version 26.22.1 – einheitliches Erscheinungsbild.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -272,11 +272,15 @@ npm run build
 
 ## Versionierung
 
-Aktuell **2611.3.25**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
-lautet `JJMM.R.P`: Jahr/Monat, Release-Linie, Subversion. Derselbe Wert steht in
-`package.json`, `package-lock.json`, `displayVersion`, App und Prüfberichten.
-Bei neuen Runden wird auch der aktuelle Monat geprüft. Frühere Einträge mit
-Juli-Präfix bleiben in der Historie als damals veröffentlichte Stände erhalten.
+Aktuell **26.22.1**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
+lautet `Jahr.Push.Iteration`: zweistellige Jahreszahl, laufende Nummer des
+GitHub-Pushes auf `main` im Jahr, lokale Iteration. Jeder Push auf `main` erhöht
+die Push-Nummer und setzt die Iteration auf 1; lokale Arbeitsrunden davor zählen
+die Iteration hoch. Derselbe Wert steht in `package.json`, `package-lock.json`,
+`displayVersion`, App, Fußleiste, Kontakt-Mail-Betreff und Prüfberichten.
+Bis `2611.3.25` galt das Schema `JJMM.R.P` (Jahr/Monat, Release-Linie,
+Subversion); diese Einträge bleiben in der Historie als damals veröffentlichte
+Stände erhalten.
 
 ## Leitprinzipien
 
@@ -308,6 +312,7 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `26.22.1` | 2026-11-02 | Umstellung des Versionsschemas auf `Jahr.Push.Iteration` (zuletzt `2611.3.25`); Hilfe- und Konzeptseite im Produktions-Build wieder mit Inhalt. |
 | `2611.3.25` | 2026-11-02 | Einheitliches Erscheinungsbild: neutrales Farbschema, Theme-Knopf automatisch/hell/dunkel, zwei Fußleisten mit GeoTIFF Inspector, Version und Quellcode. |
 | `2610.3.24` | 2026-10-08 | DXF-Kommentare im Nur-Geometrie-Export akzeptieren. |
 | `2610.3.23` | 2026-10-08 | Ungefilterte CRS-Auswahl mit Namen und separater eigener Eingabe. |
@@ -480,3 +485,7 @@ Die App nutzt jetzt das gemeinsame Erscheinungsbild der öffentlichen Apps von M
 - **Zwei Fußleisten:** „Weitere Apps“ (jetzt auch GeoTIFF Inspector) sowie Autor, Jahr und Version mit Datenquellen, Quellcode, Hilfe / Bugreport / Kontakt, Lizenzen / Copyright, Impressum und Ko-fi.
 
 Analyse, Bereinigung und Export sind unverändert.
+
+## 26.22.1 · 2026-11-02 · Versionsschema und Hilfeseite
+
+Die Version folgt jetzt `Jahr.Push.Iteration`: zweistellige Jahreszahl, laufende Nummer des GitHub-Pushes auf `main` im Jahr und die lokale Iteration (bisher `JJMM.R.P`, zuletzt `2611.3.25`). Hilfe- und Konzeptseite blieben in der veröffentlichten Fassung leer, weil sie versehentlich die Haupt-App mitstarteten; sie laden jetzt wieder eigenständig. Analyse, Bereinigung und Export sind unverändert.

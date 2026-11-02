@@ -21,6 +21,7 @@ import {
   type LayerObjectSummary,
 } from "./analysis/layerFilter";
 import { selectDisturbanceArea } from "./analysis/selectDisturbanceArea";
+import { renderMarkdown } from "./markdown";
 import { median } from "./analysis/statistics";
 import { assessClustersForMap, normalizeEpsg, type ClusterMapReport, type MapClusterAssessment } from "./geo/mapProjection";
 import {
@@ -1285,11 +1286,8 @@ function openCopyrightDialog(): void {
 
 async function loadCopyrightContent(): Promise<void> {
   try {
-    const [{ marked }, copyrightDocument] = await Promise.all([
-      import("marked"),
-      import("../docs/COPYRIGHT-LICENSES.md?raw"),
-    ]);
-    elements.copyrightContent.innerHTML = marked.parse(copyrightDocument.default, { async: false }) as string;
+    const copyrightDocument = await import("../docs/COPYRIGHT-LICENSES.md?raw");
+    elements.copyrightContent.innerHTML = renderMarkdown(copyrightDocument.default);
     elements.copyrightContent.querySelectorAll<HTMLAnchorElement>("a").forEach((anchor) => {
       anchor.target = "_blank";
       anchor.rel = "noopener";

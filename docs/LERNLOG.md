@@ -902,3 +902,27 @@ Angleichung an das gemeinsame Design der öffentlichen Apps (Vorbild GeoTIFF Ins
 Theme dreistufig (`gic.theme`: auto/light/dark, Default auto). Statt den Media-Query-Zweig für jede `[data-theme="light"]`-Regel zu duplizieren, löst ein Inline-Skript im `<head>` „auto“ vor dem ersten Zeichnen auf und setzt `data-theme` auf das effektive Theme (zusätzlich `data-theme-mode`); `theme.ts` hört auf Systemwechsel. Merksatz: Ein JS-aufgelöstes effektives Theme hält bestehende Theme-Selektoren gültig; der Pre-Paint-Code muss klassisches (nicht Modul-)Skript sein.
 
 Verifiziert: siehe Bericht dieser Runde (Tests, Build, Browser-Screenshots hell/dunkel, DE/EN).
+
+## 26.22.1 · 2026-11-02 · Umstellung des Versionsschemas, Hilfeseite im Build
+
+26.22.1 — Umstellung von JJMM.R.P (zuletzt 2611.3.25) auf Jahr.Push.Iteration;
+Push-Zähler aus der Zahl der main-Commits 2026 abgeleitet (21 Commits auf
+`origin/main` seit dem 1. Januar 2026, dieser Push ist Nummer 22).
+
+Altfehler: Im Produktions-Build (`npm run build` + `vite preview`) blieb
+`help.html` leer mit „Element #header-version fehlt.“; `concept.html` war
+gleich betroffen. Ursache: Haupt-App lud `marked` per `import("marked")`,
+Hilfe und Konzept statisch. Rolldown legte den Laufzeit-Helfer für das
+Namensraum-Objekt des dynamischen Imports in den main-Chunk; der gemeinsame
+marked-Chunk importierte deshalb main, und die Nebenseiten führten den
+App-Bootstrap aus. Im Dev-Server tritt das nicht auf. Eine Code-Splitting-
+Gruppe für `\0rolldown/runtime.js` wirkt nicht, die Laufzeit durchläuft die
+Gruppen-Tests nicht. Lösung: gemeinsamer Renderer `src/markdown.ts`, überall
+statisch importiert; der Chunk landet im gemeinsamen `theme`-Chunk ohne
+Rückverweis auf main (Kosten: marked rund 12 kB gzip zusätzlich beim Start der
+Haupt-App). Regressionstest `src/buildChunks.test.ts` baut mit `write: false`
+und prüft, dass help/concept den main-Chunk weder statisch noch dynamisch
+erreichen; mit dem alten Code schlägt er fehl.
+
+Merksatz: Dev-Server grün heißt nicht Build grün — Mehrseiten-Builds auf
+Rückverweise zwischen Entry-Chunks prüfen.
