@@ -987,7 +987,7 @@ function renderCanvases(): void {
 }
 
 function setStatus(message: string, type: "working" | "error" | "warning" | "ok"): void {
-  elements.status.className = `status-${type}`;
+  elements.status.className = `status-line status-${type}`;
   elements.status.innerHTML = `<i></i><span>${escapeHtml(message)}</span>`;
 }
 

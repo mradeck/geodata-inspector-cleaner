@@ -927,6 +927,24 @@ erreichen; mit dem alten Code schlägt er fehl.
 Merksatz: Dev-Server grün heißt nicht Build grün — Mehrseiten-Builds auf
 Rückverweise zwischen Entry-Chunks prüfen.
 
+## 26.23.2 · 2026-11-02 · Favicon aus dem Markenzeichen, Statusleiste entfernt
+
+Befund: Die App hatte kein Favicon im Repo, der Browser zeigte das
+Standard-Symbol. Das Markenzeichen ist reines CSS (drei `<span>` in
+`.brand-mark`, um 45° gedreht); für das Favicon wurde es als SVG nachgebaut
+(Raute mit Radius 9/34, drei Punkte, dritter mit 55 % Deckkraft) und mit
+weißer Füllung versehen, damit es auf dunklen Tab-Leisten sichtbar bleibt; der
+1-px-Rahmen ist auf 1,6 px verstärkt. Bei 16 px sind die Punkte klein (rund
+2 px); Alternativen mit gefüllter Raute liegen nur als Vorschlag vor.
+
+Die dritte Leiste unter den Fußleisten trug `#status`, in das `setStatus`
+Fortschritt, Lesefehler, CRS-Fehler und Speichermeldungen schreibt. Sie wurde
+nicht ersatzlos gestrichen, sondern als `.status-line` unter das Ablagefeld
+verlegt; `setStatus` setzt die Basisklasse mit, damit die Zustandsklassen sie
+nicht überschreiben.
+
+Merksatz: Beim Entfernen einer Leiste zuerst prüfen, wer hineinschreibt.
+
 ## 26.23.1 · 2026-11-02 · Design-Runde 3: Kopfleiste, englische Hilfe, Inter
 
 Kopfleiste rechts nach gemeinsamer Vorgabe: „Prüfbericht“, Über, Hilfe als

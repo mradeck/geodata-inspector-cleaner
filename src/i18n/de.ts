@@ -1,5 +1,3 @@
-import { APP_VERSION } from "../version";
-
 export const de = {
   "repair.action": "Einpunkt-Linien: Aktion",
   "repair.actionFor": "Aktion für Linie {handle} auf {layer}",
@@ -444,7 +442,6 @@ export const de = {
   "error.format": "Unterstützt werden derzeit .dxf, .geojson und .json.",
   "unit.m": "{value} m",
   "unit.km": "{value} km",
-  "version.label": `Version ${APP_VERSION}`,
 } as const;
 
 export type TranslationKey = keyof typeof de;

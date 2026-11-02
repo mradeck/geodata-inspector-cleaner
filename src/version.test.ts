@@ -6,10 +6,12 @@ import { en } from "./i18n/en";
 import { APP_VERSION } from "./version";
 
 describe("Versionskonsistenz", () => {
-  it("verwendet displayVersion zentral in App und Sprachkatalogen", () => {
+  it("verwendet displayVersion zentral in App, Kopfleiste und Fußleiste", () => {
     expect(APP_VERSION).toBe(packageMetadata.displayVersion);
-    expect(de["version.label"]).toBe(`Version ${packageMetadata.displayVersion}`);
-    expect(en["version.label"]).toBe(`Version ${packageMetadata.displayVersion}`);
+    // Seit 26.23.2 gibt es keine eigene Versionszeile mehr unter der Fußleiste.
+    expect(de).not.toHaveProperty("version.label");
+    expect(en).not.toHaveProperty("version.label");
+    expect(indexPage).toContain('id="footer-version"');
   });
 
   it("folgt dem Schema Jahr.Push.Iteration und ist npm-kompatibel identisch", () => {

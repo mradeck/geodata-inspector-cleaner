@@ -18,7 +18,7 @@ is selected.
 
 ## Project status
 
-**Version 26.23.1 – shared design, round 3.** The source code is licensed under
+**Version 26.23.2 – shared design, round 3.** The source code is licensed under
 MIT. Real survey files, coordinate-based private regression fixtures and project
 screenshots are excluded from the repository and its published history. The
 current version already provides:
@@ -51,7 +51,7 @@ current version already provides:
   link to the Pointcloud Manager demo and an integrated copyright/licence
   overview,
 - the full release version right next to the app title and also in the browser
-  tab and the status line,
+  tab and the footer,
 - a disturbance-area preview that is collapsed by default and renders only
   when needed,
 - a start view bound to the browser height without an outer vertical scroll
@@ -117,7 +117,7 @@ the e-mail template follow the DE/EN language choice.
 ## Version display and compact disturbance preview
 
 As in Pointcloud Manager, the canonical version is shown right next to the app
-title, for example `v26.23.1`. The browser tab and the bottom status line show
+title, for example `v26.23.2`. The browser tab and the footer show
 the same value. The display comes centrally from `package.json` and is not
 maintained as a separate version value.
 
@@ -138,7 +138,7 @@ the **Documentation** section.
 ### Start view and preview grid
 
 The app shell takes exactly the available browser height. Header, workspace and
-status line therefore stay together in the viewport; the empty start view no
+footer therefore stay together in the viewport; the empty start view no
 longer produces an outer vertical scroll bar. After an import, long analysis
 results scroll inside the central stage, and the sidebars scroll in their own
 area when needed. The long help and concept pages remain normally scrollable.
@@ -279,7 +279,7 @@ package publication and is independent of GitHub repository visibility.
 
 ## Versioning
 
-Currently **26.23.1**, a public MIT release with cleaned history. The scheme is
+Currently **26.23.2**, a public MIT release with cleaned history. The scheme is
 `Year.Push.Iteration`: two-digit year, running number of the GitHub push to
 `main` within the year, and the local iteration. Every push to `main` increases
 the push number and resets the iteration to 1; local work rounds before that
@@ -318,6 +318,7 @@ area and the IP address. No tiles are prefetched or collected for offline use.
 
 | Version | Date | Content |
 |---|---|---|
+| `26.23.2` | 2026-11-02 | Favicon from the brand mark (SVG, 32 px PNG, Apple touch icon) on all pages; the third bar under the footer is gone, status messages now appear below the drop zone. |
 | `26.23.1` | 2026-11-02 | Design round 3: header order Inspection report · About · Help as “(i)” · interface · language, English help, self-hosted Inter font, new MeasureMap link. |
 | `26.22.1` | 2026-11-02 | Version scheme changed to `Year.Push.Iteration` (last `2611.3.25`); help and concept pages show content again in the production build. |
 | `2611.3.25` | 2026-11-02 | Shared design: neutral colour scheme, interface button automatic/light/dark, two footer bars with GeoTIFF Inspector, version and source code. |
@@ -543,6 +544,19 @@ the GitHub push to `main` in that year, and the local iteration (previously
 `JJMM.R.P`, last `2611.3.25`). The help and concept pages showed no content in
 the published version because they accidentally started the main app as well;
 they now load independently again. Analysis, cleaning and export are unchanged.
+
+## 26.23.2 · 2026-11-02 · Favicon and two footer bars
+
+- **Favicon:** the browser tab now shows the brand mark of the header (rotated
+  rounded square with three dots, blue on white), as SVG plus a 32 px PNG and an
+  Apple touch icon, on the app, help and concept pages.
+- **Footer:** only the two footer bars remain. The former third line under them
+  (“Ready · data remains on this device” and the version) is gone; the version
+  stays in the header and the footer. Status messages such as “Reading …”, read
+  errors, an invalid CRS or a saved file now appear directly below the drop zone
+  in the input panel.
+
+Analysis, cleaning and export are unchanged.
 
 ## 26.23.1 · 2026-11-02 · Header, English help and font
 

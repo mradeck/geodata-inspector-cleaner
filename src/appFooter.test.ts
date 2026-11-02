@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import page from "../index.html?raw";
+import helpPage from "../help.html?raw";
+import conceptPage from "../concept.html?raw";
+import mainCode from "./main.ts?raw";
 import footerCode from "./appFooter.ts?raw";
 import { supportMailto } from "./appFooter";
 import { APP_VERSION } from "./version";
@@ -31,6 +34,37 @@ describe("App-Fußzeile", () => {
     expect(footer).not.toContain('href="https://geodata-inspector-cleaner.netlify.app/"');
     expect(footer).toContain('id="footer-version"');
     expect(footerCode).toContain('"footer-version").textContent = APP_VERSION');
+  });
+
+  it("besteht aus genau zwei Leisten; Statusmeldungen stehen im Eingabebereich", () => {
+    const footer = page.split('<footer class="app-footer">')[1]!.split('</footer>')[0]!;
+    const bars = [...footer.matchAll(/^        <(nav|div) class="([^"]+)"/gm)].map(match => match[2]);
+    expect(bars).toEqual(["related-apps", "footer-meta"]);
+    expect(footer).not.toContain('id="status"');
+    expect(footer).not.toContain("statusbar");
+    expect(page).not.toContain("statusbar");
+    expect(styles).not.toContain(".statusbar");
+    const sidebar = page.split('<aside class="sidebar sidebar-left">')[1]!.split('</aside>')[0]!;
+    expect(sidebar).toMatch(/<p id="status" class="status-line" role="status" aria-live="polite">/);
+    expect(sidebar.indexOf('id="status"')).toBeGreaterThan(sidebar.indexOf('id="drop-zone"'));
+    expect(mainCode).toContain("elements.status.className = `status-line status-${type}`");
+  });
+
+  it("verlinkt das Favicon aus dem Markenzeichen in allen HTML-Einstiegen", () => {
+    for (const html of [page, helpPage, conceptPage]) {
+      expect(html).toContain('<link rel="icon" type="image/svg+xml" href="./src/assets/favicon.svg" />');
+      expect(html).toContain('<link rel="icon" type="image/png" sizes="32x32" href="./src/assets/favicon-32.png" />');
+      expect(html).toContain('<link rel="apple-touch-icon" sizes="180x180" href="./src/assets/apple-touch-icon.png" />');
+    }
+    const svg = readFileSync(new URL("./assets/favicon.svg", import.meta.url), "utf8");
+    expect(svg).toContain('rotate(45)');
+    expect(svg.match(/<circle /g)).toHaveLength(3);
+    expect(svg).toContain('#1f6fd1');
+    expect(svg).not.toMatch(/<text|font-family/);
+    for (const png of ["favicon-32.png", "apple-touch-icon.png"]) {
+      const bytes = readFileSync(new URL(`./assets/${png}`, import.meta.url));
+      expect(bytes.subarray(1, 4).toString("ascii")).toBe("PNG");
+    }
   });
 
   it("verwendet einen nativen Kontakt-Dialog und die bestehende Lizenzansicht", () => {

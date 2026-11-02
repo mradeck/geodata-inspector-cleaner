@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `26.23.1`
-- **npm-kompatible Version:** `26.23.1`
+- **Aktuelle Release-Version:** `26.23.2`
+- **npm-kompatible Version:** `26.23.2`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Inter (`@fontsource-variable/inter`, selbst gehostet), Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
@@ -30,7 +30,7 @@ Version `Jahr.Push.Iteration`, ohne führende Nullen außer im Jahr:
   Feature-/Bugfix-Runde ohne Push erhöht sie um 1.
 
 Der Wert steht identisch in `package.json` (`version`, `displayVersion`),
-`package-lock.json`, den HTML-Fallbacks, App-Kopf, Fußleiste, Statuszeile,
+`package-lock.json`, den HTML-Fallbacks, App-Kopf, Fußleiste,
 Exportberichten und im Betreff der Kontakt-Mail. Eine anderslautende konkrete
 Versionsvorgabe des Nutzers hat Vorrang.
 
@@ -157,7 +157,7 @@ Merksätze:
   innerhalb ihrer begrenzten Höhe scrollen, damit der Exportbutton erreichbar bleibt.
   Die DWG-Roadmap bleibt in der Dokumentation, erhält aber keine
   separate Kachel in der knappen Seitenleiste.
-- Die Versionsnummer neben dem App-Titel, im Browser-Tab, in der Statuszeile und
+- Die Versionsnummer neben dem App-Titel, im Browser-Tab, in der Fußleiste und
   in Exportberichten stammt zentral aus `displayVersion`; keine zweite
   handgepflegte Laufzeitkonstante einführen.
 - Die Haupt-App bindet `body` und `.app-shell` an `100vh` und hält den äußeren
@@ -244,6 +244,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `26.23.2` | 2026-11-02 | Favicon aus dem Markenzeichen (`src/assets/favicon.svg`, `favicon-32.png`, `apple-touch-icon.png`) in allen drei HTML-Einstiegen; dritte Leiste unter der Fußzeile entfernt, `#status` steht als `.status-line` unter dem Ablagefeld. |
 | `26.23.1` | 2026-11-02 | Design-Runde 3: Kopfleiste Prüfbericht · Über · Hilfe „(i)“ · Interface · Sprache; englische Hilfe aus README.md; Inter selbst gehostet; MeasureMap-Link `measuremap-viewer-editor.netlify.app`. |
 | `26.22.1` | 2026-11-02 | Umstellung des Versionsschemas auf `Jahr.Push.Iteration` (zuletzt `2611.3.25`); Hilfe- und Konzeptseite im Produktions-Build wieder mit Inhalt. |
 | `2611.3.25` | 2026-11-02 | Einheitliches Erscheinungsbild: neutrales Farbschema, Theme automatisch/hell/dunkel, zwei Fußleisten mit GeoTIFF Inspector, Version und Quellcode. |
@@ -408,6 +409,15 @@ importiert. Merksatz: Nebenseiten dürfen den main-Chunk nicht erreichen;
 `src/buildChunks.test.ts` prüft das am echten Build. Eine Rolldown-Gruppe für
 `\0rolldown/runtime.js` greift nicht (die Laufzeit läuft nicht durch die
 Gruppen-Tests).
+
+## 26.23.2 · 2026-11-02 · Favicon, zwei Fußleisten
+
+Favicon = Markenzeichen der Kopfleiste im hellen Interface (`#1f6fd1` auf Weiß,
+Rahmen 50 % Deckkraft), als SVG plus aus dem SVG gerenderte PNGs (32 px, 180 px);
+die Dateien liegen in `src/assets/`, damit Vite sie in allen drei Einstiegen
+hasht. Die dritte Statusleiste unter der Fußzeile ist entfernt; die
+Laufzeitmeldungen von `setStatus` stehen in `#status.status-line` unter dem
+Ablagefeld (role="status", aria-live). Keine zweite Statusleiste wieder einführen.
 
 ## 26.23.1 · 2026-11-02 · Design-Runde 3
 

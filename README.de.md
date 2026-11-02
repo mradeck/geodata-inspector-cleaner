@@ -13,7 +13,7 @@ Der Sprachbutton verwendet mitgelieferte SVG-Flaggen für eine einheitliche Anze
 
 ## Projektstatus
 
-**Version 26.23.1 – einheitliches Erscheinungsbild, Runde 3.** Der
+**Version 26.23.2 – einheitliches Erscheinungsbild, Runde 3.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -44,7 +44,7 @@ aktuelle Stand demonstriert bereits:
 - ein **Über**-Menü mit zweisprachiger „Über mich“-Ansicht, transparenter
   Pointcloud-Manager-Demoverlinkung und integrierter Copyright-/Lizenzübersicht,
 - die vollständige Release-Version direkt neben dem App-Titel und zusätzlich in
-  Browser-Tab und Statuszeile,
+  Browser-Tab und Fußleiste,
 - eine standardmäßig eingeklappte, bedarfsgerecht rendernde
   Störbereichsvorschau,
 - eine an die Browserhöhe gebundene Startansicht ohne äußeren vertikalen
@@ -112,7 +112,7 @@ Beschriftungen, Hilfe-Link und E-Mail-Vorlage folgen der DE-/EN-Sprachwahl.
 ## Versionsanzeige und kompakte Störbereichsvorschau
 
 Die kanonische Version steht nun wie beim Pointcloud Manager direkt neben dem
-App-Titel, beispielsweise `v2609.3.10`. Browser-Tab und untere Statuszeile zeigen
+App-Titel, beispielsweise `v26.23.2`. Browser-Tab und Fußleiste zeigen
 denselben Stand. Die Anzeige wird zentral aus `package.json` bezogen und nicht
 als unabhängiger Versionswert gepflegt.
 
@@ -135,7 +135,7 @@ Seitenleiste entfernt; die DWG-Strategie bleibt weiterhin im Abschnitt
 ### Startansicht und Vorschauraster
 
 Die App-Hülle belegt exakt die verfügbare Browserhöhe. Kopfzeile, Arbeitsbereich
-und Statuszeile bleiben dadurch gemeinsam im Viewport; die leere Startansicht
+und Fußleiste bleiben dadurch gemeinsam im Viewport; die leere Startansicht
 erzeugt keinen äußeren vertikalen Scrollbalken mehr. Nach einem Import scrollen
 lange Analyseergebnisse weiterhin innerhalb der mittleren Bühne, Seitenleisten
 bei Bedarf in ihrem eigenen Bereich. Die langen Hilfe- und Konzeptseiten bleiben
@@ -276,7 +276,7 @@ npm run build
 
 ## Versionierung
 
-Aktuell **26.23.1**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
+Aktuell **26.23.2**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
 lautet `Jahr.Push.Iteration`: zweistellige Jahreszahl, laufende Nummer des
 GitHub-Pushes auf `main` im Jahr, lokale Iteration. Jeder Push auf `main` erhöht
 die Push-Nummer und setzt die Iteration auf 1; lokale Arbeitsrunden davor zählen
@@ -316,6 +316,7 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `26.23.2` | 2026-11-02 | Favicon aus dem Markenzeichen (SVG, 32-px-PNG, Apple-Touch-Icon) auf allen Seiten; die dritte Leiste unter der Fußzeile entfällt, Statusmeldungen stehen jetzt unter dem Ablagefeld. |
 | `26.23.1` | 2026-11-02 | Design-Runde 3: Kopfleiste Prüfbericht · Über · Hilfe als „(i)“ · Interface · Sprache, englische Hilfe, Schrift Inter selbst gehostet, neuer MeasureMap-Link. |
 | `26.22.1` | 2026-11-02 | Umstellung des Versionsschemas auf `Jahr.Push.Iteration` (zuletzt `2611.3.25`); Hilfe- und Konzeptseite im Produktions-Build wieder mit Inhalt. |
 | `2611.3.25` | 2026-11-02 | Einheitliches Erscheinungsbild: neutrales Farbschema, Theme-Knopf automatisch/hell/dunkel, zwei Fußleisten mit GeoTIFF Inspector, Version und Quellcode. |
@@ -494,6 +495,19 @@ Analyse, Bereinigung und Export sind unverändert.
 ## 26.22.1 · 2026-11-02 · Versionsschema und Hilfeseite
 
 Die Version folgt jetzt `Jahr.Push.Iteration`: zweistellige Jahreszahl, laufende Nummer des GitHub-Pushes auf `main` im Jahr und die lokale Iteration (bisher `JJMM.R.P`, zuletzt `2611.3.25`). Hilfe- und Konzeptseite blieben in der veröffentlichten Fassung leer, weil sie versehentlich die Haupt-App mitstarteten; sie laden jetzt wieder eigenständig. Analyse, Bereinigung und Export sind unverändert.
+
+## 26.23.2 · 2026-11-02 · Favicon und zwei Fußleisten
+
+- **Favicon:** Der Browser-Tab zeigt jetzt das Markenzeichen der Kopfleiste
+  (gedrehtes Rundquadrat mit drei Punkten, Blau auf Weiß), als SVG sowie als
+  32-px-PNG und Apple-Touch-Icon, in App, Hilfe und Konzeptseite.
+- **Fußleiste:** Es bleiben nur die zwei Fußleisten. Die bisherige dritte Zeile
+  darunter („Bereit · Daten bleiben auf diesem Gerät“ und die Version) entfällt;
+  die Version steht weiter in Kopf- und Fußleiste. Statusmeldungen wie „Lese …“,
+  Lesefehler, ungültiges CRS oder „gespeichert“ erscheinen jetzt direkt unter dem
+  Ablagefeld im Eingabebereich.
+
+Analyse, Bereinigung und Export sind unverändert.
 
 ## 26.23.1 · 2026-11-02 · Kopfleiste, englische Hilfe und Schrift
 

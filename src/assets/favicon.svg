@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Markenzeichen der Kopfleiste (.brand-mark, helles Interface): um 45° gedrehtes
+       Rundquadrat (Radius 9/34) mit drei Punkten; Rahmen auf 1,6 px verstärkt. -->
+  <g transform="translate(32 32) rotate(45) scale(1.5)">
+    <rect x="-16.2" y="-16.2" width="32.4" height="32.4" rx="8.6" fill="#ffffff" stroke="#1f6fd1" stroke-opacity=".5" stroke-width="1.6"/>
+    <circle cx="-6" cy="5" r="2.5" fill="#1f6fd1"/>
+    <circle cx="5" cy="-6" r="2.5" fill="#1f6fd1"/>
+    <circle cx="6" cy="6" r="2.5" fill="#1f6fd1" fill-opacity=".55"/>
+  </g>
+</svg>

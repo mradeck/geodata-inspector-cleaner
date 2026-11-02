@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark light" />
     <meta name="description" content="Lokale Inspektion und Bereinigung räumlicher Ausreißer in DXF- und GeoJSON-Dateien." />
+    <link rel="icon" type="image/svg+xml" href="./src/assets/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./src/assets/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./src/assets/apple-touch-icon.png" />
     <title>Geodata Inspector & Cleaner</title>
     <script>
       // Theme vor dem ersten Zeichnen setzen (kein Aufblitzen); „auto“ folgt prefers-color-scheme.
@@ -29,7 +32,7 @@
           <span class="brand-copy">
             <span class="brand-title-line">
               <strong>Geodata Inspector</strong>
-              <span id="header-version" class="brand-version">v26.23.1</span>
+              <span id="header-version" class="brand-version">v26.23.2</span>
             </span>
             <small>& Cleaner</small>
           </span>
@@ -71,6 +74,7 @@
               <span data-i18n="input.drop.action">Datei auswählen · lokal analysiert</span>
               <small data-i18n="input.drop.dwg">DWG: Roadmap / Vorabkonvertierung</small>
             </label>
+            <p id="status" class="status-line" role="status" aria-live="polite"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></p>
             <p class="field-help" data-i18n="input.addHint">Weitere Dateien werden hinzugefügt. DXF ohne CRS verwendet die aktuelle Analysevorgabe.</p>
             <button id="new-session" class="button button-quiet" type="button" data-i18n="input.newSession">Neue Sitzung · Daten leeren</button>
             <button id="load-demo" class="button button-demo" data-i18n="input.demo">Beispiel mit entferntem Plankopf öffnen</button>
@@ -334,10 +338,6 @@
             <a href="https://www.multikopterschule.de/Kontakt-Impressum/IMPRESSUM/" target="_blank" rel="noopener noreferrer"><span data-i18n="footer.imprint">Impressum</span> ↗</a>
             <a href="https://ko-fi.com/mradeck/tip" target="_blank" rel="noopener noreferrer" aria-label="Michael Radeck auf Ko-fi unterstützen" data-i18n-aria-label="footer.kofiAria"><span aria-hidden="true">☕</span> Ko-fi</a>
           </nav>
-        </div>
-        <div class="statusbar">
-        <span id="status"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></span>
-        <span data-i18n="version.label">Version 26.23.1</span>
         </div>
       </footer>
     </div>
