@@ -4,10 +4,10 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `26.22.1`
-- **npm-kompatible Version:** `26.22.1`
+- **Aktuelle Release-Version:** `26.23.3`
+- **npm-kompatible Version:** `26.23.3`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
-- **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
+- **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Inter (`@fontsource-variable/inter`, selbst gehostet), Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
 - **Lernlog:** `docs/LERNLOG.md`
 - **Copyright-/Lizenzübersicht:** `docs/COPYRIGHT-LICENSES.md`
@@ -30,7 +30,7 @@ Version `Jahr.Push.Iteration`, ohne führende Nullen außer im Jahr:
   Feature-/Bugfix-Runde ohne Push erhöht sie um 1.
 
 Der Wert steht identisch in `package.json` (`version`, `displayVersion`),
-`package-lock.json`, den HTML-Fallbacks, App-Kopf, Fußleiste, Statuszeile,
+`package-lock.json`, den HTML-Fallbacks, App-Kopf, Fußleiste,
 Exportberichten und im Betreff der Kontakt-Mail. Eine anderslautende konkrete
 Versionsvorgabe des Nutzers hat Vorrang.
 
@@ -114,9 +114,19 @@ Merksätze:
   beibehalten, kein Prefetch/Offline-Download und Kartenprovider konfigurierbar halten.
 - Sichtbare und barrierefreie UI-Texte in beiden zentralen Sprachkatalogen
   (`src/i18n/de.ts`, `src/i18n/en.ts`) ergänzen; Katalog-Parität testen.
-- Die Anwenderhilfe rendert `README.de.md` über `help.html`; Bedienänderungen müssen
-  deshalb in der README so beschrieben sein, dass sie auch innerhalb der App als
-  Hilfe verständlich bleiben. Das Produktkonzept bleibt separat versioniert.
+- Die Anwenderhilfe rendert über `help.html` je Sprache `README.de.md` (DE) bzw.
+  `README.md` (EN), ausgewählt in `src/helpSource.ts`. Bedienänderungen müssen
+  deshalb in BEIDEN READMEs inhaltlich gleichwertig so beschrieben sein, dass sie
+  auch innerhalb der App als Hilfe verständlich bleiben. Das Produktkonzept bleibt
+  separat versioniert.
+- Kopfleiste rechts in fester Reihenfolge: app-spezifisch „Prüfbericht“, dann
+  „Über“-Menü, Hilfe als „(i)“-Icon-Knopf (`#help-link`, Lucide-`Info`-SVG,
+  Titel/aria-label aus `header.help`), Interface-Knopf, Sprachknopf. Kein
+  Text-Knopf „Hilfe“. `src/headerLayout.test.ts` prüft die Reihenfolge.
+- Schrift: Inter selbst gehostet über `@fontsource-variable/inter`, in allen drei
+  Einstiegen (`main.ts`, `help.ts`, `concept.ts`) importiert;
+  `--font-ui: "Inter Variable", "Inter", system-ui, …`. Keine Google Fonts oder
+  anderen externen Font-CDNs.
 - Das Kopfmenü `Über` rendert Copyright-/Lizenzinformationen dynamisch aus
   `docs/COPYRIGHT-LICENSES.md`. Diese Datei ist die einzige redaktionelle Quelle;
   der Dialog darf keine abweichende zweite Lizenzliste pflegen. Externe Demo-
@@ -147,7 +157,7 @@ Merksätze:
   innerhalb ihrer begrenzten Höhe scrollen, damit der Exportbutton erreichbar bleibt.
   Die DWG-Roadmap bleibt in der Dokumentation, erhält aber keine
   separate Kachel in der knappen Seitenleiste.
-- Die Versionsnummer neben dem App-Titel, im Browser-Tab, in der Statuszeile und
+- Die Versionsnummer neben dem App-Titel, im Browser-Tab, in der Fußleiste und
   in Exportberichten stammt zentral aus `displayVersion`; keine zweite
   handgepflegte Laufzeitkonstante einführen.
 - Die Haupt-App bindet `body` und `.app-shell` an `100vh` und hält den äußeren
@@ -234,6 +244,9 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `26.23.3` | 2026-11-02 | Favicon: Variante „Raute in Akzentblau mit weißen Punkten“ (bei 16 px besser lesbar). |
+| `26.23.2` | 2026-11-02 | Favicon aus dem Markenzeichen (`src/assets/favicon.svg`, `favicon-32.png`, `apple-touch-icon.png`) in allen drei HTML-Einstiegen; dritte Leiste unter der Fußzeile entfernt, `#status` steht als `.status-line` unter dem Ablagefeld. |
+| `26.23.1` | 2026-11-02 | Design-Runde 3: Kopfleiste Prüfbericht · Über · Hilfe „(i)“ · Interface · Sprache; englische Hilfe aus README.md; Inter selbst gehostet; MeasureMap-Link `measuremap-viewer-editor.netlify.app`. |
 | `26.22.1` | 2026-11-02 | Umstellung des Versionsschemas auf `Jahr.Push.Iteration` (zuletzt `2611.3.25`); Hilfe- und Konzeptseite im Produktions-Build wieder mit Inhalt. |
 | `2611.3.25` | 2026-11-02 | Einheitliches Erscheinungsbild: neutrales Farbschema, Theme automatisch/hell/dunkel, zwei Fußleisten mit GeoTIFF Inspector, Version und Quellcode. |
 | `2610.3.24` | 2026-10-08 | DXF-Kommentare im Nur-Geometrie-Export akzeptieren. |
@@ -397,3 +410,23 @@ importiert. Merksatz: Nebenseiten dürfen den main-Chunk nicht erreichen;
 `src/buildChunks.test.ts` prüft das am echten Build. Eine Rolldown-Gruppe für
 `\0rolldown/runtime.js` greift nicht (die Laufzeit läuft nicht durch die
 Gruppen-Tests).
+
+## 26.23.2 · 2026-11-02 · Favicon, zwei Fußleisten
+
+Favicon = Markenzeichen der Kopfleiste im hellen Interface (`#1f6fd1` auf Weiß,
+Rahmen 50 % Deckkraft), als SVG plus aus dem SVG gerenderte PNGs (32 px, 180 px);
+die Dateien liegen in `src/assets/`, damit Vite sie in allen drei Einstiegen
+hasht. Die dritte Statusleiste unter der Fußzeile ist entfernt; die
+Laufzeitmeldungen von `setStatus` stehen in `#status.status-line` unter dem
+Ablagefeld (role="status", aria-live). Keine zweite Statusleiste wieder einführen.
+
+## 26.23.1 · 2026-11-02 · Design-Runde 3
+
+Kopfleiste nach der gemeinsamen Vorgabe: „Prüfbericht“, dann Über (1), Hilfe als
+„(i)“-Icon (2), Interface (3), Sprache (4). Die Hilfeseite zeigt bei EN die
+englische `README.md`, die dafür inhaltlich auf den Stand der deutschen Fassung
+gebracht wurde; Konzeptseite mit Interface-Knopf. Inter über
+`@fontsource-variable/inter` selbst gehostet (OFL 1.1), keine Anfrage an Google
+Fonts. MeasureMap-Link überall `https://measuremap-viewer-editor.netlify.app/`.
+Merksatz: Die englische README ist Anwenderhilfe – jede Bedienänderung in beiden
+READMEs nachziehen.

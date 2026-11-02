@@ -13,7 +13,7 @@ Der Sprachbutton verwendet mitgelieferte SVG-Flaggen für eine einheitliche Anze
 
 ## Projektstatus
 
-**Version 26.22.1 – einheitliches Erscheinungsbild.** Der
+**Version 26.23.3 – einheitliches Erscheinungsbild, Runde 3.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -44,7 +44,7 @@ aktuelle Stand demonstriert bereits:
 - ein **Über**-Menü mit zweisprachiger „Über mich“-Ansicht, transparenter
   Pointcloud-Manager-Demoverlinkung und integrierter Copyright-/Lizenzübersicht,
 - die vollständige Release-Version direkt neben dem App-Titel und zusätzlich in
-  Browser-Tab und Statuszeile,
+  Browser-Tab und Fußleiste,
 - eine standardmäßig eingeklappte, bedarfsgerecht rendernde
   Störbereichsvorschau,
 - eine an die Browserhöhe gebundene Startansicht ohne äußeren vertikalen
@@ -57,21 +57,23 @@ Kontrollimport.
 
 ## Hilfe, Sprache und Darstellung
 
-Der frühere **Konzept**-Button in der Kopfleiste ist durch **Hilfe** ersetzt.
-Die Hilfeseite rendert den Inhalt dieser `README.de.md` direkt als formatiertes
-HTML. Dadurch bleiben Bedienhinweise, Exportgrenzen, Versionsangaben und
+Die Kopfleiste zeigt rechts zuerst **Prüfbericht**, dann in fester Reihenfolge
+**Über**, die **Hilfe** als runden „(i)“-Knopf, den Interface-Knopf und den
+Sprachknopf. Die Hilfe öffnet sich in einem neuen Tab. Die Hilfeseite rendert auf
+Deutsch den Inhalt dieser `README.de.md` und auf Englisch die inhaltlich
+gleichwertige englische `README.md` direkt als formatiertes HTML. Dadurch bleiben Bedienhinweise, Exportgrenzen, Versionsangaben und
 Screenshots an einer einzigen redaktionellen Quelle gebunden. Das weiterhin
 versionierte Produkt-/UX-Konzept ist über den Dokumentationsabschnitt dieser
 README erreichbar, aber nicht mehr die primäre Anwenderhilfe.
 
 Die Sprachschaltfläche wechselt die Bedienoberfläche unmittelbar zwischen
-Deutsch und Englisch und speichert die Auswahl lokal im Browser. Die Hilfe-
-Navigation folgt dieser Auswahl; die eigentliche README-Fachdokumentation wird
-derzeit in ihrer gepflegten deutschen Originalfassung angezeigt.
+Deutsch und Englisch und speichert die Auswahl lokal im Browser. Die Hilfe- und
+die Konzeptseite folgen dieser Auswahl und haben einen eigenen Sprachknopf; beim
+Umschalten wechselt der angezeigte Text sofort in die andere Sprache.
 
-Über die Sonnen-/Mondsymbol-Schaltfläche lässt sich die gesamte Oberfläche
-zwischen hellem und dunklem Design umstellen. Die Wahl gilt auch für die
-Hilfeseite und bleibt unter `gic.theme` lokal gespeichert. Es werden dafür keine
+Der Interface-Knopf schaltet die gesamte Oberfläche der Reihe nach zwischen
+automatisch (folgt der Systemeinstellung), hell und dunkel um. Die Wahl gilt auch
+für Hilfe- und Konzeptseite und bleibt unter `gic.theme` lokal gespeichert. Es werden dafür keine
 Einstellungen an einen Server übertragen.
 
 Das Kopfmenü **Über** enthält wie im Pointcloud Manager die Einträge **Über
@@ -89,8 +91,10 @@ App-Dialog. Die Datei bleibt damit die gemeinsame Quelle für Release-Stand,
 Bibliothekslizenzen, OpenStreetMap-Pflichten und die Sicherheitsgrenze des
 Markdown-Renderers.
 
-Am unteren Rand findest du **Weitere Apps**: Geoid Forge, DXF Coordinate Forge,
-[PointCloud Manager](https://www.pointcloud-manager.com) und GPS / UTM Converter.
+Am unteren Rand findest du **Weitere Apps**: GeoTIFF Inspector,
+[MeasureMap](https://measuremap-viewer-editor.netlify.app/), [Geoid-TIFF 2 PGM Converter](https://geoid-tiff2pgm-converter.netlify.app/),
+DXF Coordinate Forge, [PointCloud Manager](https://www.pointcloud-manager.com),
+GPS / UTM Converter, SkyCheck und michael-radeck.de.
 Die kompakte Fußzeile bleibt im App-Viewport sichtbar und verlinkt außerdem
 **Impressum**, **Ko-fi** und **Lizenzen / Copyright**. Der Lizenzlink öffnet dieselbe
 gepflegte Übersicht wie das Über-Menü; keine zweite Lizenzliste.
@@ -108,7 +112,7 @@ Beschriftungen, Hilfe-Link und E-Mail-Vorlage folgen der DE-/EN-Sprachwahl.
 ## Versionsanzeige und kompakte Störbereichsvorschau
 
 Die kanonische Version steht nun wie beim Pointcloud Manager direkt neben dem
-App-Titel, beispielsweise `v2609.3.10`. Browser-Tab und untere Statuszeile zeigen
+App-Titel, beispielsweise `v26.23.3`. Browser-Tab und Fußleiste zeigen
 denselben Stand. Die Anzeige wird zentral aus `package.json` bezogen und nicht
 als unabhängiger Versionswert gepflegt.
 
@@ -131,7 +135,7 @@ Seitenleiste entfernt; die DWG-Strategie bleibt weiterhin im Abschnitt
 ### Startansicht und Vorschauraster
 
 Die App-Hülle belegt exakt die verfügbare Browserhöhe. Kopfzeile, Arbeitsbereich
-und Statuszeile bleiben dadurch gemeinsam im Viewport; die leere Startansicht
+und Fußleiste bleiben dadurch gemeinsam im Viewport; die leere Startansicht
 erzeugt keinen äußeren vertikalen Scrollbalken mehr. Nach einem Import scrollen
 lange Analyseergebnisse weiterhin innerhalb der mittleren Bühne, Seitenleisten
 bei Bedarf in ihrem eigenen Bereich. Die langen Hilfe- und Konzeptseiten bleiben
@@ -272,7 +276,7 @@ npm run build
 
 ## Versionierung
 
-Aktuell **26.22.1**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
+Aktuell **26.23.3**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
 lautet `Jahr.Push.Iteration`: zweistellige Jahreszahl, laufende Nummer des
 GitHub-Pushes auf `main` im Jahr, lokale Iteration. Jeder Push auf `main` erhöht
 die Push-Nummer und setzt die Iteration auf 1; lokale Arbeitsrunden davor zählen
@@ -312,6 +316,9 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `26.23.3` | 2026-11-02 | Favicon: Variante „Raute in Akzentblau mit weißen Punkten“ (bei 16 px besser lesbar). |
+| `26.23.2` | 2026-11-02 | Favicon aus dem Markenzeichen (SVG, 32-px-PNG, Apple-Touch-Icon) auf allen Seiten; die dritte Leiste unter der Fußzeile entfällt, Statusmeldungen stehen jetzt unter dem Ablagefeld. |
+| `26.23.1` | 2026-11-02 | Design-Runde 3: Kopfleiste Prüfbericht · Über · Hilfe als „(i)“ · Interface · Sprache, englische Hilfe, Schrift Inter selbst gehostet, neuer MeasureMap-Link. |
 | `26.22.1` | 2026-11-02 | Umstellung des Versionsschemas auf `Jahr.Push.Iteration` (zuletzt `2611.3.25`); Hilfe- und Konzeptseite im Produktions-Build wieder mit Inhalt. |
 | `2611.3.25` | 2026-11-02 | Einheitliches Erscheinungsbild: neutrales Farbschema, Theme-Knopf automatisch/hell/dunkel, zwei Fußleisten mit GeoTIFF Inspector, Version und Quellcode. |
 | `2610.3.24` | 2026-10-08 | DXF-Kommentare im Nur-Geometrie-Export akzeptieren. |
@@ -489,3 +496,25 @@ Analyse, Bereinigung und Export sind unverändert.
 ## 26.22.1 · 2026-11-02 · Versionsschema und Hilfeseite
 
 Die Version folgt jetzt `Jahr.Push.Iteration`: zweistellige Jahreszahl, laufende Nummer des GitHub-Pushes auf `main` im Jahr und die lokale Iteration (bisher `JJMM.R.P`, zuletzt `2611.3.25`). Hilfe- und Konzeptseite blieben in der veröffentlichten Fassung leer, weil sie versehentlich die Haupt-App mitstarteten; sie laden jetzt wieder eigenständig. Analyse, Bereinigung und Export sind unverändert.
+
+## 26.23.2 · 2026-11-02 · Favicon und zwei Fußleisten
+
+- **Favicon:** Der Browser-Tab zeigt jetzt das Markenzeichen der Kopfleiste
+  (gedrehtes Rundquadrat mit drei Punkten, Blau auf Weiß), als SVG sowie als
+  32-px-PNG und Apple-Touch-Icon, in App, Hilfe und Konzeptseite.
+- **Fußleiste:** Es bleiben nur die zwei Fußleisten. Die bisherige dritte Zeile
+  darunter („Bereit · Daten bleiben auf diesem Gerät“ und die Version) entfällt;
+  die Version steht weiter in Kopf- und Fußleiste. Statusmeldungen wie „Lese …“,
+  Lesefehler, ungültiges CRS oder „gespeichert“ erscheinen jetzt direkt unter dem
+  Ablagefeld im Eingabebereich.
+
+Analyse, Bereinigung und Export sind unverändert.
+
+## 26.23.1 · 2026-11-02 · Kopfleiste, englische Hilfe und Schrift
+
+- **Kopfleiste:** rechts zuerst **Prüfbericht**, dann **Über** (Über mich, Copyright), die **Hilfe** als runder „(i)“-Knopf, der Interface-Knopf und der Sprachknopf. Der frühere Text-Knopf „Hilfe“ entfällt.
+- **Hilfe auf Englisch:** Bei englischer Sprache zeigt die Hilfeseite die englische `README.md`, die jetzt inhaltlich dieser deutschen Fassung entspricht. Der Sprachknopf auf Hilfe- und Konzeptseite wechselt den Text sofort; die Konzeptseite hat jetzt auch den Interface-Knopf.
+- **Schrift:** Inter (SIL Open Font License 1.1) wird mit der App ausgeliefert. Es entsteht keine Anfrage an Google Fonts oder andere Schrift-Dienste.
+- **MeasureMap** ist jetzt unter <https://measuremap-viewer-editor.netlify.app/> verlinkt.
+
+Analyse, Bereinigung und Export sind unverändert.

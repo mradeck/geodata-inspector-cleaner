@@ -1,6 +1,7 @@
 :root {
   color-scheme: dark;
-  --font-ui: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-ui: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-family: var(--font-ui);
   color: var(--text);
   background: var(--bg);
@@ -71,6 +72,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .language-button img { display: block; width: 21px; height: 14px; object-fit: cover; border-radius: 1px; box-shadow: 0 0 0 1px var(--line); }
 .theme-button { display: inline-grid; min-width: 39px; padding-inline: 10px; place-items: center; font-family: system-ui, sans-serif; font-size: 16px; line-height: 1; }
 .theme-button svg { display: block; }
+.icon-button { display: inline-grid; min-width: 39px; padding: 7px 10px; place-items: center; line-height: 1; }
+.icon-button svg { display: block; width: 18px; height: 18px; }
 .header-menu { position: relative; }
 .header-menu summary { list-style: none; user-select: none; }
 .header-menu summary::-webkit-details-marker { display: none; }
@@ -234,7 +237,8 @@ input[type="range"] { width: 100%; accent-color: var(--green); margin: 15px 0 6p
 .cleaner-actions { display: grid; gap: 7px; }
 .cleaner-button { width: 100%; color: var(--green); border-color: color-mix(in srgb, var(--green) 35%, transparent); background: color-mix(in srgb, var(--green) 8%, transparent); }
 .cleaner-convert-button { color: var(--green); border-color: color-mix(in srgb, var(--green) 34%, transparent); background: color-mix(in srgb, var(--green) 7%, transparent); }
-.statusbar { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; border-top: 1px solid var(--line); color: var(--muted); font: 9px ui-monospace, monospace; background: var(--bg); }.statusbar i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); margin-right: 7px; }.status-error i { background: var(--red); }.status-warning i { background: var(--amber); }.status-working i { animation: pulse 1s infinite; }
+/* Statuszeile im Eingabebereich (bis 26.23.1 eine dritte Leiste unter der Fußzeile). */
+.status-line { display: flex; align-items: flex-start; gap: 7px; margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }.status-line i { flex: 0 0 auto; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); margin-top: 5px; }.status-line.status-error { color: var(--red); }.status-line.status-error i { background: var(--red); }.status-line.status-warning i { background: var(--amber); }.status-line.status-working i { animation: pulse 1s infinite; }
 
 .modal-overlay { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 24px; background: rgba(0, 0, 0, .6); backdrop-filter: blur(8px); }
 .app-footer { background: var(--panel); border-top: 1px solid var(--line); font-size: 11px; }
@@ -248,7 +252,6 @@ input[type="range"] { width: 100%; accent-color: var(--green); margin: 15px 0 6p
 }
 .app-footer a:hover, .app-footer button:hover { border-color: var(--accent); color: var(--text); text-decoration: none; }
 .app-footer :focus-visible, .support-dialog :focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
-.app-footer .statusbar { min-height: 28px; }
 .support-dialog { padding: 0; color: var(--text); }
 .support-dialog::backdrop { background: rgba(0, 0, 0, .55); backdrop-filter: blur(5px); }
 .support-dialog .about-header form { margin: 0; }
@@ -301,7 +304,6 @@ input[type="range"] { width: 100%; accent-color: var(--green); margin: 15px 0 6p
 [data-theme="light"] .map-privacy-note { background: rgba(31, 111, 209, .045); }
 [data-theme="light"] .dxf-version-field select { background: #fff; }
 [data-theme="light"] .analysis-crs-field :is(input, select) { background: #fff; }
-[data-theme="light"] .statusbar { color: var(--muted); background: #fff; }
 [data-theme="light"] .drop-zone small,
 [data-theme="light"] .metric-card small,
 [data-theme="light"] .preview-coordinate-range,

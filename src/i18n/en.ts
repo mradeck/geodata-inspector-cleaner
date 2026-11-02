@@ -1,5 +1,4 @@
 import type { TranslationKey } from "./de";
-import { APP_VERSION } from "../version";
 
 export const en: Record<TranslationKey, string> = {
   "repair.action": "Single-vertex lines: action",
@@ -445,5 +444,4 @@ export const en: Record<TranslationKey, string> = {
   "error.format": "Currently supported: .dxf, .geojson and .json.",
   "unit.m": "{value} m",
   "unit.km": "{value} km",
-  "version.label": `Version ${APP_VERSION}`,
 };

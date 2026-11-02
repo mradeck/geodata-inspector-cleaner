@@ -1,6 +1,6 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 26.22.1
+**Release:** 26.23.3
 
 **Prüfstand:** 2. November 2026
 
@@ -42,6 +42,7 @@ entfernt und durch `.gitignore` von künftigen Commits ausgeschlossen.
 |---|---:|---|---|
 | [Leaflet](https://github.com/Leaflet/Leaflet/blob/main/LICENSE) | 1.9.4 | BSD-2-Clause | Interaktive OSM-Karte; Copyright- und Lizenzhinweise bei Weitergabe beibehalten. |
 | [proj4js](https://github.com/proj4js/proj4js/blob/main/LICENSE.md) | 2.20.9 | MIT | CRS-Transformation; Copyright- und Lizenzhinweis beibehalten. |
+| [Inter](https://github.com/rsms/inter/blob/master/LICENSE.txt) über [@fontsource-variable/inter](https://github.com/fontsource/font-files/tree/main/fonts/variable/inter) | 5.3.0 | SIL Open Font License 1.1 (OFL-1.1) | Schrift der Oberfläche, Hilfe- und Konzeptseite; © The Inter Project Authors. Die woff2-Dateien werden mit der App ausgeliefert (selbst gehostet, keine Anfrage an Google Fonts oder andere Font-CDNs). Lizenztext bei Weitergabe beibehalten; die Schrift darf nicht allein verkauft werden. |
 | [marked](https://github.com/markedjs/marked/blob/master/LICENSE.md) | 18.0.6 | MIT plus mitgeführte Markdown-BSD-Hinweise | Rendering der fest eingebauten Konzept-, README-Hilfe- und Copyright-Dokumente; Notices bei Weitergabe beibehalten. |
 
 Relevante indirekte Laufzeitkomponenten:
@@ -156,3 +157,5 @@ Nur Footer-CSS und externe Links ergänzt; keine neue Bibliothek. ALKIS/LDBV und
 2611.3.25: Einheitliches Erscheinungsbild (neutrales Farbschema, dreistufiger Theme-Knopf mit Inline-SVG-Symbolen, zwei Fußleisten). Keine neue Bibliothek, keine neuen externen Dienste; Lockfile-Lizenzen unverändert. Die Fußleiste verlinkt zusätzlich GeoTIFF Inspector und den Quellcode auf GitHub (reine Links, kein Embed oder Prefetch).
 
 26.22.1: Umstellung des Versionsschemas auf `Jahr.Push.Iteration` und gemeinsamer Markdown-Renderer (`src/markdown.ts`) für Haupt-App, Hilfe und Konzept. `marked` wird dadurch in der Haupt-App nicht mehr nachgeladen, sondern mit dem gemeinsamen Chunk ausgeliefert; Bibliotheken, Versionen, Lizenzen und Dienste unverändert.
+
+26.23.1: Schrift Inter (SIL OFL 1.1, © The Inter Project Authors) über `@fontsource-variable/inter` 5.3.0 als neue Laufzeitabhängigkeit; die Schriftdateien werden selbst gehostet mitgebündelt, es entsteht keine Anfrage an `fonts.googleapis.com`/`fonts.gstatic.com`. Keine weiteren neuen Bibliotheken oder Dienste. Der MeasureMap-Link in der Fußleiste zeigt jetzt auf `https://measuremap-viewer-editor.netlify.app/` (reiner Link). `npm audit --omit=dev`: keine Befunde.

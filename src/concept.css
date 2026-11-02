@@ -7,7 +7,7 @@
 }
 
 .concept-shell { min-height: 100vh; }
-.concept-topbar { position: sticky; top: 0; z-index: 10; }
+.concept-topbar { position: sticky; top: 0; z-index: 10; min-height: 72px; }
 .concept-topbar .brand { min-width: 290px; }
 .concept-section-label { margin-right: auto; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 .concept-main { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 52px 0 90px; }

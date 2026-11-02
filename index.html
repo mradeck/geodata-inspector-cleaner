@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark light" />
     <meta name="description" content="Lokale Inspektion und Bereinigung räumlicher Ausreißer in DXF- und GeoJSON-Dateien." />
+    <link rel="icon" type="image/svg+xml" href="./src/assets/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./src/assets/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./src/assets/apple-touch-icon.png" />
     <title>Geodata Inspector & Cleaner</title>
     <script>
       // Theme vor dem ersten Zeichnen setzen (kein Aufblitzen); „auto“ folgt prefers-color-scheme.
@@ -29,7 +32,7 @@
           <span class="brand-copy">
             <span class="brand-title-line">
               <strong>Geodata Inspector</strong>
-              <span id="header-version" class="brand-version">v26.22.1</span>
+              <span id="header-version" class="brand-version">v26.23.3</span>
             </span>
             <small>& Cleaner</small>
           </span>
@@ -37,7 +40,6 @@
         <div class="privacy-chip"><span></span><span data-i18n="header.privacy">Geometrie lokal · OSM-Karte online</span></div>
         <nav class="top-actions" aria-label="Projektaktionen" data-i18n-aria-label="header.actionsAria">
           <button id="download-report" class="button button-quiet" disabled data-i18n="header.report">Prüfbericht</button>
-          <a id="help-link" class="button button-quiet" href="./help.html?lang=de" target="_blank" rel="noopener" data-i18n="header.help">Hilfe</a>
           <details id="about-menu" class="header-menu">
             <summary class="button button-quiet" data-i18n="header.aboutMenu">Über</summary>
             <div class="header-menu-panel">
@@ -45,6 +47,9 @@
               <button id="open-copyright" type="button" data-i18n="header.copyright">Copyright</button>
             </div>
           </details>
+          <a id="help-link" class="button button-quiet icon-button help-button" href="./help.html?lang=de" target="_blank" rel="noopener" title="Hilfe" aria-label="Hilfe" data-i18n-title="header.help" data-i18n-aria-label="header.help">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          </a>
           <button id="btn-toggle-theme" class="button button-quiet theme-button" type="button">
             <span id="theme-icon" aria-hidden="true"></span>
           </button>
@@ -69,6 +74,7 @@
               <span data-i18n="input.drop.action">Datei auswählen · lokal analysiert</span>
               <small data-i18n="input.drop.dwg">DWG: Roadmap / Vorabkonvertierung</small>
             </label>
+            <p id="status" class="status-line" role="status" aria-live="polite"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></p>
             <p class="field-help" data-i18n="input.addHint">Weitere Dateien werden hinzugefügt. DXF ohne CRS verwendet die aktuelle Analysevorgabe.</p>
             <button id="new-session" class="button button-quiet" type="button" data-i18n="input.newSession">Neue Sitzung · Daten leeren</button>
             <button id="load-demo" class="button button-demo" data-i18n="input.demo">Beispiel mit entferntem Plankopf öffnen</button>
@@ -312,8 +318,8 @@
         <nav class="related-apps" aria-label="Weitere Apps" data-i18n-aria-label="footer.apps">
           <strong data-i18n="footer.apps">Weitere Apps</strong>
           <a href="https://mradeck.github.io/geotiff-inspector/" target="_blank" rel="noopener noreferrer">GeoTIFF Inspector <span aria-hidden="true">↗</span></a>
-          <a href="https://measuremap-viewer-editor-emlid.netlify.app/" target="_blank" rel="noopener noreferrer">MeasureMap <span aria-hidden="true">↗</span></a>
-          <a href="https://geoid-forge.netlify.app/" target="_blank" rel="noopener noreferrer">Geoid Forge <span aria-hidden="true">↗</span></a>
+          <a href="https://measuremap-viewer-editor.netlify.app/" target="_blank" rel="noopener noreferrer">MeasureMap <span aria-hidden="true">↗</span></a>
+          <a href="https://geoid-tiff2pgm-converter.netlify.app/" target="_blank" rel="noopener noreferrer">Geoid-TIFF 2 PGM Converter <span aria-hidden="true">↗</span></a>
           <a href="https://dxf-coordinate-forge.netlify.app/" target="_blank" rel="noopener noreferrer">DXF Coordinate Forge <span aria-hidden="true">↗</span></a>
           <a href="https://www.pointcloud-manager.com" target="_blank" rel="noopener noreferrer">PointCloud Manager <span aria-hidden="true">↗</span></a>
           <a href="https://mradeck.github.io/gps-utm-coordinate-converter/" target="_blank" rel="noopener noreferrer">GPS / UTM Converter <span aria-hidden="true">↗</span></a>
@@ -332,10 +338,6 @@
             <a href="https://www.multikopterschule.de/Kontakt-Impressum/IMPRESSUM/" target="_blank" rel="noopener noreferrer"><span data-i18n="footer.imprint">Impressum</span> ↗</a>
             <a href="https://ko-fi.com/mradeck/tip" target="_blank" rel="noopener noreferrer" aria-label="Michael Radeck auf Ko-fi unterstützen" data-i18n-aria-label="footer.kofiAria"><span aria-hidden="true">☕</span> Ko-fi</a>
           </nav>
-        </div>
-        <div class="statusbar">
-        <span id="status"><i></i><span data-i18n="status.ready">Bereit · Daten bleiben auf diesem Gerät</span></span>
-        <span data-i18n="version.label">Version 26.22.1</span>
         </div>
       </footer>
     </div>

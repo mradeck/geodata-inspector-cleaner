@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Alternative 1: Raute in Akzentblau gefüllt, Punkte weiß und vergrößert (16-px-tauglich). -->
+  <g transform="translate(32 32) rotate(45) scale(1.5)">
+    <rect x="-17" y="-17" width="34" height="34" rx="9" fill="#1f6fd1"/>
+    <circle cx="-6.5" cy="5.5" r="4" fill="#ffffff"/>
+    <circle cx="5.5" cy="-6.5" r="4" fill="#ffffff"/>
+    <circle cx="6.5" cy="6.5" r="4" fill="#ffffff" fill-opacity=".6"/>
+  </g>
+</svg>
