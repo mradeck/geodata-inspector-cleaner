@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `26.23.2`
-- **npm-kompatible Version:** `26.23.2`
+- **Aktuelle Release-Version:** `26.23.3`
+- **npm-kompatible Version:** `26.23.3`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Inter (`@fontsource-variable/inter`, selbst gehostet), Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
@@ -244,6 +244,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `26.23.3` | 2026-11-02 | Favicon: Variante „Raute in Akzentblau mit weißen Punkten“ (bei 16 px besser lesbar). |
 | `26.23.2` | 2026-11-02 | Favicon aus dem Markenzeichen (`src/assets/favicon.svg`, `favicon-32.png`, `apple-touch-icon.png`) in allen drei HTML-Einstiegen; dritte Leiste unter der Fußzeile entfernt, `#status` steht als `.status-line` unter dem Ablagefeld. |
 | `26.23.1` | 2026-11-02 | Design-Runde 3: Kopfleiste Prüfbericht · Über · Hilfe „(i)“ · Interface · Sprache; englische Hilfe aus README.md; Inter selbst gehostet; MeasureMap-Link `measuremap-viewer-editor.netlify.app`. |
 | `26.22.1` | 2026-11-02 | Umstellung des Versionsschemas auf `Jahr.Push.Iteration` (zuletzt `2611.3.25`); Hilfe- und Konzeptseite im Produktions-Build wieder mit Inhalt. |

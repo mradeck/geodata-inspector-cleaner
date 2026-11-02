@@ -1,6 +1,6 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 26.23.2
+**Release:** 26.23.3
 
 **Prüfstand:** 2. November 2026
 

@@ -18,7 +18,7 @@ is selected.
 
 ## Project status
 
-**Version 26.23.2 – shared design, round 3.** The source code is licensed under
+**Version 26.23.3 – shared design, round 3.** The source code is licensed under
 MIT. Real survey files, coordinate-based private regression fixtures and project
 screenshots are excluded from the repository and its published history. The
 current version already provides:
@@ -117,7 +117,7 @@ the e-mail template follow the DE/EN language choice.
 ## Version display and compact disturbance preview
 
 As in Pointcloud Manager, the canonical version is shown right next to the app
-title, for example `v26.23.2`. The browser tab and the footer show
+title, for example `v26.23.3`. The browser tab and the footer show
 the same value. The display comes centrally from `package.json` and is not
 maintained as a separate version value.
 
@@ -279,7 +279,7 @@ package publication and is independent of GitHub repository visibility.
 
 ## Versioning
 
-Currently **26.23.2**, a public MIT release with cleaned history. The scheme is
+Currently **26.23.3**, a public MIT release with cleaned history. The scheme is
 `Year.Push.Iteration`: two-digit year, running number of the GitHub push to
 `main` within the year, and the local iteration. Every push to `main` increases
 the push number and resets the iteration to 1; local work rounds before that
@@ -318,6 +318,7 @@ area and the IP address. No tiles are prefetched or collected for offline use.
 
 | Version | Date | Content |
 |---|---|---|
+| `26.23.3` | 2026-11-02 | Favicon: “accent-blue diamond with white dots” variant (more legible at 16 px). |
 | `26.23.2` | 2026-11-02 | Favicon from the brand mark (SVG, 32 px PNG, Apple touch icon) on all pages; the third bar under the footer is gone, status messages now appear below the drop zone. |
 | `26.23.1` | 2026-11-02 | Design round 3: header order Inspection report · About · Help as “(i)” · interface · language, English help, self-hosted Inter font, new MeasureMap link. |
 | `26.22.1` | 2026-11-02 | Version scheme changed to `Year.Push.Iteration` (last `2611.3.25`); help and concept pages show content again in the production build. |

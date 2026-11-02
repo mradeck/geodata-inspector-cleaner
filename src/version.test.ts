@@ -8,7 +8,7 @@ import { APP_VERSION } from "./version";
 describe("Versionskonsistenz", () => {
   it("verwendet displayVersion zentral in App, Kopfleiste und Fußleiste", () => {
     expect(APP_VERSION).toBe(packageMetadata.displayVersion);
-    // Seit 26.23.2 gibt es keine eigene Versionszeile mehr unter der Fußleiste.
+    // Seit 26.23.3 gibt es keine eigene Versionszeile mehr unter der Fußleiste.
     expect(de).not.toHaveProperty("version.label");
     expect(en).not.toHaveProperty("version.label");
     expect(indexPage).toContain('id="footer-version"');

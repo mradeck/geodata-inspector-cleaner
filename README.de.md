@@ -13,7 +13,7 @@ Der Sprachbutton verwendet mitgelieferte SVG-Flaggen für eine einheitliche Anze
 
 ## Projektstatus
 
-**Version 26.23.2 – einheitliches Erscheinungsbild, Runde 3.** Der
+**Version 26.23.3 – einheitliches Erscheinungsbild, Runde 3.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -112,7 +112,7 @@ Beschriftungen, Hilfe-Link und E-Mail-Vorlage folgen der DE-/EN-Sprachwahl.
 ## Versionsanzeige und kompakte Störbereichsvorschau
 
 Die kanonische Version steht nun wie beim Pointcloud Manager direkt neben dem
-App-Titel, beispielsweise `v26.23.2`. Browser-Tab und Fußleiste zeigen
+App-Titel, beispielsweise `v26.23.3`. Browser-Tab und Fußleiste zeigen
 denselben Stand. Die Anzeige wird zentral aus `package.json` bezogen und nicht
 als unabhängiger Versionswert gepflegt.
 
@@ -276,7 +276,7 @@ npm run build
 
 ## Versionierung
 
-Aktuell **26.23.2**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
+Aktuell **26.23.3**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
 lautet `Jahr.Push.Iteration`: zweistellige Jahreszahl, laufende Nummer des
 GitHub-Pushes auf `main` im Jahr, lokale Iteration. Jeder Push auf `main` erhöht
 die Push-Nummer und setzt die Iteration auf 1; lokale Arbeitsrunden davor zählen
@@ -316,6 +316,7 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `26.23.3` | 2026-11-02 | Favicon: Variante „Raute in Akzentblau mit weißen Punkten“ (bei 16 px besser lesbar). |
 | `26.23.2` | 2026-11-02 | Favicon aus dem Markenzeichen (SVG, 32-px-PNG, Apple-Touch-Icon) auf allen Seiten; die dritte Leiste unter der Fußzeile entfällt, Statusmeldungen stehen jetzt unter dem Ablagefeld. |
 | `26.23.1` | 2026-11-02 | Design-Runde 3: Kopfleiste Prüfbericht · Über · Hilfe als „(i)“ · Interface · Sprache, englische Hilfe, Schrift Inter selbst gehostet, neuer MeasureMap-Link. |
 | `26.22.1` | 2026-11-02 | Umstellung des Versionsschemas auf `Jahr.Push.Iteration` (zuletzt `2611.3.25`); Hilfe- und Konzeptseite im Produktions-Build wieder mit Inhalt. |
