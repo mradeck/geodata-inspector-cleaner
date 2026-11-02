@@ -7,6 +7,7 @@ import { saveTextFile } from "./io/saveFile";
 import { HatchPanel } from "./hatches/renderHatchPanel";
 import { DuplicatePanel } from "./duplicates/renderDuplicatePanel";
 import { duplicateCounts } from "./duplicates/dxfDuplicates";
+import "@fontsource-variable/inter";
 import "./styles.css";
 import { analyzeDataset } from "./analysis/analyzeDataset";
 import {

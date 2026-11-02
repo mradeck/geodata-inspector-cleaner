@@ -1,5 +1,6 @@
 import { renderMarkdown } from "./markdown";
-import readme from "../README.de.md?raw";
+import { helpMarkdown } from "./helpSource";
+import "@fontsource-variable/inter";
 import "./styles.css";
 import "./concept.css";
 import {
@@ -38,7 +39,7 @@ onThemeChange(() => syncThemeControl());
 
 function renderHelp(): void {
   const language = getLanguage();
-  content.innerHTML = renderMarkdown(readme);
+  content.innerHTML = renderMarkdown(helpMarkdown(language));
   syncLanguageControl(language);
   syncThemeControl();
   document.title = `${t("header.help")} · ${t("app.title")}`;

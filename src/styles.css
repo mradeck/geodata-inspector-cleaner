@@ -1,6 +1,7 @@
 :root {
   color-scheme: dark;
-  --font-ui: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-ui: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-family: var(--font-ui);
   color: var(--text);
   background: var(--bg);
@@ -71,6 +72,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .language-button img { display: block; width: 21px; height: 14px; object-fit: cover; border-radius: 1px; box-shadow: 0 0 0 1px var(--line); }
 .theme-button { display: inline-grid; min-width: 39px; padding-inline: 10px; place-items: center; font-family: system-ui, sans-serif; font-size: 16px; line-height: 1; }
 .theme-button svg { display: block; }
+.icon-button { display: inline-grid; min-width: 39px; padding: 7px 10px; place-items: center; line-height: 1; }
+.icon-button svg { display: block; width: 18px; height: 18px; }
 .header-menu { position: relative; }
 .header-menu summary { list-style: none; user-select: none; }
 .header-menu summary::-webkit-details-marker { display: none; }

@@ -12,13 +12,13 @@ describe("App-Fußzeile", () => {
   it("verlinkt die gemeinsamen Apps und Quellen, Impressum und Ko-fi ohne Embeds", () => {
     const footer = page.split('<footer class="app-footer">')[1]!.split('</footer>')[0]!;
     for (const url of [
-      "https://measuremap-viewer-editor-emlid.netlify.app/",
+      "https://measuremap-viewer-editor.netlify.app/",
       "https://skycheck-de.netlify.app/",
       "https://www.michael-radeck.de",
       "https://www.openstreetmap.org/copyright",
       "https://www.ldbv.bayern.de/produkte/weitere/opendata.html",
       "https://www.govdata.de/dl-de/by-2-0",
-      "https://geoid-forge.netlify.app/",
+      "https://geoid-tiff2pgm-converter.netlify.app/",
       "https://dxf-coordinate-forge.netlify.app/",
       "https://www.pointcloud-manager.com",
       "https://mradeck.github.io/gps-utm-coordinate-converter/",
