@@ -1,11 +1,23 @@
 <!doctype html>
-<html lang="de" data-theme="light">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark light" />
     <meta name="description" content="Hilfe und Anwenderdokumentation für Geodata Inspector & Cleaner." />
     <title>Hilfe · Geodata Inspector & Cleaner</title>
+    <script>
+      // Theme vor dem ersten Zeichnen setzen (kein Aufblitzen); „auto“ folgt prefers-color-scheme.
+      (function () {
+        var mode = "auto";
+        try { var stored = localStorage.getItem("gic.theme"); if (stored === "light" || stored === "dark") mode = stored; } catch (e) { /* ohne Speicher: automatisch */ }
+        var light = mode === "light" || (mode === "auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches);
+        var root = document.documentElement;
+        root.setAttribute("data-theme", light ? "light" : "dark");
+        root.setAttribute("data-theme-mode", mode);
+        root.style.colorScheme = light ? "light" : "dark";
+      })();
+    </script>
   </head>
   <body class="concept-body">
     <div class="concept-shell">
@@ -17,8 +29,8 @@
         <span class="concept-section-label" data-i18n="help.section">Hilfe und Anwenderdokumentation</span>
         <nav class="top-actions" aria-label="Hilfeaktionen" data-i18n-aria-label="help.actionsAria">
           <a class="button button-quiet" href="./index.html" data-i18n="help.back">Zur Anwendung</a>
-          <button id="btn-toggle-theme" class="button button-quiet theme-button" type="button" data-i18n-title="theme.toggle.title" title="Interface-Design umschalten">
-            <span id="theme-icon" aria-hidden="true">☀</span>
+          <button id="btn-toggle-theme" class="button button-quiet theme-button" type="button">
+            <span id="theme-icon" aria-hidden="true"></span>
           </button>
           <button id="btn-toggle-language" class="button button-quiet language-button" type="button" data-i18n-title="lang.toggle.title" title="Sprache umschalten">
             <img id="language-flag" src="/src/assets/flag-de.svg" width="21" height="14" alt="" aria-hidden="true">

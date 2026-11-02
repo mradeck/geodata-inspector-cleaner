@@ -55,7 +55,7 @@ export function renderPreview(
     if (visibleIds && !visibleIds.has(feature.id)) continue;
     const isHighlighted = highlighted.has(feature.id);
     const isRemote = !primaryIds.has(feature.id);
-    context.strokeStyle = isHighlighted ? "#ffd166" : isRemote ? "#ff647c" : "#4de2b1";
+    context.strokeStyle = isHighlighted ? "#e0a13c" : isRemote ? "#e05c5c" : "#46c07a";
     context.fillStyle = context.strokeStyle;
     context.lineWidth = isHighlighted ? 3 : isRemote ? 2 : 1.4;
     context.globalAlpha = isHighlighted ? 1 : 0.86;
@@ -94,7 +94,7 @@ function drawEmptyMessage(
   message: string,
 ): void {
   context.save();
-  context.fillStyle = "#8ba7a3";
+  context.fillStyle = "#93a0af";
   context.font = "12px Inter, system-ui, sans-serif";
   context.textAlign = "center";
   context.textBaseline = "middle";
@@ -120,7 +120,7 @@ function drawClusterOverview(
     for (const cluster of clusters) {
       if (cluster.isPrimary) continue;
       const [x, y] = toScreen(cluster.center);
-      context.strokeStyle = "rgba(255, 100, 124, 0.4)";
+      context.strokeStyle = "rgba(224, 92, 92, 0.4)";
       context.beginPath();
       context.moveTo(primaryX, primaryY);
       context.lineTo(x, y);
@@ -131,7 +131,7 @@ function drawClusterOverview(
 
   for (const cluster of clusters) {
     const [x, y] = toScreen(cluster.center);
-    const color = cluster.isPrimary ? "#4de2b1" : "#ff647c";
+    const color = cluster.isPrimary ? "#46c07a" : "#e05c5c";
     context.save();
     context.globalAlpha = 1;
     context.fillStyle = color;
@@ -147,7 +147,7 @@ function drawClusterOverview(
     context.arc(x, y, cluster.isPrimary ? 12 : 10, 0, Math.PI * 2);
     context.stroke();
     context.globalAlpha = 1;
-    context.fillStyle = "rgba(228, 242, 239, 0.78)";
+    context.fillStyle = "rgba(230, 235, 241, 0.78)";
     context.font = "10px ui-monospace, SFMono-Regular, Menlo, monospace";
     context.textAlign = x > 90 ? "right" : "left";
     context.fillText(
@@ -160,9 +160,9 @@ function drawClusterOverview(
 }
 
 function drawBackground(context: CanvasRenderingContext2D, width: number, height: number): void {
-  context.fillStyle = "#0c171a";
+  context.fillStyle = "#1d2229";
   context.fillRect(0, 0, width, height);
-  context.strokeStyle = "rgba(142, 184, 178, 0.08)";
+  context.strokeStyle = "rgba(147, 160, 175, 0.09)";
   context.lineWidth = 1;
   const spacing = 32;
   for (let x = spacing; x < width; x += spacing) {
@@ -191,8 +191,8 @@ function drawScale(context: CanvasRenderingContext2D, width: number, height: num
   const pixelLength = worldLength * scale;
   const x = width - pixelLength - 18;
   const y = height - 18;
-  context.strokeStyle = "rgba(224, 244, 239, 0.72)";
-  context.fillStyle = "rgba(224, 244, 239, 0.72)";
+  context.strokeStyle = "rgba(230, 235, 241, 0.72)";
+  context.fillStyle = "rgba(230, 235, 241, 0.72)";
   context.lineWidth = 1;
   context.beginPath();
   context.moveTo(x, y - 4); context.lineTo(x, y); context.lineTo(x + pixelLength, y); context.lineTo(x + pixelLength, y - 4);

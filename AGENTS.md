@@ -4,8 +4,8 @@
 
 - **Projektname:** geodata-inspector-cleaner
 - **Typ:** lokale Single-Page-App zur DXF-/GeoJSON-Inspektion
-- **Aktuelle Release-Version:** `2610.3.24`
-- **npm-kompatible Version:** `2610.3.24`
+- **Aktuelle Release-Version:** `2611.3.25`
+- **npm-kompatible Version:** `2611.3.25`
 - **Repository:** `mradeck/geodata-inspector-cleaner`; öffentlicher Stand nur ohne private Vermessungsdaten
 - **Tech-Stack:** Vite 8, TypeScript strict, Leaflet, proj4, marked, Vitest
 - **README:** `README.md` (English), `README.de.md` (Deutsch)
@@ -116,7 +116,12 @@ Merksätze:
   und Kontakt verwenden ein natives Dialogfenster und lokale `mailto:`-Links
   ohne automatische Datei-/Koordinatenanhänge. Externe Apps, Impressum und Ko-fi
   sind reine Links ohne Embed, Prefetch oder zusätzliche Laufzeitbibliothek.
-- Hell-/Dunkelwahl wird ausschließlich lokal unter `gic.theme` gespeichert.
+- Die Interface-Wahl automatisch/hell/dunkel wird ausschließlich lokal unter
+  `gic.theme` gespeichert (Default `auto` folgt `prefers-color-scheme`). Ein
+  Inline-Skript im `<head>` jeder Seite setzt `data-theme` auf das effektive Theme
+  vor dem ersten Zeichnen. Neutrales Grau/Blau-Farbschema der öffentlichen Apps;
+  `--green` ist der historische Name der blauen Akzentfarbe, semantisches Grün
+  über `--ok`. Kein grünliches Schema wieder einführen.
   Neue Oberflächen müssen in beiden Themes auf Kontrast und Lesbarkeit geprüft
   werden; Hauptansicht und Hilfeseite verwenden dieselbe Theme-Schicht.
 - Die Störbereichsvorschau ist ein standardmäßig geschlossenes `details`-
@@ -220,6 +225,7 @@ Der Entwicklungsserver läuft standardmäßig unter `http://127.0.0.1:5174`.
 
 | Version | Datum | Änderungen |
 |---|---|---|
+| `2611.3.25` | 2026-11-02 | Einheitliches Erscheinungsbild: neutrales Farbschema, Theme automatisch/hell/dunkel, zwei Fußleisten mit GeoTIFF Inspector, Version und Quellcode. |
 | `2610.3.24` | 2026-10-08 | DXF-Kommentare im Nur-Geometrie-Export akzeptieren. |
 | `2610.3.23` | 2026-10-08 | Ungefilterte CRS-Auswahl mit Namen und separater eigener Eingabe. |
 | `2610.3.22` | 2026-10-04 | Footer-Buttons wie MeasureMap, beidseitiger Link-Abgleich und englisches Imprint. |
@@ -358,3 +364,12 @@ Die CRS-Auswahl zeigt alle fünf integrierten Karten-Koordinatensysteme mit EPSG
 Nur-Geometrie-Export akzeptiert gültige DXF-Kommentare vor der ersten SECTION, etwa aus LibreDWG. Diese Kommentare sperrten den Export bisher fälschlich. Geometrie und Z-Werte bleiben erhalten.
 
 Exportfehler stehen zusätzlich direkt über dem Exportbutton. Nicht unterstützte Objekte wie Layout-VIEWPORTs sperren den kompakten Export weiterhin; „Nur Geometrie“ ausschalten, um sie im normalen Export zu erhalten.
+
+## 2611.3.25 · 2026-11-02 · Einheitliches Erscheinungsbild
+
+Gemeinsames Design der öffentlichen Apps von Michael Radeck (Vorbild
+`mradeck/geotiff-inspector`): neutrale Farb-Tokens, dreistufiger Theme-Knopf
+mit Inline-SVG (Halbkreis/Sonne/Mond), Sprachknopf mit SVG-Fahne und Kürzel,
+Fußleiste 1 „Weitere Apps“ (eigene App nicht verlinken, GeoTIFF Inspector
+ergänzt), Fußleiste 2 mit Autor · © Jahr · Version, Datenquellen, Quellcode,
+Hilfe/Bugreport/Kontakt, Lizenzen, Impressum, Ko-fi. Die Statuszeile bleibt.

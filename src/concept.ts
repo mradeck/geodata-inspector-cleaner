@@ -3,6 +3,7 @@ import germanConcept from "../docs/PRODUCT-DESIGN.md?raw";
 import englishConcept from "../docs/PRODUCT-DESIGN.en.md?raw";
 import "./styles.css";
 import "./concept.css";
+import { initTheme } from "./theme";
 import {
   getLanguage,
   initI18n,
@@ -18,6 +19,7 @@ const languageToggle = byId<HTMLButtonElement>("btn-toggle-language");
 const languageFlag = byId<HTMLImageElement>("language-flag");
 const languageCode = byId<HTMLElement>("language-code");
 
+initTheme();
 initI18n();
 const requestedLanguage = new URLSearchParams(window.location.search).get("lang");
 if (requestedLanguage === "de" || requestedLanguage === "en") {

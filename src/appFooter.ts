@@ -15,6 +15,7 @@ export function initAppFooter(openCopyright: () => void): void {
   dialog.addEventListener("close", () => opener.focus());
   element<HTMLButtonElement>("footer-licenses").addEventListener("click", openCopyright);
   element<HTMLElement>("footer-year").textContent = String(new Date().getFullYear());
+  element<HTMLElement>("footer-version").textContent = APP_VERSION;
 
   const sync = () => {
     element<HTMLAnchorElement>("footer-help").href = `./help.html?lang=${getLanguage()}`;

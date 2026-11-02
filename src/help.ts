@@ -11,7 +11,7 @@ import {
   t,
   type Lang,
 } from "./i18n";
-import { getTheme, initTheme, onThemeChange, toggleTheme } from "./theme";
+import { cycleThemeMode, getThemeMode, initTheme, onThemeChange, THEME_ICONS } from "./theme";
 
 const content = byId<HTMLElement>("help-content");
 const languageToggle = byId<HTMLButtonElement>("btn-toggle-language");
@@ -31,7 +31,7 @@ renderHelp();
 languageToggle.addEventListener("click", () => {
   setLanguage(getLanguage() === "de" ? "en" : "de");
 });
-themeToggle.addEventListener("click", () => toggleTheme());
+themeToggle.addEventListener("click", () => cycleThemeMode());
 
 onLanguageChange(() => renderHelp());
 onThemeChange(() => syncThemeControl());
@@ -52,9 +52,9 @@ function syncLanguageControl(language: Lang): void {
 }
 
 function syncThemeControl(): void {
-  const isDark = getTheme() === "dark";
-  themeIcon.textContent = isDark ? "☀" : "☾";
-  const label = t(isDark ? "theme.toggle.toLight" : "theme.toggle.toDark");
+  const mode = getThemeMode();
+  themeIcon.innerHTML = THEME_ICONS[mode];
+  const label = t(`theme.mode.${mode}`);
   themeToggle.title = label;
   themeToggle.setAttribute("aria-label", label);
 }

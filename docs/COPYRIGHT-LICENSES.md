@@ -1,8 +1,8 @@
 # Copyright- und Lizenzübersicht
 
-**Release:** 2610.3.24
+**Release:** 2611.3.25
 
-**Prüfstand:** 8. Oktober 2026
+**Prüfstand:** 2. November 2026
 
 **Repository:** öffentlich; bereinigtes, unabhängiges Repository unter MIT
 
@@ -152,3 +152,5 @@ Nur Footer-CSS und externe Links ergänzt; keine neue Bibliothek. ALKIS/LDBV und
 2610.3.23: CRS-Auswahl mit nativen HTML-Elementen; Abhängigkeiten, Lockfile-Lizenzen und externe Dienste unverändert.
 
 2610.3.24: Eigene Parserkorrektur für DXF-Kommentare; keine neue Bibliothek, keine Einbindung von LibreDWG, unveränderte Lockfile-Lizenzen und Dienste.
+
+2611.3.25: Einheitliches Erscheinungsbild (neutrales Farbschema, dreistufiger Theme-Knopf mit Inline-SVG-Symbolen, zwei Fußleisten). Keine neue Bibliothek, keine neuen externen Dienste; Lockfile-Lizenzen unverändert. Die Fußleiste verlinkt zusätzlich GeoTIFF Inspector und den Quellcode auf GitHub (reine Links, kein Embed oder Prefetch).

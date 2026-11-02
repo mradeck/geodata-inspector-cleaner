@@ -42,7 +42,7 @@ import type { Bounds2D, GeoDataset, InspectionFinding, InspectionReport } from "
 import { renderPreview } from "./render/renderPreview";
 import { demoDataset } from "./sample/demoDataset";
 import { OsmClusterMap } from "./map/osmClusterMap";
-import { getTheme, initTheme, onThemeChange, toggleTheme } from "./theme";
+import { cycleThemeMode, getThemeMode, initTheme, onThemeChange, THEME_ICONS } from "./theme";
 import { APP_VERSION } from "./version";
 import { initAppFooter } from "./appFooter";
 
@@ -159,8 +159,8 @@ elements.languageToggle.addEventListener("click", () => {
 });
 
 elements.themeToggle.addEventListener("click", () => {
-  const theme = toggleTheme();
-  setStatus(t(theme === "light" ? "status.themeLight" : "status.themeDark"), "ok");
+  const mode = cycleThemeMode();
+  setStatus(t(mode === "auto" ? "status.themeAuto" : mode === "light" ? "status.themeLight" : "status.themeDark"), "ok");
 });
 
 elements.disturbancePreviewCard.addEventListener("toggle", () => {
@@ -1238,9 +1238,9 @@ function syncAppIdentity(): void {
 }
 
 function syncThemeControl(): void {
-  const isDark = getTheme() === "dark";
-  elements.themeIcon.textContent = isDark ? "☀" : "☾";
-  const label = t(isDark ? "theme.toggle.toLight" : "theme.toggle.toDark");
+  const mode = getThemeMode();
+  elements.themeIcon.innerHTML = THEME_ICONS[mode];
+  const label = t(`theme.mode.${mode}`);
   elements.themeToggle.title = label;
   elements.themeToggle.setAttribute("aria-label", label);
 }

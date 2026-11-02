@@ -24,9 +24,13 @@ describe("App-Fußzeile", () => {
       "https://mradeck.github.io/gps-utm-coordinate-converter/",
       "https://www.multikopterschule.de/Kontakt-Impressum/IMPRESSUM/",
       "https://ko-fi.com/mradeck/tip",
+      "https://mradeck.github.io/geotiff-inspector/",
+      "https://github.com/mradeck/geodata-inspector-cleaner",
     ]) expect(footer).toContain(`href="${url}" target="_blank" rel="noopener noreferrer"`);
     expect(footer).not.toMatch(/<iframe|<script/);
     expect(footer).not.toContain('href="https://geodata-inspector-cleaner.netlify.app/"');
+    expect(footer).toContain('id="footer-version"');
+    expect(footerCode).toContain('"footer-version").textContent = APP_VERSION');
   });
 
   it("verwendet einen nativen Kontakt-Dialog und die bestehende Lizenzansicht", () => {

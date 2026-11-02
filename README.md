@@ -6,7 +6,7 @@ A local-first single-page app for inspecting and cleaning spatial outliers in DX
 
 [Open the app](https://geodata-inspector-cleaner.netlify.app/)
 
-**Version: 2610.3.24.** The source code is licensed under MIT. Real survey files, coordinate-based private regression fixtures and project screenshots are excluded from the repository and its published history.
+**Version: 2611.3.25.** The source code is licensed under MIT. Real survey files, coordinate-based private regression fixtures and project screenshots are excluded from the repository and its published history.
 
 The language button uses bundled SVG flags for consistent display on Windows, macOS and Linux.
 
@@ -24,7 +24,7 @@ The language button uses bundled SVG flags for consistent display on Windows, ma
 - Compact DXF output preserving native geometry and required resources, plus GeoJSON-to-DXF conversion.
 - AutoCAD 2000 (AC1015) and AutoCAD 2018 (AC1032) output profiles where supported.
 - Reimport checks for exported feature counts, clusters and bounds.
-- German/English controls, persistent light/dark themes and integrated help.
+- German/English language button with vector flags, an interface button that cycles automatic / light / dark (automatic follows the system setting) and integrated help.
 
 ## Workflow
 
@@ -153,3 +153,7 @@ All five built-in map coordinate systems are now available in an unfiltered CRS 
 Geometry-only export now accepts valid DXF comments before the first SECTION, including files written by LibreDWG. Previously these comments incorrectly blocked export. Geometry and Z values are preserved.
 
 Export preparation errors are also shown directly above the export button. Unsupported objects such as layout VIEWPORTs continue to block compact export; turn off geometry-only mode to retain them in the normal export.
+
+## 2611.3.25 · 2026-11-02 · Shared design
+
+The app now uses the shared look of Michael Radeck's public apps: a neutral grey/blue colour scheme in light and dark mode (replacing the earlier greenish scheme; green, amber and red remain status colours), an interface button that cycles automatic → light → dark (automatic follows the operating system, the choice is stored locally and applied before the first paint), and two footer bars. The first lists the related apps, now including GeoTIFF Inspector; the second shows author, year and version plus data sources, source code, help/bug report/contact, licenses, imprint and Ko-fi. Analysis, cleaning and export are unchanged.

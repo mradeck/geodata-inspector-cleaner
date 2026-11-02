@@ -894,3 +894,11 @@ Nur-Geometrie scheiterte bereits beim ersten Kommentar (999) vor SECTION. Kommen
 Exportfehler stehen zusätzlich direkt über dem Exportbutton. Nicht unterstützte Objekte wie Layout-VIEWPORTs sperren den kompakten Export weiterhin; „Nur Geometrie“ ausschalten, um sie im normalen Export zu erhalten.
 
 Verifiziert: 181 Tests bestanden, 10 optionale Tests übersprungen; Build erfolgreich. Private HBF-Datei: normaler Export mit 9613 Entitäten möglich, kompakter Export nach Kommentarfix wegen zweier Layout-VIEWPORTs gesperrt. Browserprüfung mit synthetischer VIEWPORT-Datei: Sperrgrund am Button sichtbar, nach Ausschalten wieder exportierbar. Audit weiterhin 5 Entwicklungsbefunde; Abhängigkeiten unverändert, Repository öffentlich.
+
+## 2611.3.25 · 2026-11-02 · Einheitliches Erscheinungsbild
+
+Angleichung an das gemeinsame Design der öffentlichen Apps (Vorbild GeoTIFF Inspector). Die Variablennamen blieben, um die vielen Selektoren nicht anzufassen: `--green` ist jetzt der historische Name der blauen Akzentfarbe (`var(--accent)`), semantisches Grün läuft über das neue `--ok`. Fest verdrahtete Grüntöne (`rgba(77,226,177,…)`) wurden per Skript durch `color-mix(in srgb, var(--green) x%, transparent)` ersetzt, damit sie in beiden Themes mitwandern. Canvas-Vorschau: neutraler Hintergrund, Statusfarben an `--ok/--err/--warn` des Vorbilds angeglichen.
+
+Theme dreistufig (`gic.theme`: auto/light/dark, Default auto). Statt den Media-Query-Zweig für jede `[data-theme="light"]`-Regel zu duplizieren, löst ein Inline-Skript im `<head>` „auto“ vor dem ersten Zeichnen auf und setzt `data-theme` auf das effektive Theme (zusätzlich `data-theme-mode`); `theme.ts` hört auf Systemwechsel. Merksatz: Ein JS-aufgelöstes effektives Theme hält bestehende Theme-Selektoren gültig; der Pre-Paint-Code muss klassisches (nicht Modul-)Skript sein.
+
+Verifiziert: siehe Bericht dieser Runde (Tests, Build, Browser-Screenshots hell/dunkel, DE/EN).

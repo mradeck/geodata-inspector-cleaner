@@ -13,7 +13,7 @@ Der Sprachbutton verwendet mitgelieferte SVG-Flaggen für eine einheitliche Anze
 
 ## Projektstatus
 
-**Version 2610.3.24 – gezielte Reparatur von Einpunkt-Polylinien.** Der
+**Version 2611.3.25 – einheitliches Erscheinungsbild.** Der
 aktuelle Stand demonstriert bereits:
 
 - lokalen Dateiimport für ASCII-DXF und GeoJSON,
@@ -272,7 +272,7 @@ npm run build
 
 ## Versionierung
 
-Aktuell **2610.3.24**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
+Aktuell **2611.3.25**, öffentlicher MIT-Stand mit bereinigter Historie. Das Schema
 lautet `JJMM.R.P`: Jahr/Monat, Release-Linie, Subversion. Derselbe Wert steht in
 `package.json`, `package-lock.json`, `displayVersion`, App und Prüfberichten.
 Bei neuen Runden wird auch der aktuelle Monat geprüft. Frühere Einträge mit
@@ -308,6 +308,7 @@ vorgeladen oder für Offline-Nutzung gesammelt.
 
 | Version | Datum | Inhalt |
 |---|---|---|
+| `2611.3.25` | 2026-11-02 | Einheitliches Erscheinungsbild: neutrales Farbschema, Theme-Knopf automatisch/hell/dunkel, zwei Fußleisten mit GeoTIFF Inspector, Version und Quellcode. |
 | `2610.3.24` | 2026-10-08 | DXF-Kommentare im Nur-Geometrie-Export akzeptieren. |
 | `2610.3.23` | 2026-10-08 | Ungefilterte CRS-Auswahl mit Namen und separater eigener Eingabe. |
 | `2610.3.22` | 2026-10-04 | Footer-Buttons wie MeasureMap, beidseitiger Link-Abgleich und englisches Imprint. |
@@ -468,3 +469,14 @@ Die CRS-Auswahl zeigt alle fünf integrierten Karten-Koordinatensysteme mit EPSG
 Nur-Geometrie-Export akzeptiert gültige DXF-Kommentare vor der ersten SECTION, etwa aus LibreDWG. Diese Kommentare sperrten den Export bisher fälschlich. Geometrie und Z-Werte bleiben erhalten.
 
 Exportfehler stehen zusätzlich direkt über dem Exportbutton. Nicht unterstützte Objekte wie Layout-VIEWPORTs sperren den kompakten Export weiterhin; „Nur Geometrie“ ausschalten, um sie im normalen Export zu erhalten.
+
+## 2611.3.25 · 2026-11-02 · Einheitliches Erscheinungsbild
+
+Die App nutzt jetzt das gemeinsame Erscheinungsbild der öffentlichen Apps von Michael Radeck:
+
+- **Farbschema:** neutrales Grau/Blau im hellen und dunklen Interface. Das frühere grünliche Schema ist ersetzt; Grün, Gelb und Rot bleiben als Statusfarben (behalten, prüfen, entfernen) erhalten.
+- **Interface-Knopf** oben rechts: schaltet der Reihe nach *automatisch* (Halbkreis, folgt der Systemeinstellung), *hell* (Sonne) und *dunkel* (Mond). Die Wahl wird lokal im Browser gespeichert und schon vor dem ersten Zeichnen angewendet.
+- **Sprachknopf:** Fahne und Kürzel DE/EN; beim ersten Aufruf gilt die Browsersprache.
+- **Zwei Fußleisten:** „Weitere Apps“ (jetzt auch GeoTIFF Inspector) sowie Autor, Jahr und Version mit Datenquellen, Quellcode, Hilfe / Bugreport / Kontakt, Lizenzen / Copyright, Impressum und Ko-fi.
+
+Analyse, Bereinigung und Export sind unverändert.
